@@ -1,0 +1,261 @@
+{
+  "revision": "새 연구 3차",
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 135,
+      "sha256": "1b5742b635af479db5a6ce6ff379766a3242bff4366b03f197e8b39ff499863c"
+    },
+    {
+      "path": "docs/논문_가설과_수식.md",
+      "bytes": 12129,
+      "sha256": "4fe7b2f1637fe9ced695340a41d4caa203ddb1f632353c756871bd351ae9a971"
+    },
+    {
+      "path": "docs/연구설계.md",
+      "bytes": 5467,
+      "sha256": "c0a8dccee7457f3e0d9fce04efe37c93d853520fb3e96c9c9b1c8f46ca4832f3"
+    },
+    {
+      "path": "docs/읽기안내/레벨1.md",
+      "bytes": 1539,
+      "sha256": "d38d483acfccecc8bf9ed214df59843d49d97b9603868b98724aa3153d06173a"
+    },
+    {
+      "path": "docs/읽기안내/레벨2.md",
+      "bytes": 1407,
+      "sha256": "d9b43e3ab59c9ca8e45a20014fe384a39a8d3ade1bd78b64bc3bb50064e483a4"
+    },
+    {
+      "path": "docs/읽기안내/레벨3.md",
+      "bytes": 1696,
+      "sha256": "c9217488b647584848021882c7e78e61ccd88121a427d5c28b805adf855ab6d7"
+    },
+    {
+      "path": "docs/읽기안내/레벨4.md",
+      "bytes": 1625,
+      "sha256": "e6a73f1874bdfefba9a082dfe5a372fad75f410cee717524a7ab8bcb64d5ed20"
+    },
+    {
+      "path": "docs/읽기안내/레벨5.md",
+      "bytes": 1885,
+      "sha256": "31264d2bca0a009cf5fe0a283b6d7af2cc8582e260939cccbbda18b66434cab0"
+    },
+    {
+      "path": "docs/전체차이.diff",
+      "bytes": 364673,
+      "sha256": "b9c92f98802729710dd583f7b9e8c8dbe85b50f529c5207498ce2dc7cb84082d"
+    },
+    {
+      "path": "docs/차수목록.md",
+      "bytes": 712,
+      "sha256": "efe71b8b46c2b58c75ae0f76f1324755b1040b72cf7740613f89314512b1a308"
+    },
+    {
+      "path": "docs/차수비교.md",
+      "bytes": 1318,
+      "sha256": "04c5425d08c1dd24145f8e7ff6f7368bf56ac908830dee9a36ae7e26eddc4c9a"
+    },
+    {
+      "path": "docs/차수설명.md",
+      "bytes": 6206,
+      "sha256": "6a859107eecb8203e359dcdf80ddf9939634f05a1bf1fd0ff01030c7d5c30be4"
+    },
+    {
+      "path": "docs/참고문헌.bib",
+      "bytes": 1434,
+      "sha256": "a3134cfa27471bdc840c52b0d5c505e8158ffc20f47ca1fc7039d5185164e04e"
+    },
+    {
+      "path": "history/1차/docs/구현계획.md",
+      "bytes": 1281,
+      "sha256": "de2e89c850feb811419418d55038bfece7fdc5993006ad0baeec67664a27e7ef"
+    },
+    {
+      "path": "history/1차/docs/연구설계.md",
+      "bytes": 5072,
+      "sha256": "86cf8d6b28ac4263efc1bc160c33ac8e91386f858e97b2a643a7b605db07d0b1"
+    },
+    {
+      "path": "history/1차/rust_money/Cargo.lock",
+      "bytes": 152,
+      "sha256": "2e7f3a833da840ed9ca6f61f82bd853d3acd971c609b603903f53125ea1d665a"
+    },
+    {
+      "path": "history/1차/rust_money/Cargo.toml",
+      "bytes": 79,
+      "sha256": "97e0eb7ac769aef5f79cdf5337e46a05d8291b08404f6df53b0350c2b1ae472a"
+    },
+    {
+      "path": "history/1차/rust_money/src/main.rs",
+      "bytes": 2540,
+      "sha256": "f8cd29fe9679d0cd98253ee95584774d35f4bfc705f959ca5aa5d4084c3f663c"
+    },
+    {
+      "path": "history/1차/scripts/build_rust.ps1",
+      "bytes": 391,
+      "sha256": "6251e7019c123b7387cf6c64377c6047b68f2313c48b3f36663c1472acee5b34"
+    },
+    {
+      "path": "history/1차/차수설명.md",
+      "bytes": 6754,
+      "sha256": "bedf94a4feb3ee815963f7a0eadaa51879c1effbaea01dd14457fc3db6713482"
+    },
+    {
+      "path": "README.md",
+      "bytes": 6778,
+      "sha256": "2e941c9e182698bb5f01cc6984f4bde13904b23428ff696d8dce7ea80d99fb8b"
+    },
+    {
+      "path": "rentlab/__init__.py",
+      "bytes": 48,
+      "sha256": "006383028a4f9dccb86b45dda19253d78ec205b1b0bcd3214c5ece2a593bc605"
+    },
+    {
+      "path": "rentlab/__main__.py",
+      "bytes": 82,
+      "sha256": "f2365dbefed48b78354d2610cc1debc9c0e0d097a831e175286c3889fba2184e"
+    },
+    {
+      "path": "rentlab/acquire.py",
+      "bytes": 28958,
+      "sha256": "fe94a1b30a20ca3f969bfb30762021d0e5483827913031628212ac84bb627ad6"
+    },
+    {
+      "path": "rentlab/engine.py",
+      "bytes": 35356,
+      "sha256": "5326ba7516801e09520aab9db976c0f71a185b1c84ef49cc880143e8585a4dd3"
+    },
+    {
+      "path": "rentlab/experiment_runner.py",
+      "bytes": 11928,
+      "sha256": "08d0f3d25d67e44141c586cc12b04cd251a0be33636ac53f34b928f3a18e25ad"
+    },
+    {
+      "path": "rentlab/research_metrics.py",
+      "bytes": 26899,
+      "sha256": "e3152613fcf376e45c6cbafefc750149d28c419e8d735d43adb70fffd2d1442f"
+    },
+    {
+      "path": "rentlab/runtime.py",
+      "bytes": 2689,
+      "sha256": "7d6f3d1511729546740c2e0dbacc8b44d8859ea03e815e91c0b1268816e5ba52"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 66,
+      "sha256": "36f228243262274d2ac1aca612d0c0172953601cac5739c5736902d9e824bf4c"
+    },
+    {
+      "path": "requirements_acquire.txt",
+      "bytes": 39,
+      "sha256": "2ff77848c92222f90316ee0e2204cbe5db734a06209056e24a4fc11e4713d347"
+    },
+    {
+      "path": "run_dashboard.py",
+      "bytes": 12551,
+      "sha256": "8c1700001925c00f48acc1580d9bdd25c970d5df968e296363e5fbd617ff473f"
+    },
+    {
+      "path": "rust_money/Cargo.lock",
+      "bytes": 152,
+      "sha256": "2e7f3a833da840ed9ca6f61f82bd853d3acd971c609b603903f53125ea1d665a"
+    },
+    {
+      "path": "rust_money/Cargo.toml",
+      "bytes": 79,
+      "sha256": "97e0eb7ac769aef5f79cdf5337e46a05d8291b08404f6df53b0350c2b1ae472a"
+    },
+    {
+      "path": "rust_money/src/main.rs",
+      "bytes": 2540,
+      "sha256": "f8cd29fe9679d0cd98253ee95584774d35f4bfc705f959ca5aa5d4084c3f663c"
+    },
+    {
+      "path": "scripts/build_rust.ps1",
+      "bytes": 1724,
+      "sha256": "bad07cc0f51329a3e8c0e86fb8975acbf6cbe302a53e95d7e2a5fc98f00caeec"
+    },
+    {
+      "path": "tests/test_dashboard_v3.py",
+      "bytes": 6209,
+      "sha256": "201c76cbdba19e6f46ceb9caff573b47c9258726e5ec4b3c72d620cb7f7c8688"
+    },
+    {
+      "path": "tests/test_engine.py",
+      "bytes": 9766,
+      "sha256": "5dc3b03c661e951d792346a506186d467d315285bc162e7b616e1ca6774dfc7e"
+    },
+    {
+      "path": "tests/test_engine_v3.py",
+      "bytes": 9831,
+      "sha256": "93d1dc550e4d6244f4973c4a714cf618d61a6a74fbc33990e850ca06d0005f36"
+    },
+    {
+      "path": "tests/test_research_metrics.py",
+      "bytes": 5862,
+      "sha256": "b38aac2a9247d872d9d5daa5175fc933db4431f6b601e675bb355bcdd6b6e64f"
+    },
+    {
+      "path": "tests/test_runtime_v3.py",
+      "bytes": 17812,
+      "sha256": "7849a6f8ccb1cfff6a51dee7e9c8c9ccd6dc702f5be7d6f59cb1a49a8ef4676a"
+    },
+    {
+      "path": "web/app.js",
+      "bytes": 19446,
+      "sha256": "f91dcd27c38ee99cf74e03b7f99377ace69e287aa5008f25c772c1b1db12cf00"
+    },
+    {
+      "path": "web/formulas.css",
+      "bytes": 741,
+      "sha256": "63f5f37cdab28bf548148b39a84886e4566747b349e500171490b3b2937501b5"
+    },
+    {
+      "path": "web/formulas.html",
+      "bytes": 4520,
+      "sha256": "f8dc60a66188d4852ead4e5815cdc8f8d1fb87b319ff2900d6938783efb234fd"
+    },
+    {
+      "path": "web/index.html",
+      "bytes": 8131,
+      "sha256": "96548258fde7e547f1adfac7ee74ac56d9f524130a1aa6f2a8c36a740c9a8fef"
+    },
+    {
+      "path": "web/NanumGothic-Bold.ttf",
+      "bytes": 2073868,
+      "sha256": "f96298f9fb18e364d2370f4c3ce948ac67a2b61af992d7234bc15c42b033c674"
+    },
+    {
+      "path": "web/OFL.txt",
+      "bytes": 4534,
+      "sha256": "eeacf16032901d0ed0456876ec77b8f0fda6b3fecec7d972f8543eb602e6c30f"
+    },
+    {
+      "path": "web/style.css",
+      "bytes": 9743,
+      "sha256": "07f565775f17164d20d4a23547cb87ac82cb926804c2df45af6d1403bce5c8c8"
+    },
+    {
+      "path": "대시보드_시작.ps1",
+      "bytes": 581,
+      "sha256": "0f2e83969310b585682965b495b00830d90a15fe1033b47129d994f9ff1f2f30"
+    },
+    {
+      "path": "변경기록.md",
+      "bytes": 1103,
+      "sha256": "4f560d90c9c0d6fdc04b000ea3475a990e3dc8fef8e0e71c330f39abf7b7d206"
+    },
+    {
+      "path": "사용안내.md",
+      "bytes": 3805,
+      "sha256": "27a33f6fc3ed7a3d8577aea666a316eb5c20e298fbc1993e6fa9cae56707e529"
+    },
+    {
+      "path": "연구_실행.ps1",
+      "bytes": 608,
+      "sha256": "2b07511bd47b19881683fb9d046919c41a91b7676c79439625bdc19ec8973b62"
+    }
+  ],
+  "note": "공개파일.json 자체는 순환 해시를 피하기 위해 목록에서 제외. 원자료·검증근거·빌드 산출물 비공개."
+}
