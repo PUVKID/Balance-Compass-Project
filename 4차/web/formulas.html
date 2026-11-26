@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Balance Compass · 가설과 수식</title>
+<link rel="stylesheet" href="/formulas.css">
+<main><a href="/">← 대시보드</a><h1>학습 결과에 적용할 8개 가설</h1><p class="notice">실제 실험은 사용자 요청으로 중지되어 있습니다. 이 페이지는 미리 고정한 계산 방법입니다. 실측 학습 성능·가설 지지 결과는 아직 없습니다.</p>
+<p>학습 2022–2023 → 검증 2024 상반기 → 보정 2024 하반기 → 테스트 2025. 전세·월세를 별도 평가합니다. H2는 월세에만 적용하여 총 15개 평가입니다. A는 검증 선택 AI, B는 검증 선택 중앙값 기준, S는 전체 후보의 검증 선택 모델입니다.</p>
+<table><thead><tr><th>가설</th><th>자동 계산하는 효과량</th></tr></thead><tbody>
+<tr><td>H1 · 미래 오차 개선</td><td>MAE(B) − MAE(A) &gt; 0</td></tr>
+<tr><td>H2 · 보증금 정보 기여</td><td>MAE(보증금 제외 AI) − MAE(포함 AI) &gt; 0<br><small>월세만. 특징 집합별 검증 선택 비교이며 인과효과가 아닙니다.</small></td></tr>
+<tr><td>H3 · 90% 포함률 동등성</td><td>포함률 − 0.90의 신뢰구간 전체가 (−0.02,+0.02) 안</td></tr>
+<tr><td>H4 · 지역 포함률 편차</td><td>지역 동일 가중 mean |포함률 − 0.90| − 0.02 &gt; 0</td></tr>
+<tr><td>H5 · 미학습 서울 이동</td><td>같은 서울 계약의 MAE(서울 제외 학습) − MAE(일반 학습) &gt; 0</td></tr>
+<tr><td>H6 · 가격대 오차 차이</td><td>[상위 가격대 MAE(S) − 하위 가격대 MAE(S)] / 학습 목표 중앙값 &gt; 0<br><small>학습 20·80 분위 경계로 테스트 실제 가격을 분류하는 사후 진단입니다.</small></td></tr>
+<tr><td>H7 · 지역 보정 개선</td><td>지역 편차(전체 보정) − 지역 편차(지역 보정) &gt; 0</td></tr>
+<tr><td>H8 · 하반기 포함률 감소</td><td>같은 적격 지역의 mean(상반기 포함률 − 하반기 포함률) &gt; 0</td></tr>
+</tbody></table>
+<h2>구간과 점수</h2><p>보정 절대 잔차 m개의 ⌈(m+1)×0.90⌉번째 값을 q로 정하고 예측값 ±q를 사용합니다. 표본이 부족하면 미산출입니다. 시간·지역 이동에서 90%를 보장하지 않습니다.</p>
+<div class="formula">IS = (U−L) + 20(L−y)·1{y&lt;L} + 20(y−U)·1{y&gt;U}</div><p>구간 폭과 미포함 벌점을 함께 계산합니다. MAE·평균 폭·포함률과 함께 보고합니다.</p>
+<h2>불확실성과 미산출</h2><p>단지 군집 20개 이상에서 9,999회 재표집합니다. 지역 지표는 지역 안에서 단지를 재표집합니다. 15개 평가에 Bonferroni 원칙을 적용한 근사 percentile 구간입니다. 정확한 가족 95% 보장은 아닙니다. 지역은 30행·5단지 이상, H6는 양 가격대 각각 20단지 이상이 필요합니다. 부족한 입력은 0으로 만들지 않습니다.</p><p>지역 보정은 해당 지역 보정 자료 100행 이상에서 적용하며 나머지는 전체 반경으로 대체합니다. 적격 평가 지역에 실제 적용이 없으면 H7은 미산출입니다. 합성 검사는 논문 가설의 지지 근거로 쓰지 않습니다.</p>
+<h2>연구용 제안 요약지표</h2><div class="formula">BC_loss = 0.50 MAE/s + 0.25 평균 IS/s + 0.25 지역 편차/0.10</div><p>s는 학습 목표 중앙값입니다. 기존 점수들을 결합한 검증 전 제안이며 proper score·검증된 신규 통계량이라는 주장을 하지 않습니다. 모델 선택·가설 판정에 사용하지 않고 가중치 민감도도 함께 저장합니다.</p>
+<h2>사용한 문헌</h2><ol><li><a href="https://doi.org/10.1080/01621459.2017.1307116">Lei 등(2018)</a> · split conformal 순위와 가정</li><li><a href="https://doi.org/10.1198/016214506000001437">Gneiting·Raftery(2007)</a> · interval score</li><li><a href="https://proceedings.mlr.press/v25/vovk12.html">Vovk(2012)</a> · 그룹 조건부 보정의 개념·조건</li><li><a href="https://doi.org/10.1162/rest.90.3.414">Cameron 등(2008)</a> · 군집 의존성 고려 참고. 구현은 논문의 bootstrap-t와 다릅니다.</li></ol>
+<p>상세 명세·판정 규칙·인용 BibTeX는 프로젝트의 docs/논문_가설과_수식.md, docs/참고문헌.bib에 있습니다. 실제 모델 학습이 완료되면 hypothesis_results.json·CSV를 자동 생성합니다.</p></main></html>
