@@ -27,3 +27,6 @@ Cluster resampling does not resolve every common spatial/temporal shock or model
 | 1 | [Round 1](../../../2차/history/1차/차수설명.md#user-content-reading-level-5) |
 | 2 | [Round 2](../../../2차/docs/차수설명.md#user-content-reading-level-5) |
 | 3 | [Round 3](../../../3차/docs/차수설명.md#user-content-reading-level-5) |
+
+
+Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. The English guide covers revisions 1–4; revisions 5–6 currently have Korean documentation only. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../../../6차/docs/차수설명.md).

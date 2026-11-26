@@ -37,3 +37,6 @@ Balance Compass studies **apartment lease deposits, monthly rent, and prediction
 Historical documents remain in Korean and are explicitly labeled. The current round and all five English reading guides are available in English.
 
 [Current source](../4차/) · [Execution specification · Korean](../4차/docs/4차_실행안내.md) · [Formulas and interpretation · Korean](../4차/docs/확장분석_수식과해석.md)
+
+
+Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. The English guide covers revisions 1–4; revisions 5–6 currently have Korean documentation only. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../6차/docs/차수설명.md).
