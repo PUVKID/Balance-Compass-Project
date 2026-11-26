@@ -1,7 +1,7 @@
 # LEVEL 3 - Practitioner
 
 
-**Latest: Round 8.** [Read the current round at this level](../round8.md#user-content-reading-level-3). The Round 4 foundation below is retained for context.
+**Latest: Round 9.** [Read the current round at this level](../round9.md#user-content-reading-level-3). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨3.md)
 
@@ -61,10 +61,27 @@ Revision 7 adds strict CSV/feature input validation, frozen-condition evidence a
 
 Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics and partial historical-rate evidence. Round 8 is available in Korean and English. Real training is stopped; complete research approval and measured outcomes are unavailable. [Revision 8 · Korean](../../../8차/docs/차수설명.md#user-content-reading-level-3).
 
-## Latest · Round 8
+## Round 8 record
 
 | Focus | Current checks | Boundary |
 |---|---|---|
 | Input lineage and completion | Full 48-month audit, selected manifest and post-analysis hash checks | Data integrity is not independent location truth, historical-vintage approval or measured performance |
 
-[Round 8 at this level](../round8.md#user-content-reading-level-3) · [Current source](../../../8차/)
+[Round 8 at this level](../round8.md#user-content-reading-level-3) · [Current source](../../../9차/)
+
+
+Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../../../9차/docs/차수설명.md#user-content-reading-level-3).
+
+
+## Latest Round 9
+
+Use Python 3.12, the fixed dependencies and the Rust money parser. Run python -B -X utf8 -m unittest discover -s tests -v from the revision folder. The full suite contains 171 controlled tests. A passing suite is not measured research performance and does not authorize restarting stopped training.
+
+| Step | Inspect | Failure handling |
+|---|---|---|
+| Controlled suite | unittest output: 171 tests | Do not report completion on failure |
+| Before combined output | Both summary.json files | Reject missing, changed or differently typed data |
+| Calibration check | Calibration prediction CSVs | Reject changed row population or observations |
+| Traceability | 입력검증.json and 일반원본_summary.json | Preserve originals separately |
+
+[Round 9 at this level](../round9.md#user-content-reading-level-3) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-3)

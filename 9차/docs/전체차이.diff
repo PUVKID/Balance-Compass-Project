@@ -1,0 +1,1731 @@
+--- 8차/README.md
++++ 9차/README.md
+@@ -1,23 +1,14 @@
+-# 새 연구 8차
++# Balance Compass · 새 연구 9차
+ 
+-**한국어** · [English · LEVEL 1~5](../en/docs/round8.md)
++전국 아파트 임대료 예측과 예측구간 신뢰성 연구의 저장 결과 대조를 보강한다. 실제 학습은 중지 상태이며 실측 성능은 없다.
+ 
+-코드 검사와 연구 전체 완료를 분리하고 실제 원문·입력 전수 대조, 군집 의존 진단, 공식 과거 금리 문서를 확인했다.
++| 검증 경로 | 9차 처리 | 한계 |
++|---|---|---|
++| 양쪽 저장 summary | 반환값과 저장 JSON을 분석 폴더 생성 전에 대조 | 원자료의 과거 사실성을 인증하지 않음 |
++| 홀드아웃 보정 계약 | 일반 보정 자료에서 서울 제외 후 원행 집합·관측값 일치 확인 | 예측값은 모델별 차이를 허용 |
++| 회귀 검사 | 기존 168개에 3개 검사 추가, 총 171개 통과 | 제어 입력 검사이며 실제 학습 아님 |
++| 연구 상태 | 8가설·15개 평가·분할·수식·문턱 유지 | 실제 학습 중지·성능 미측정 |
+ 
+-[LEVEL 1](docs/차수설명.md#user-content-reading-level-1) · [LEVEL 2](docs/차수설명.md#user-content-reading-level-2) · [LEVEL 3](docs/차수설명.md#user-content-reading-level-3) · [LEVEL 4](docs/차수설명.md#user-content-reading-level-4) · [LEVEL 5](docs/차수설명.md#user-content-reading-level-5)
++[차수 상세](docs/차수설명.md) · [직전 비교](docs/차수비교.md) · [전체 차수](docs/차수목록.md) · [실행 안내](사용안내.md) · [수식·인용](docs/논문_가설과_수식.md)
+ 
+-| 검증 대상 | 직접 확인 | 해석 |
+-|---|---|---|
+-| 48개월 원문→확장 입력 | 4,845,086행·21항목/원행ID/군집ID 전수 일치 | 다운로드한 원문과 일치; 당시 신고판 입증 아님 |
+-| 기존 정제 | 2,857,449행; 비신규 1,964,806 / 건축연도 오류 22,831 제외 | 배제 기준 변경 없음 |
+-| 외부 표 | 14개 CSV·427,418행; 행수/해시/행 폭 일치 | 원응답 전체 재검사와 구별 |
+-| 현재 단지 연결 | 385,030/2,857,449 = 13.4746% | 위치 정답 정확도·전국 대표성 아님 |
+-| 군집 미상 | 적격 31행; 최종 테스트 월세1/전세3행 | 행 유지; 군집 추론의 부족 근거를 숨기지 않음 |
+-| 보정 집중 | 100행 이상이면서 5단지 미만: 월세 20 / 전세 29지역 | 100행은 100독립단지와 다름 |
+-| 금리 역사 문서 | 초기값 + 변경 12건의 공식 문서13건 대조 | 발표일/값 근거; 모든 통계의 과거판 승인 아님 |
+-| 실행 입력 선택 | --manifest 경로·SHA 추적/166개 검사 통과 | 실제 학습·원자료 변경 없음 |
+-| 실제 학습 | stopped_by_user 원문 동일 | 성능/가설지지 미산출 |
+-
+-[전수 검증과 남은 경계](docs/8차_전수검증.md) · [연구 조건](docs/연구조건_동결.json) · [출처 상태](docs/국내자료_출처목록.json) · [전체 차수](docs/차수목록.md)
+-
+-**후속 수리:** 통합 분석 반환 후 manifest·엔진의 SHA를 다시 확인해 변경된 실행이 완료 처리되지 않도록 했다. 위 166개는 최초 검사 기록이며, 새 회귀 2개를 포함한 현재 검사는 **168개 통과**다. [수리 범위와 근거](docs/8차_전수검증.md#user-content-analysis-completion-guard)
++[English · Round 9](../en/docs/round9.md)
+--- 8차/docs/9차_결과대조.md
++++ 9차/docs/9차_결과대조.md
+@@ -0,0 +1,32 @@
++# 9차 저장 결과 대조 검증
++
++8차 이후 저장 결과 통합 경로를 추가로 점검했다. 실제 학습이나 자료 취득은 실행하지 않았다. 8차 코드 완료 가드·두 회귀 검사와 한영 설명 보완(기준 9630bd0)을 보존한다.
++
++## 재현한 누락과 수리
++
++| 사례 | 수정 전 | 수정 후 |
++|---|---|---|
++| 일반 summary 누락·변경 | 반환값만으로 통합 진행 가능 | 분석 폴더 생성 전 ValueError |
++| 홀드아웃 summary 누락·변경 | 복사 후에 발견되어 분석 폴더가 남음 | 양쪽 모두 사전 대조 |
++| 홀드아웃 보정 원행 대체·누락 | 원행 중복·건수·시점이 맞으면 다른 계약도 통과 | 서울 제외 보정 행 집합과 정확히 대조 |
++| 보정 정답·지역·날짜·단지 변경 | 개별 파일 형식 검사만 통과하면 허용 | 같은 원행의 관측값 불일치 거부 |
++| 보정 행 순서·모델 예측 차이 | 허용 | 그대로 허용 |
++
++experiment_runner.combine_results는 양쪽 summary를 읽어 반환값과 JSON 자료형까지 대조한 뒤 같은 바이트를 별도 복사본으로 보관한다. 일반 원본은 일반원본_summary.json, 홀드아웃 원본은 홀드아웃/summary.json에 저장하고 입력검증.json에 해시를 남긴다. 일반 복사본은 분석 결과 summary.json과 다른 파일이다. 원본 결과는 덮어쓰지 않는다.
++
++research_metrics.write_research_results는 일반 보정 표에서 서울특별시 및 하위 지역을 제외하고 홀드아웃 보정 표와 source_row_id 집합을 대조한다. ID로 정렬한 뒤 정답(actual_won)은 유한 수치로, date·region·cluster_id는 문자열로 일치해야 한다. prediction_won은 학습 결과이므로 같은 값을 강제하지 않는다. 이는 기존 동일 입력 홀드아웃 조건의 구현 보강이며 새로운 과학 가설이나 배제 기준이 아니다.
++
++## 직접 검증
++
++새 검사 3개는 양쪽 summary 누락/변경/불리언 자료형 변경 6조건, 보정 원행 대체/누락 및 4개 관측 항목 변경 6조건과 정상 예측 변경/역순 입력을 검증한다. 수정 전 failures=7/errors=3을 관측했다. 누락 파일의 예외 종류와 늦은 실패 위치도 포함한다. 불리언 true와 숫자 1을 같게 보는 Python 사전 비교의 누락도 제어 입력에서 2개 오류로 재현해 JSON 자료형을 보존하는 비교로 수리했다. 최종 세 검사와 전체 171개 검사를 다시 실행했다. 기존 합성 제어 검사와 실제 적합을 구분한다. 이 차수는 484만 행 전수 감사를 다시 실행한 것으로 보고하지 않는다. 8차 전수 감사는 해당 시점 결과로 보존한다.
++
++| 검증 경로 | 9차 처리 | 한계 |
++|---|---|---|
++| 양쪽 저장 summary | 반환값과 저장 JSON을 분석 폴더 생성 전에 대조 | 원자료의 과거 사실성을 인증하지 않음 |
++| 홀드아웃 보정 계약 | 일반 보정 자료에서 서울 제외 후 원행 집합·관측값 일치 확인 | 예측값은 모델별 차이를 허용 |
++| 회귀 검사 | 기존 168개에 3개 검사 추가, 총 171개 통과 | 제어 입력 검사이며 실제 학습 아님 |
++| 연구 상태 | 8가설·15개 평가·분할·수식·문턱 유지 | 실제 학습 중지·성능 미측정 |
++
++## 여전히 미입증인 사항
++
++단지 미상 31행, 독립 위치 정답, 시설·인구·임대차 자료의 계약 당시 판본과 공개 시점, 실제 대규모 자원·성능은 이번 수리로 해결되지 않는다. 가짜 ID·사후 삭제·출처 없는 수치 보정은 수행하지 않았다. 학습 중지 상태를 유지하며 논문 가설 지지나 연구 전체 완료를 주장하지 않는다. [8차 자료 감사](8차_전수검증.md), [수식·인용](논문_가설과_수식.md), [직전 비교](차수비교.md).
+--- 8차/docs/읽기안내/레벨1.md
++++ 9차/docs/읽기안내/레벨1.md
+@@ -1,24 +1,13 @@
+ # LEVEL 1 - Beginner
+ 
+-**한국어** · [English · same level](../../../en/docs/round8.md#user-content-reading-level-1)
++실험 결과 상자의 이름표와 상자 안의 기록이 같은지 양쪽 모두 확인한다. 서로 다른 계약의 보정 자료가 섞이면 계산 전에 멈춘다. 검사 통과가 실제 예측 성능을 뜻하지는 않는다.
+ 
+-[LEVEL 1](레벨1.md) · [LEVEL 2](레벨2.md) · [LEVEL 3](레벨3.md) · [LEVEL 4](레벨4.md) · [LEVEL 5](레벨5.md)
++| 쉬운 상황 | 확인하는 것 | 결과 |
++|---|---|---|
++| 상자의 이름표와 내용이 다름 | 결과 요약과 저장 기록 | 계산 전에 중단 |
++| 다른 계약이 섞임 | 같은 계약 번호인지 | 잘못된 비교 거부 |
++| 새 모델의 예측이 달라짐 | 관측 계약은 그대로인지 | 정상 비교 허용 |
+ 
++[차수 상세](../차수설명.md#user-content-reading-level-1) · [직전 비교](../차수비교.md) · [전체 차수](../차수목록.md)
+ 
+-### 원문과 결과를 구분하기
+-
+-영수증 상자에 빠진 종이나 바뀐 숫자가 없는지 전부 비교했다. 하지만 같은 주소라고 같은 단지인지, 예전에 그 시설이 있었는지는 영수증 개수만으로 알 수 없다.
+-
+-단지를 알 수 없는 계약 31건에 각각 다른 단지 번호를 만들지 않았다. 100건이 한 단지에 몰렸다면 100개의 독립 사례처럼 설명하지 않는다.
+-
+-| 먼저 볼 것 | 쉬운 설명 | 기억할 점 |
+-|---|---|---|
+-| 원문 대조 | 받은 영수증과 정리한 표의 모든 값을 비교 | 숫자가 같아도 과거 공개판까지 증명되지는 않음 |
+-| 같은 단지 | 같은 단지의 계약은 서로 관련될 수 있음 | 100계약을 100개 독립 사례로 세지 않음 |
+-| 모르는 단지 | 단지 미상 31행은 그대로 보존 | 가짜 번호로 독립 사례를 만들지 않음 |
+-| 현재 결과 | 자료 검사와 실행기 수리를 완료 | 실제 학습은 중지 상태, 예측 성능은 미측정 |
+-
+-[공통 수치·분할·감사 근거](../차수설명.md#user-content-shared-audit-evidence) · [전수 검증 전체](../8차_전수검증.md)
+-
+-
+-[8차 같은 수준 상세](../차수설명.md#user-content-reading-level-1) · [이전 7차](../../../7차/docs/차수설명.md#user-content-reading-level-1)
++[English at this level](../../../en/docs/round9.md#user-content-reading-level-1)
+--- 8차/docs/읽기안내/레벨2.md
++++ 9차/docs/읽기안내/레벨2.md
+@@ -1,24 +1,13 @@
+ # LEVEL 2 - Explorer
+ 
+-**한국어** · [English · same level](../../../en/docs/round8.md#user-content-reading-level-2)
++일반 보정 계약에서 서울 계약만 제외한 집합이 홀드아웃 보정 계약과 같아야 한다. 계약 번호·정답·날짜·지역·단지는 같아야 하고 별도 모델의 예측값은 달라도 된다.
+ 
+-[LEVEL 1](레벨1.md) · [LEVEL 2](레벨2.md) · [LEVEL 3](레벨3.md) · [LEVEL 4](레벨4.md) · [LEVEL 5](레벨5.md)
++| 자료 흐름 | 남겨야 할 것 | 달라도 되는 것 |
++|---|---|---|
++| 일반 보정 → 서울 제외 | 나머지 계약 번호 전체 | 행의 나열 순서 |
++| 일반 ↔ 홀드아웃 관측 | 실제 금액·계약일·지역·단지 | 별도 모델의 예측 |
++| 요약 → 분석 복사본 | 값과 JSON 자료형·검사한 바이트 | 분석 결과용 파일 이름 |
+ 
++[차수 상세](../차수설명.md#user-content-reading-level-2) · [직전 비교](../차수비교.md) · [전체 차수](../차수목록.md)
+ 
+-### 분모와 연결을 따라가기
+-
+-원문 4,845,086행 → 기존 규칙의 적격 2,857,449행 → 현재 단지 연결 385,030행으로 분모가 줄어든다. 외부 표 14개 427,418행은 중복 판본을 포함하며 계약 수가 아니다.
+-
+-학교 설립일·공원 고시일·역 기준일과 과거 운영·공표 이력은 서로 다르다. 확보 상태와 사용 승인을 분리했다.
+-
+-| 자료 흐름 | 확인한 연결 | 분모·출처의 차이 |
+-|---|---|---|
+-| 원문 → 확장 표 | 48개월의 21항목과 원행·단지 ID 대조 | 원문 4,845,086행 |
+-| 정제 → 단지 연결 | 기존 포함 규칙과 현재 KAPT 지도 확인 | 적격 2,857,449행 중 연결 385,030행 |
+-| 외부 표 → 후보 | 14개 표의 구조·행수·해시 확인 | 427,418행은 중복 판본을 포함하며 계약 수가 아님 |
+-| 역사 문서 → 조건 | 금리 날짜·값 13건의 공식 근거 | 일부 금리 근거와 모든 특징의 과거판 승인은 다름 |
+-
+-[공통 수치·분할·감사 근거](../차수설명.md#user-content-shared-audit-evidence) · [전수 검증 전체](../8차_전수검증.md)
+-
+-
+-[8차 같은 수준 상세](../차수설명.md#user-content-reading-level-2) · [이전 7차](../../../7차/docs/차수설명.md#user-content-reading-level-2)
++[English at this level](../../../en/docs/round9.md#user-content-reading-level-2)
+--- 8차/docs/읽기안내/레벨3.md
++++ 9차/docs/읽기안내/레벨3.md
+@@ -1,24 +1,14 @@
+ # LEVEL 3 - Practitioner
+ 
+-**한국어** · [English · same level](../../../en/docs/round8.md#user-content-reading-level-3)
++Python 3.12와 고정 의존성 및 Rust 파서 환경에서 python -B -X utf8 -m unittest discover -s tests -v로 제어 검사를 실행한다. 171개 통과를 관측했다. summary 불일치와 보정 집합/관측값 불일치는 ValueError로 중단한다. 실제 학습 명령은 실행하지 않았다.
+ 
+-[LEVEL 1](레벨1.md) · [LEVEL 2](레벨2.md) · [LEVEL 3](레벨3.md) · [LEVEL 4](레벨4.md) · [LEVEL 5](레벨5.md)
++| 실행 단계 | 확인 위치 | 오류 처리 |
++|---|---|---|
++| 제어 검사 | unittest discover, 총171개 | 실패하면 완료 처리하지 않음 |
++| 통합 전 | 양쪽 summary.json | 누락·값/자료형 불일치 거부 |
++| 보정 대조 | calibration_predictions.csv | 집합·관측 불일치 ValueError |
++| 결과 추적 | 입력검증.json, 일반원본_summary.json | 원본 결과와 별도 보관 |
+ 
++[차수 상세](../차수설명.md#user-content-reading-level-3) · [직전 비교](../차수비교.md) · [전체 차수](../차수목록.md)
+ 
+-### 감사 결과와 실행 중지 읽기
+-
+-전수 감사는 원문·확장 표의 SHA와 21항목·source_row_id·cluster_id를 48개월 모든 행에서 대조하고 Rust 금액 파서로 기존 정제를 실행했다. 구형 9열 입력과도 모든 행의 값을 대조했다. 실행기는 --manifest로 확장 입력을 선택하고 계획·상태에 경로와 SHA를 남긴다. 모델 적합은 금지했다.
+-
+-연구조건_동결.json의 입력·코드·감사 해시는 검사 시점 조건을 고정한다. features.json이나 학습 재개 승인이 아니다. 기존 사전 검사는 입력 기술 검사만 수행한다.
+-
+-| 실행 단계 | 이번 확인·수리 | 실행 경계 |
+-|---|---|---|
+-| 계획 | --manifest로 확장 명세를 명시 | --execute 없는 계획은 학습·실행 폴더를 만들지 않음 |
+-| 일반·홀드아웃 | 같은 manifest 경로와 시작 SHA를 추적 | 각 실행 후 입력·엔진 변경을 거부 |
+-| 통합 분석 | 반환 후 manifest·엔진 SHA를 다시 대조 | 분석 중 바뀌면 failed·종료 2, completed 금지 |
+-| 재현 검사 | 기존 166개와 통합 후 변경 회귀 2개 | 제어 자료 검사이며 실제 성능·학습 재개가 아님 |
+-
+-[공통 수치·분할·감사 근거](../차수설명.md#user-content-shared-audit-evidence) · [전수 검증 전체](../8차_전수검증.md)
+-
+-
+-[8차 같은 수준 상세](../차수설명.md#user-content-reading-level-3) · [이전 7차](../../../7차/docs/차수설명.md#user-content-reading-level-3)
++[English at this level](../../../en/docs/round9.md#user-content-reading-level-3)
+--- 8차/docs/읽기안내/레벨4.md
++++ 9차/docs/읽기안내/레벨4.md
+@@ -1,24 +1,14 @@
+ # LEVEL 4 - Advanced
+ 
+-**한국어** · [English · same level](../../../en/docs/round8.md#user-content-reading-level-4)
++combine_results는 두 summary를 분석 디렉터리 생성 전에 대조하고 읽은 동일 바이트를 복사한다. 보정 집합은 source_row_id 인덱스로 정렬해 비교하므로 순서를 강제하지 않는다. 원본 일반 summary와 분석 summary를 다른 이름으로 보관한다.
+ 
+-[LEVEL 1](레벨1.md) · [LEVEL 2](레벨2.md) · [LEVEL 3](레벨3.md) · [LEVEL 4](레벨4.md) · [LEVEL 5](레벨5.md)
++| 모듈 계약 | 비교 방법 | 보존 파일 |
++|---|---|---|
++| combine_results | JSON 자료형을 구분하는 정렬 직렬화 비교 | 일반원본_summary.json, 홀드아웃/summary.json |
++| write_research_results | source_row_id 집합 비교 후 ID 정렬 | 각 보정 CSV의 실제 읽은 바이트 해시 |
++| 관측 열 | 문자열3개·정답 수치의 동일성 | date·region·cluster_id·actual_won |
++| 학습 산출 열 | 동일값 강제 안 함 | prediction_won의 별도 추정 허용 |
+ 
++[차수 상세](../차수설명.md#user-content-reading-level-4) · [직전 비교](../차수비교.md) · [전체 차수](../차수목록.md)
+ 
+-### 식별과 의존 구조 확인
+-
+-일반 시간 분할의 단지 중첩과 보정 지역 집중을 목표별로 집계했다. 단지 미상 31행과 100행 이상·5단지 미만 지역을 그대로 보고하며 기존 표본·군집 문턱은 바꾸지 않았다.
+-
+-KAPT 주소와 지도는 같은 출처 체계다. 한국부동산원 표는 광고 건수 차이와 주택 종류를 재검토했지만 격리를 유지한다. 정답 라벨 없는 정확도를 만들지 않는다.
+-
+-| 구현·자료 계약 | 검증 방법 | 남는 경계 |
+-|---|---|---|
+-| ID와 스키마 | 원문 SHA·논리 행 번호·시군구/번지/단지명 재계산 | 구형 9열의 값 일치가 없는 ID 칼럼을 복원하지 않음 |
+-| 실행기 | 선택 경로를 계획/상태에, SHA를 상태에 보존 | 명시 입력 누락 시 구형 입력으로 자동 대체하지 않음 |
+-| 완료 처리 | 일반·홀드아웃·통합 후 원래 입력/엔진 해시 대조 | 바뀐 산출물은 실패 근거로 남고 완료로 승인되지 않음 |
+-| 연결 품질 | 현재 지도와 동일 출처의 주소 연결 진단 | 독립 좌표 정답·전국 대표성·현장 거리 정확도 미입증 |
+-
+-[공통 수치·분할·감사 근거](../차수설명.md#user-content-shared-audit-evidence) · [전수 검증 전체](../8차_전수검증.md)
+-
+-
+-[8차 같은 수준 상세](../차수설명.md#user-content-reading-level-4) · [이전 7차](../../../7차/docs/차수설명.md#user-content-reading-level-4)
++[English at this level](../../../en/docs/round9.md#user-content-reading-level-4)
+--- 8차/docs/읽기안내/레벨5.md
++++ 9차/docs/읽기안내/레벨5.md
+@@ -1,24 +1,14 @@
+ # LEVEL 5 - Expert
+ 
+-**한국어** · [English · same level](../../../en/docs/round8.md#user-content-reading-level-5)
++같은 원천 manifest·설정이라는 선언만으로 결과 보정 행의 동일성을 대신하지 않는다. 이 수리는 H5 비교 입력의 추적성을 강화하지만 단지 간 독립성·시간 교환가능성·인과 일반화를 증명하지 않는다. 기존 8가설·15개 평가 및 다중평가 구간 조건은 유지하며 미입증 역사판과 군집 결손은 그대로 보고한다.
+ 
+-[LEVEL 1](레벨1.md) · [LEVEL 2](레벨2.md) · [LEVEL 3](레벨3.md) · [LEVEL 4](레벨4.md) · [LEVEL 5](레벨5.md)
++| 연구 조건 | 9차가 확인하는 범위 | 입증하지 않는 범위 |
++|---|---|---|
++| H5 비교 입력 | 서울 제외 보정 모집합과 관측 키 동일성 | 지역 이동의 인과적 효과 |
++| 분석 추적성 | 반환 요약·저장 JSON·복사 해시 연결 | 역사판과 원천 자료의 사실성 |
++| 불확실성 | 기존 단지 bootstrap·15평가 규칙 유지 | 시간/군집 독립성과 포함률 보장 |
++| 실측 주장 | 제어 검사만171개 통과 | 실제 성능·가설 지지·논문 완료 |
+ 
++[차수 상세](../차수설명.md#user-content-reading-level-5) · [직전 비교](../차수비교.md) · [전체 차수](../차수목록.md)
+ 
+-### 추론 가능한 범위 확정하기
+-
+-군집 누락이 있는 전체 테스트의 bootstrap 확정 판정은 기존 규칙상 불완전하다. 학습 단지 중첩이 큰 시간 평가를 미학습 단지 일반화로 바꾸어 부르지 않는다. 보정 100행은 교환가능성·독립성을 입증하지 않는다.
+-
+-한국은행 공식 역사 문서 13건은 날짜·값의 부분 근거다. 당시 취득판의 무수정성·모든 금리 동결 회의·시설 역사·라벨 공개 시점을 입증하지 않는다. 8가설·15개 평가와 기존 수식·문턱, 확증·탐색 경계를 유지한다.
+-
+-| 추론 조건 | 현재 관측 | 해석 제한 |
+-|---|---|---|
+-| 군집 완전성 | 적격 31행 미상, 최종 테스트 월세 1·전세 3행 | 전체 단지 bootstrap CI가 완비됐다고 확정할 수 없음 |
+-| 보정 의존성 | 100행 이상·5단지 미만 월세 20·전세 29지역 | 기존 문턱 유지, 100행은 독립성·교환가능성 보증 아님 |
+-| 일반화 | 테스트의 학습 단지 중첩을 목표별 진단 | 시간 평가와 미학습 단지·서울 홀드아웃 분모를 구분 |
+-| 역사·확증 | 8가설·15평가·기존 과학 조건 유지 | 부분 역사 근거와 사후 2025 집계 열람을 확증 승인으로 바꾸지 않음 |
+-
+-[공통 수치·분할·감사 근거](../차수설명.md#user-content-shared-audit-evidence) · [전수 검증 전체](../8차_전수검증.md)
+-
+-
+-[8차 같은 수준 상세](../차수설명.md#user-content-reading-level-5) · [이전 7차](../../../7차/docs/차수설명.md#user-content-reading-level-5)
++[English at this level](../../../en/docs/round9.md#user-content-reading-level-5)
+--- 8차/docs/차수목록.md
++++ 9차/docs/차수목록.md
+@@ -1,14 +1,15 @@
+-# 새 연구 전체 차수
+-
+-| 차수 | 자료 폴더 | 상세 | 직전 비교 |
+-|---|---|---|---|
+-| 새 연구 1차 | [보존](../../2차/history/1차/) | [상세](../../2차/history/1차/차수설명.md) | [초기](../../2차/history/1차/차수설명.md) |
+-| 새 연구 2차 | [소스](../../2차/) | [상세](../../2차/docs/차수설명.md) | [1→2](../../2차/docs/차수비교.md) |
+-| 새 연구 3차 | [소스](../../3차/) | [상세](../../3차/docs/차수설명.md) | [2→3](../../3차/docs/차수비교.md) |
+-| 새 연구 4차 | [소스](../../4차/) | [상세](../../4차/docs/차수설명.md) | [3→4](../../4차/docs/차수비교.md) |
+-| 새 연구 5차 | [소스](../../5차/) | [상세](../../5차/docs/차수설명.md) | [4→5](../../5차/docs/차수비교.md) |
+-| 새 연구 6차 | [소스](../../6차/) | [상세](../../6차/docs/차수설명.md) | [5→6](../../6차/docs/차수비교.md) |
+-| 새 연구 7차 | [소스](../../7차/) | [상세](../../7차/docs/차수설명.md) | [6→7](../../7차/docs/차수비교.md) |
+-| 새 연구 8차 | [소스](../../8차/) | [상세](../../8차/docs/차수설명.md) | [7→8](../../8차/docs/차수비교.md) |
+-
+-8차는 실제 입력 전수 감사와 연구 조건 대조다. 실제 학습은 중지 상태이며 전체 연구 승인을 뜻하지 않는다.
++# 새 연구 전체 차수
++
++| 차수 | 자료 폴더 | 상세 | 직전 비교 |
++|---|---|---|---|
++| 새 연구 1차 | [보존](../../2차/history/1차/) | [상세](../../2차/history/1차/차수설명.md) | [초기](../../2차/history/1차/차수설명.md) |
++| 새 연구 2차 | [소스](../../2차/) | [상세](../../2차/docs/차수설명.md) | [1→2](../../2차/docs/차수비교.md) |
++| 새 연구 3차 | [소스](../../3차/) | [상세](../../3차/docs/차수설명.md) | [2→3](../../3차/docs/차수비교.md) |
++| 새 연구 4차 | [소스](../../4차/) | [상세](../../4차/docs/차수설명.md) | [3→4](../../4차/docs/차수비교.md) |
++| 새 연구 5차 | [소스](../../5차/) | [상세](../../5차/docs/차수설명.md) | [4→5](../../5차/docs/차수비교.md) |
++| 새 연구 6차 | [소스](../../6차/) | [상세](../../6차/docs/차수설명.md) | [5→6](../../6차/docs/차수비교.md) |
++| 새 연구 7차 | [소스](../../7차/) | [상세](../../7차/docs/차수설명.md) | [6→7](../../7차/docs/차수비교.md) |
++| 새 연구 8차 | [소스](../../8차/) | [상세](../../8차/docs/차수설명.md) | [7→8](../../8차/docs/차수비교.md) |
++| 새 연구 9차 | [소스](../../9차/) | [상세](../../9차/docs/차수설명.md) | [8→9](../../9차/docs/차수비교.md) |
++
++9차는 저장 결과 대조 보강이며 실제 학습은 중지 상태다.
+--- 8차/docs/차수비교.md
++++ 9차/docs/차수비교.md
+@@ -1,23 +1,12 @@
+-# 새 연구 7차에서 8차로
++# 새 연구 8차 → 9차
+ 
+-| 검증 대상 | 직접 확인 | 해석 |
++| 구분 | 8차 | 9차 |
+ |---|---|---|
+-| 48개월 원문→확장 입력 | 4,845,086행·21항목/원행ID/군집ID 전수 일치 | 다운로드한 원문과 일치; 당시 신고판 입증 아님 |
+-| 기존 정제 | 2,857,449행; 비신규1,964,806/건축연도오류22,831 제외 | 배제 기준 변경 없음 |
+-| 외부 표 | 14개 CSV·427,418행; 행수/해시/행 폭 일치 | 원응답 전체 재검사와 구별 |
+-| 현재 단지 연결 | 385,030/2,857,449 = 13.4746% | 위치 정답 정확도·전국 대표성 아님 |
+-| 군집 미상 | 적격31행; 최종 테스트 월세1/전세3행 | 행 유지; 군집 추론의 부족 근거를 숨기지 않음 |
+-| 보정 집중 | 100행 이상이면서5단지 미만: 월세20/전세29지역 | 100행은100독립단지와 다름 |
+-| 금리 역사 문서 | 초기값+변경12건의 공식 문서13건 대조 | 발표일/값 근거; 모든 통계의 과거판 승인 아님 |
+-| 실행 입력 선택 | --manifest 경로·SHA 추적/166개 검사 통과 | 실제 학습·원자료 변경 없음 |
+-| 실제 학습 | stopped_by_user 원문 동일 | 성능/가설지지 미산출 |
++| 저장 summary | 일반 반환값과 저장 파일 대조 없음, 홀드아웃은 복사 후 대조 | 양쪽 분석 전 대조·검사한 동일 바이트 보관 |
++| 홀드아웃 보정 | 제외 지역/형식/건수 검사 | 같은 원천의 서울 제외 원행 집합·관측값 대조 추가 |
++| 검사 | 168개(완료 가드2개 포함) | 171개 |
++| 가설·수식·학습 | 8가설15평가·학습 중지 | 유지 |
+ 
+-추가: 실제 전수 검증 보고, 연구 조건 해시 기록, 실제 출처 상태 목록과 입력 선택 제어 검사 5개. 수정: experiment_runner의 명시적 --manifest 선택·계획/상태 경로·SHA 추적, 단일 실행의 변경 차단, 8차 설명과 탐색·버전 표기. 삭제: 공개 파일 삭제 없음. 엔진의 모델·가설·수식·분할·포함 규칙은 변경하지 않았다.
++추가: docs/9차_결과대조.md, tests/test_result_binding_v9.py. 수정: experiment_runner.py, research_metrics.py 및9차 설명·탐색. 삭제: 공개 파일 삭제 없음. 일반원본_summary.json은 실행 시 생성하는 별도 분석 근거이며 실제 결과를 지금 생성하지 않았다.
+ 
+-[전체 차이](전체차이.diff) · [검증 보고](8차_전수검증.md)
+-
+-전체 차이는 현재 공개 7차와 8차의 허용 상대 경로를 주석·공백까지 대조한다. 비교 자체·목록 JSON의 자기 참조를 제외하고 바이너리 변경은 크기·SHA를 별도 기록한다.
+-
+-## 게시 후 보완
+-
+-통합 분석 반환 후 manifest·엔진 해시를 완료 전에 다시 확인하도록 수리하고 회귀 2개를 추가했습니다. 8차 한·영 LEVEL 1~5 안내는 현재 내용으로 연결하며 공통 감사 수치는 한 번 보존합니다. 기존 166개 검사 이력과 원자료 감사는 유지합니다. [추가 수리의 범위](8차_전수검증.md#user-content-analysis-completion-guard)
++[전체 차이](전체차이.diff) · [검증 상세](9차_결과대조.md)
+--- 8차/docs/차수설명.md
++++ 9차/docs/차수설명.md
+@@ -1,146 +1,86 @@
+-# 새 연구 8차 상세
++# 새 연구 9차 상세
+ 
+-**한국어** · [English](../../en/docs/round8.md)
+-
+-[전수 검증·수치·출처·한계](8차_전수검증.md) · [직전 비교](차수비교.md) · [연구 조건](연구조건_동결.json)
++[결과 대조 검증](9차_결과대조.md) · [직전 비교](차수비교.md) · [수식·인용](논문_가설과_수식.md)
+ 
+ <a id="reading-level-1"></a>
+ 
+ ## LEVEL 1 - Beginner
+ 
+-### 원문과 결과를 구분하기
++### 저장 결과의 이름표 확인
+ 
+-영수증 상자에 빠진 종이나 바뀐 숫자가 없는지 전부 비교했다. 하지만 같은 주소라고 같은 단지인지, 예전에 그 시설이 있었는지는 영수증 개수만으로 알 수 없다.
++실험 결과 상자의 이름표와 상자 안의 기록이 같은지 양쪽 모두 확인한다. 서로 다른 계약의 보정 자료가 섞이면 계산 전에 멈춘다. 검사 통과가 실제 예측 성능을 뜻하지는 않는다.
+ 
+-단지를 알 수 없는 계약 31건에 각각 다른 단지 번호를 만들지 않았다. 100건이 한 단지에 몰렸다면 100개의 독립 사례처럼 설명하지 않는다.
++| 쉬운 상황 | 확인하는 것 | 결과 |
++|---|---|---|
++| 상자의 이름표와 내용이 다름 | 결과 요약과 저장 기록 | 계산 전에 중단 |
++| 다른 계약이 섞임 | 같은 계약 번호인지 | 잘못된 비교 거부 |
++| 새 모델의 예측이 달라짐 | 관측 계약은 그대로인지 | 정상 비교 허용 |
+ 
+-| 먼저 볼 것 | 쉬운 설명 | 기억할 점 |
+-|---|---|---|
+-| 원문 대조 | 받은 영수증과 정리한 표의 모든 값을 비교 | 숫자가 같아도 과거 공개판까지 증명되지는 않음 |
+-| 같은 단지 | 같은 단지의 계약은 서로 관련될 수 있음 | 100계약을 100개 독립 사례로 세지 않음 |
+-| 모르는 단지 | 단지 미상 31행은 그대로 보존 | 가짜 번호로 독립 사례를 만들지 않음 |
+-| 현재 결과 | 자료 검사와 실행기 수리를 완료 | 실제 학습은 중지 상태, 예측 성능은 미측정 |
+-
+-[공통 수치·분할·감사 근거](#user-content-shared-audit-evidence) · [전수 검증 전체](8차_전수검증.md)
+-
+-[프로젝트 같은 수준](../../docs/읽기안내/레벨1.md) · [이전 7차 같은 수준](../../7차/docs/차수설명.md#user-content-reading-level-1) · [전체 검증과 출처](8차_전수검증.md)
++[English at this level](../../en/docs/round9.md#user-content-reading-level-1) · [프로젝트 같은 수준](../../docs/읽기안내/레벨1.md) · [이전8차 같은 수준](../../8차/docs/차수설명.md#user-content-reading-level-1) · [검증 상세](9차_결과대조.md)
+ 
+ <a id="reading-level-2"></a>
+ 
+ ## LEVEL 2 - Explorer
+ 
+-### 분모와 연결을 따라가기
++### 같은 계약을 따라 대조
+ 
+-원문 4,845,086행 → 기존 규칙의 적격 2,857,449행 → 현재 단지 연결 385,030행으로 분모가 줄어든다. 외부 표 14개 427,418행은 중복 판본을 포함하며 계약 수가 아니다.
++일반 보정 계약에서 서울 계약만 제외한 집합이 홀드아웃 보정 계약과 같아야 한다. 계약 번호·정답·날짜·지역·단지는 같아야 하고 별도 모델의 예측값은 달라도 된다.
+ 
+-학교 설립일·공원 고시일·역 기준일과 과거 운영·공표 이력은 서로 다르다. 확보 상태와 사용 승인을 분리했다.
++| 자료 흐름 | 남겨야 할 것 | 달라도 되는 것 |
++|---|---|---|
++| 일반 보정 → 서울 제외 | 나머지 계약 번호 전체 | 행의 나열 순서 |
++| 일반 ↔ 홀드아웃 관측 | 실제 금액·계약일·지역·단지 | 별도 모델의 예측 |
++| 요약 → 분석 복사본 | 값과 JSON 자료형·검사한 바이트 | 분석 결과용 파일 이름 |
+ 
+-| 자료 흐름 | 확인한 연결 | 분모·출처의 차이 |
+-|---|---|---|
+-| 원문 → 확장 표 | 48개월의 21항목과 원행·단지 ID 대조 | 원문 4,845,086행 |
+-| 정제 → 단지 연결 | 기존 포함 규칙과 현재 KAPT 지도 확인 | 적격 2,857,449행 중 연결 385,030행 |
+-| 외부 표 → 후보 | 14개 표의 구조·행수·해시 확인 | 427,418행은 중복 판본을 포함하며 계약 수가 아님 |
+-| 역사 문서 → 조건 | 금리 날짜·값 13건의 공식 근거 | 일부 금리 근거와 모든 특징의 과거판 승인은 다름 |
+-
+-[공통 수치·분할·감사 근거](#user-content-shared-audit-evidence) · [전수 검증 전체](8차_전수검증.md)
+-
+-[프로젝트 같은 수준](../../docs/읽기안내/레벨2.md) · [이전 7차 같은 수준](../../7차/docs/차수설명.md#user-content-reading-level-2) · [전체 검증과 출처](8차_전수검증.md)
++[English at this level](../../en/docs/round9.md#user-content-reading-level-2) · [프로젝트 같은 수준](../../docs/읽기안내/레벨2.md) · [이전8차 같은 수준](../../8차/docs/차수설명.md#user-content-reading-level-2) · [검증 상세](9차_결과대조.md)
+ 
+ <a id="reading-level-3"></a>
+ 
+ ## LEVEL 3 - Practitioner
+ 
+-### 감사 결과와 실행 중지 읽기
++### 실행과 오류 확인
+ 
+-전수 감사는 원문·확장 표의 SHA와 21항목·source_row_id·cluster_id를 48개월 모든 행에서 대조하고 Rust 금액 파서로 기존 정제를 실행했다. 구형 9열 입력과도 모든 행의 값을 대조했다. 실행기는 --manifest로 확장 입력을 선택하고 계획·상태에 경로와 SHA를 남긴다. 모델 적합은 금지했다.
++Python 3.12와 고정 의존성 및 Rust 파서 환경에서 python -B -X utf8 -m unittest discover -s tests -v로 제어 검사를 실행한다. 171개 통과를 관측했다. summary 불일치와 보정 집합/관측값 불일치는 ValueError로 중단한다. 실제 학습 명령은 실행하지 않았다.
+ 
+-연구조건_동결.json의 입력·코드·감사 해시는 검사 시점 조건을 고정한다. features.json이나 학습 재개 승인이 아니다. 기존 사전 검사는 입력 기술 검사만 수행한다.
++| 실행 단계 | 확인 위치 | 오류 처리 |
++|---|---|---|
++| 제어 검사 | unittest discover, 총171개 | 실패하면 완료 처리하지 않음 |
++| 통합 전 | 양쪽 summary.json | 누락·값/자료형 불일치 거부 |
++| 보정 대조 | calibration_predictions.csv | 집합·관측 불일치 ValueError |
++| 결과 추적 | 입력검증.json, 일반원본_summary.json | 원본 결과와 별도 보관 |
+ 
+-| 실행 단계 | 이번 확인·수리 | 실행 경계 |
+-|---|---|---|
+-| 계획 | --manifest로 확장 명세를 명시 | --execute 없는 계획은 학습·실행 폴더를 만들지 않음 |
+-| 일반·홀드아웃 | 같은 manifest 경로와 시작 SHA를 추적 | 각 실행 후 입력·엔진 변경을 거부 |
+-| 통합 분석 | 반환 후 manifest·엔진 SHA를 다시 대조 | 분석 중 바뀌면 failed·종료 2, completed 금지 |
+-| 재현 검사 | 기존 166개와 통합 후 변경 회귀 2개 | 제어 자료 검사이며 실제 성능·학습 재개가 아님 |
+-
+-[공통 수치·분할·감사 근거](#user-content-shared-audit-evidence) · [전수 검증 전체](8차_전수검증.md)
+-
+-[프로젝트 같은 수준](../../docs/읽기안내/레벨3.md) · [이전 7차 같은 수준](../../7차/docs/차수설명.md#user-content-reading-level-3) · [전체 검증과 출처](8차_전수검증.md)
++[English at this level](../../en/docs/round9.md#user-content-reading-level-3) · [프로젝트 같은 수준](../../docs/읽기안내/레벨3.md) · [이전8차 같은 수준](../../8차/docs/차수설명.md#user-content-reading-level-3) · [검증 상세](9차_결과대조.md)
+ 
+ <a id="reading-level-4"></a>
+ 
+ ## LEVEL 4 - Advanced
+ 
+-### 식별과 의존 구조 확인
++### 저장 바이트와 관측 키 연결
+ 
+-일반 시간 분할의 단지 중첩과 보정 지역 집중을 목표별로 집계했다. 단지 미상 31행과 100행 이상·5단지 미만 지역을 그대로 보고하며 기존 표본·군집 문턱은 바꾸지 않았다.
++combine_results는 두 summary를 분석 디렉터리 생성 전에 대조하고 읽은 동일 바이트를 복사한다. 보정 집합은 source_row_id 인덱스로 정렬해 비교하므로 순서를 강제하지 않는다. 원본 일반 summary와 분석 summary를 다른 이름으로 보관한다.
+ 
+-KAPT 주소와 지도는 같은 출처 체계다. 한국부동산원 표는 광고 건수 차이와 주택 종류를 재검토했지만 격리를 유지한다. 정답 라벨 없는 정확도를 만들지 않는다.
++| 모듈 계약 | 비교 방법 | 보존 파일 |
++|---|---|---|
++| combine_results | JSON 자료형을 구분하는 정렬 직렬화 비교 | 일반원본_summary.json, 홀드아웃/summary.json |
++| write_research_results | source_row_id 집합 비교 후 ID 정렬 | 각 보정 CSV의 실제 읽은 바이트 해시 |
++| 관측 열 | 문자열3개·정답 수치의 동일성 | date·region·cluster_id·actual_won |
++| 학습 산출 열 | 동일값 강제 안 함 | prediction_won의 별도 추정 허용 |
+ 
+-| 구현·자료 계약 | 검증 방법 | 남는 경계 |
+-|---|---|---|
+-| ID와 스키마 | 원문 SHA·논리 행 번호·시군구/번지/단지명 재계산 | 구형 9열의 값 일치가 없는 ID 칼럼을 복원하지 않음 |
+-| 실행기 | 선택 경로를 계획/상태에, SHA를 상태에 보존 | 명시 입력 누락 시 구형 입력으로 자동 대체하지 않음 |
+-| 완료 처리 | 일반·홀드아웃·통합 후 원래 입력/엔진 해시 대조 | 바뀐 산출물은 실패 근거로 남고 완료로 승인되지 않음 |
+-| 연결 품질 | 현재 지도와 동일 출처의 주소 연결 진단 | 독립 좌표 정답·전국 대표성·현장 거리 정확도 미입증 |
+-
+-[공통 수치·분할·감사 근거](#user-content-shared-audit-evidence) · [전수 검증 전체](8차_전수검증.md)
+-
+-[프로젝트 같은 수준](../../docs/읽기안내/레벨4.md) · [이전 7차 같은 수준](../../7차/docs/차수설명.md#user-content-reading-level-4) · [전체 검증과 출처](8차_전수검증.md)
++[English at this level](../../en/docs/round9.md#user-content-reading-level-4) · [프로젝트 같은 수준](../../docs/읽기안내/레벨4.md) · [이전8차 같은 수준](../../8차/docs/차수설명.md#user-content-reading-level-4) · [검증 상세](9차_결과대조.md)
+ 
+ <a id="reading-level-5"></a>
+ 
+ ## LEVEL 5 - Expert
+ 
+-### 추론 가능한 범위 확정하기
++### 추론 조건과 구현 검증 구분
+ 
+-군집 누락이 있는 전체 테스트의 bootstrap 확정 판정은 기존 규칙상 불완전하다. 학습 단지 중첩이 큰 시간 평가를 미학습 단지 일반화로 바꾸어 부르지 않는다. 보정 100행은 교환가능성·독립성을 입증하지 않는다.
++같은 원천 manifest·설정이라는 선언만으로 결과 보정 행의 동일성을 대신하지 않는다. 이 수리는 H5 비교 입력의 추적성을 강화하지만 단지 간 독립성·시간 교환가능성·인과 일반화를 증명하지 않는다. 기존 8가설·15개 평가 및 다중평가 구간 조건은 유지하며 미입증 역사판과 군집 결손은 그대로 보고한다.
+ 
+-한국은행 공식 역사 문서 13건은 날짜·값의 부분 근거다. 당시 취득판의 무수정성·모든 금리 동결 회의·시설 역사·라벨 공개 시점을 입증하지 않는다. 8가설·15개 평가와 기존 수식·문턱, 확증·탐색 경계를 유지한다.
++| 연구 조건 | 9차가 확인하는 범위 | 입증하지 않는 범위 |
++|---|---|---|
++| H5 비교 입력 | 서울 제외 보정 모집합과 관측 키 동일성 | 지역 이동의 인과적 효과 |
++| 분석 추적성 | 반환 요약·저장 JSON·복사 해시 연결 | 역사판과 원천 자료의 사실성 |
++| 불확실성 | 기존 단지 bootstrap·15평가 규칙 유지 | 시간/군집 독립성과 포함률 보장 |
++| 실측 주장 | 제어 검사만171개 통과 | 실제 성능·가설 지지·논문 완료 |
+ 
+-| 추론 조건 | 현재 관측 | 해석 제한 |
+-|---|---|---|
+-| 군집 완전성 | 적격 31행 미상, 최종 테스트 월세 1·전세 3행 | 전체 단지 bootstrap CI가 완비됐다고 확정할 수 없음 |
+-| 보정 의존성 | 100행 이상·5단지 미만 월세 20·전세 29지역 | 기존 문턱 유지, 100행은 독립성·교환가능성 보증 아님 |
+-| 일반화 | 테스트의 학습 단지 중첩을 목표별 진단 | 시간 평가와 미학습 단지·서울 홀드아웃 분모를 구분 |
+-| 역사·확증 | 8가설·15평가·기존 과학 조건 유지 | 부분 역사 근거와 사후 2025 집계 열람을 확증 승인으로 바꾸지 않음 |
+-
+-[공통 수치·분할·감사 근거](#user-content-shared-audit-evidence) · [전수 검증 전체](8차_전수검증.md)
+-
+-[프로젝트 같은 수준](../../docs/읽기안내/레벨5.md) · [이전 7차 같은 수준](../../7차/docs/차수설명.md#user-content-reading-level-5) · [전체 검증과 출처](8차_전수검증.md)
+-
+-<a id="shared-audit-evidence"></a>
+-
+-## 공통 수치·분할·감사 근거
+-
+-8차 원자료 감사의 전체 수치입니다. **최초 코드 검사 166개**와 이후 추가한 **통합 완료 경계 회귀 2개**를 구분합니다. 자료·분할·미상 행은 변경하지 않았습니다.
+-
+-| 검증 대상 | 직접 확인 | 해석 |
+-|---|---|---|
+-| 48개월 원문→확장 입력 | 4,845,086행·21항목/원행ID/군집ID 전수 일치 | 다운로드한 원문과 일치; 당시 신고판 입증 아님 |
+-| 기존 정제 | 2,857,449행; 비신규 1,964,806 / 건축연도 오류 22,831 제외 | 배제 기준 변경 없음 |
+-| 외부 표 | 14개 CSV·427,418행; 행수/해시/행 폭 일치 | 원응답 전체 재검사와 구별 |
+-| 현재 단지 연결 | 385,030/2,857,449 = 13.4746% | 위치 정답 정확도·전국 대표성 아님 |
+-| 군집 미상 | 적격 31행; 최종 테스트 월세1/전세3행 | 행 유지; 군집 추론의 부족 근거를 숨기지 않음 |
+-| 보정 집중 | 100행 이상이면서 5단지 미만: 월세 20 / 전세 29지역 | 100행은 100독립단지와 다름 |
+-| 금리 역사 문서 | 초기값 + 변경 12건의 공식 문서13건 대조 | 발표일/값 근거; 모든 통계의 과거판 승인 아님 |
+-| 실행 입력 선택 | --manifest 경로·SHA 추적/166개 검사 통과 | 실제 학습·원자료 변경 없음 |
+-| 실제 학습 | stopped_by_user 원문 동일 | 성능/가설지지 미산출 |
+-
+-| 목표/분할 | 적격 계약 | 알려진 군집 | 군집 미상 계약 | KAPT 연결 계약 |
+-|---|---|---|---|---|
+-| jeonse/calibration | 202,554 | 22,278 | 0 | 25,080 |
+-| jeonse/test | 372,671 | 26,014 | 3 | 45,051 |
+-| jeonse/train | 743,702 | 29,080 | 4 | 98,787 |
+-| jeonse/validation | 225,883 | 23,115 | 9 | 29,034 |
+-| monthly/calibration | 180,771 | 24,473 | 4 | 24,704 |
+-| monthly/test | 377,571 | 30,197 | 1 | 49,671 |
+-| monthly/train | 575,818 | 30,311 | 4 | 86,531 |
+-| monthly/validation | 178,479 | 24,756 | 6 | 26,172 |
+-
+-| 목표 | 보정 지역 | 100행 이상 지역 | 그중 5단지 미만 | 최대 단일단지 비중 |
+-|---|---|---|---|---|
+-| monthly | 3017 | 537 | 20 | 100% |
+-| jeonse | 2708 | 605 | 29 | 100% |
+-
+-통합 분석 반환 후 변경 차단은 [전수 검증의 추가 수리](8차_전수검증.md#user-content-analysis-completion-guard)를 참조합니다.
++[English at this level](../../en/docs/round9.md#user-content-reading-level-5) · [프로젝트 같은 수준](../../docs/읽기안내/레벨5.md) · [이전8차 같은 수준](../../8차/docs/차수설명.md#user-content-reading-level-5) · [검증 상세](9차_결과대조.md)
+--- 8차/rentlab/experiment_runner.py
++++ 9차/rentlab/experiment_runner.py
+@@ -99,6 +99,17 @@
+     validate_holdout_settings(main_summary,held_summary)
+     run_dir = Path(run_dir)
+     main_dir, held_dir = run_dir / "결과", run_dir / "홀드아웃결과"
++    # 반환값만으로 저장 결과의 일관성을 대신하지 않는다. 복사/분석 전에 양쪽을 확인한다.
++    saved_summaries = {}
++    for folder, expected_summary in ((main_dir, main_summary), (held_dir, held_summary)):
++        try:
++            raw_summary = (folder / "summary.json").read_bytes()
++            saved_summary = json.loads(raw_summary.decode("utf-8-sig"))
++        except (OSError, UnicodeError, ValueError) as error:
++            raise ValueError(f"저장 summary 누락/형식 오류: {folder.name}") from error
++        if json.dumps(saved_summary, sort_keys=True, allow_nan=False) != json.dumps(expected_summary, sort_keys=True, allow_nan=False):
++            raise ValueError(f"반환값과 저장 summary 불일치: {folder.name}")
++        saved_summaries[folder] = raw_summary
+     for target in ("jeonse", "monthly"):
+         rows, columns = [], []
+         for folder in (main_dir, held_dir):
+@@ -136,14 +147,13 @@
+                 target_path = destination / source.name
+                 shutil.copy2(source, target_path)
+                 evidence.append({"source":str(source), "copy":str(target_path), "sha256":hashlib.sha256(target_path.read_bytes()).hexdigest()})
+-    # 실제 분석 함수도 홀드아웃 조건·원본 지문을 확인하므로 summary를 함께 복사한다.
+-    held_summary_source = held_dir / "summary.json"
+-    copied_summary = copied_held / "summary.json"
+-    if json.loads(held_summary_source.read_text(encoding="utf-8")) != held_summary:
+-        raise ValueError("홀드아웃 반환값과 저장 summary 불일치")
+-    shutil.copy2(held_summary_source, copied_summary)
+-    evidence.append({"source":str(held_summary_source), "copy":str(copied_summary),
+-                     "sha256":hashlib.sha256(copied_summary.read_bytes()).hexdigest()})
++    # 실제로 대조한 같은 summary 바이트를 보관한다. 양쪽 원본은 변경하지 않는다.
++    for source_dir, destination in ((main_dir, output), (held_dir, copied_held)):
++        copied_summary = destination / ("일반원본_summary.json" if source_dir == main_dir else "summary.json")
++        raw_summary = saved_summaries[source_dir]
++        copied_summary.write_bytes(raw_summary)
++        evidence.append({"source":str(source_dir / "summary.json"), "copy":str(copied_summary),
++                         "sha256":hashlib.sha256(raw_summary).hexdigest()})
+     summary = copy.deepcopy(main_summary)
+     atomic_json(output / "입력검증.json", {"manifest_sha256":hashlib.sha256(manifest.read_bytes()).hexdigest(),
+                                          "holdout_region":region, "files":evidence})
+--- 8차/rentlab/research_metrics.py
++++ 9차/rentlab/research_metrics.py
+@@ -1,499 +1,511 @@
+-"""사전에 정한 가설에 저장된 예측을 적용한다. 이 모듈은 모델을 학습하지 않는다."""
+-from __future__ import annotations
+-from dataclasses import dataclass, asdict
+-from pathlib import Path
+-import hashlib
+-import io
+-import json
+-import math
+-
+-import numpy as np
+-import pandas as pd
+-
+-TITLES = {
+-    "H1": "미래 계약에서 AI와 중앙값 기준의 오차 차이",
+-    "H2": "관측 보증금의 월세 예측 기여",
+-    "H3": "명목 90% 예측구간과 실제 포함률의 동등성",
+-    "H4": "지역 동일 가중 포함률 편차",
+-    "H5": "미학습 지역으로 이동할 때의 오차 증가",
+-    "H6": "학습기 가격 구간에 따른 정규화 오차 차이",
+-    "H7": "지역별 보정에 따른 포함률 편차 감소",
+-    "H8": "지역 구성을 맞춘 상·하반기 포함률 감소",
+-}
+-FORMULAS = {"H1": "MAE(검증 선택 기준모델) − MAE(검증 선택 AI)",
+-            "H2": "MAE(보증금 제외 AI) − MAE(보증금 포함 AI)",
+-            "H3": "실제 포함률 − (1 − α), 동등성 범위 ±ε",
+-            "H4": "mean_g |coverage_g − (1−α)| − ε",
+-            "H5": "MAE(지역 홀드아웃) − MAE(일반 시간분할)",
+-            "H6": "[MAE(학습기 상위 가격구간) − MAE(하위 구간)] / median_train(y)",
+-            "H7": "macro_gap(전체 보정) − macro_gap(지역 보정)",
+-            "H8": "mean_g [coverage_g,상반기 − coverage_g,하반기]"}
+-SOURCES = [
+-    {"id": "Lei2018", "title": "Distribution-Free Predictive Inference for Regression", "url": "https://doi.org/10.1080/01621459.2017.1307116", "use": "분할 conformal의 순위와 구간"},
+-    {"id": "Gneiting2007", "title": "Strictly Proper Scoring Rules, Prediction, and Estimation", "url": "https://doi.org/10.1198/016214506000001437", "use": "예측구간 폭과 미포함 벌점을 결합한 interval score"},
+-    {"id": "Vovk2012", "title": "Conditional Validity of Inductive Conformal Predictors", "url": "https://proceedings.mlr.press/v25/vovk12.html", "use": "조건부·그룹별 보정의 근거와 한계"},
+-    {"id": "Cameron2008", "title": "Bootstrap-Based Improvements for Inference with Clustered Errors", "url": "https://www.nber.org/papers/t0344", "use": "군집 의존성 고려의 동기. 논문의 bootstrap-t를 그대로 구현한 것은 아님"},
+-]
+-
+-
+-@dataclass(frozen=True)
+-class AnalysisConfig:
+-    alpha: float = .1
+-    coverage_tolerance: float = .02
+-    confidence: float = .95
+-    family_size: int = 15
+-    bootstrap_replicates: int = 9999
+-    minimum_clusters: int = 20
+-    minimum_group_n: int = 30
+-    minimum_group_clusters: int = 5
+-    regional_calibration_min: int = 100
+-    seed: int = 20261126
+-
+-    def __post_init__(self):
+-        for field in ('family_size','bootstrap_replicates','minimum_clusters','minimum_group_n',
+-                      'minimum_group_clusters','regional_calibration_min','seed'):
+-            value=getattr(self,field)
+-            if type(value) is not int or value < (0 if field=='seed' else 1):
+-                raise ValueError('분석 설정의 개수·군집·시드는 범위에 맞는 정수여야 합니다')
+-        if not 0 < self.alpha < 1 or not 0 < self.confidence < 1:
+-            raise ValueError("alpha와 신뢰수준은 0과 1 사이여야 합니다")
+-        if not 0 < self.coverage_tolerance < 1 or self.family_size != 15:
+-            raise ValueError("동등성 허용오차와 고정 15개 평가 가족을 확인하십시오")
+-        if self.bootstrap_replicates < 99 or self.minimum_clusters < 2 or self.minimum_group_clusters < 2:
+-            raise ValueError("부트스트랩 반복·군집 조건이 부족합니다")
+-        if self.minimum_group_n < 1 or self.regional_calibration_min < 1:
+-            raise ValueError("최소 표본 수는 양수여야 합니다")
+-
+-
+-def interval_score(actual, lower, upper, alpha=.1):
+-    y, lo, hi = [np.asarray(v, dtype=float) for v in (actual, lower, upper)]
+-    if y.shape != lo.shape or y.shape != hi.shape or not 0 < alpha < 1:
+-        raise ValueError("구간 점수의 모양 또는 alpha 오류")
+-    if not all(np.isfinite(v).all() for v in (y, lo, hi)) or (lo > hi).any():
+-        raise ValueError("구간 점수에는 유한한 값과 올바른 하한·상한이 필요합니다")
+-    return hi - lo + 2 / alpha * np.maximum(lo - y, 0) + 2 / alpha * np.maximum(y - hi, 0)
+-
+-
+-def finite_radius(residuals, alpha=.1):
+-    values = np.asarray(residuals, dtype=float)
+-    if values.ndim != 1 or not np.isfinite(values).all() or (values < 0).any() or not 0 < alpha < 1:
+-        raise ValueError("보정 잔차 또는 alpha 오류")
+-    rank = math.ceil((len(values) + 1) * (1 - alpha))
+-    return None if rank > len(values) or not len(values) else float(np.partition(values, rank - 1)[rank - 1])
+-
+-
+-def balance_score(mae, mean_interval_score, macro_gap, train_scale, alpha=.1, weights=(.5, .25, .25)):
+-    """연구용 제안 지표. proper score나 검증된 신규 통계량이라고 주장하지 않는다."""
+-    if len(weights) != 3:
+-        raise ValueError("균형 손실은 정확히 3개 가중치가 필요합니다")
+-    values = np.asarray([mae, mean_interval_score, macro_gap, train_scale, alpha, *weights], dtype=float)
+-    if not np.isfinite(values).all() or train_scale <= 0 or not 0 < alpha < 1:
+-        raise ValueError("균형 손실의 척도와 입력은 유효해야 합니다")
+-    if min(mae, mean_interval_score, macro_gap, *weights) < 0 or not np.isclose(sum(weights), 1):
+-        raise ValueError("음수가 아닌 손실과 합계 1인 가중치가 필요합니다")
+-    return float(weights[0] * mae / train_scale + weights[1] * mean_interval_score / train_scale + weights[2] * macro_gap / alpha)
+-
+-
+-def _numbers(frame, column):
+-    if column not in frame:
+-        return None
+-    values = pd.to_numeric(frame[column], errors="raise").to_numpy(dtype=float)
+-    if not np.isfinite(values).all():
+-        raise ValueError(f"유한하지 않은 예측·정답 칼럼: {column}")
+-    return values
+-
+-
+-def _blank(hypothesis, target, reason="필요한 입력 또는 비교 결과가 없습니다"):
+-    return {"id": hypothesis, "target": target, "title": TITLES[hypothesis], "formula": FORMULAS[hypothesis],
+-            "status": "unmeasured", "effect": None, "ci": None, "decision": "unmeasured", "reason": reason,
+-            "n": None, "clusters": None, "unit": "원" if hypothesis in {"H1", "H2", "H5"} else "무차원"}
+-
+-
+-def _interval(samples, config):
+-    values = np.asarray(samples, dtype=float)
+-    values = values[np.isfinite(values)]
+-    if len(values) < math.ceil(.8 * config.bootstrap_replicates):
+-        return None
+-    tail = (1 - config.confidence) / config.family_size / 2
+-    return [float(v) for v in np.quantile(values, [tail, 1 - tail])]
+-
+-
+-def _finish(row, value, samples, config, n, clusters, reason=""):
+-    if not np.isfinite(value):
+-        return row
+-    row.update(status="measured", effect=float(value), n=int(n), clusters=clusters, reason=reason)
+-    row["bootstrap_requested"] = config.bootstrap_replicates
+-    row["bootstrap_valid"] = int(np.isfinite(samples).sum()) if samples is not None else 0
+-    row["ci"] = _interval(samples, config) if samples is not None else None
+-    row["decision"] = "inconclusive"
+-    if row["ci"] is None:
+-        row["status"] = "partial"
+-        row["reason"] = (reason + " · " if reason else "") + "군집 식별·표본·유효 재표집이 부족하여 신뢰구간과 확정 판정은 미산출"
+-    elif not _confirmatory_config(config):
+-        row["status"] = "partial"
+-        row["reason"] = (reason + " · " if reason else "") + "기술 확인용 반복수 또는 변경된 분석 조건입니다. 논문용 확정 판정에 사용하지 않습니다"
+-    elif row["id"] == "H3":
+-        lo, hi = row["ci"]
+-        eps = config.coverage_tolerance
+-        row["decision"] = "support" if lo > -eps and hi < eps else "not_support" if lo > eps or hi < -eps else "inconclusive"
+-    else:
+-        lo, hi = row["ci"]
+-        row["decision"] = "support" if lo > 0 else "not_support" if hi <= 0 else "inconclusive"
+-    return row
+-
+-
+-def _confirmatory_config(config):
+-    from .research_protocol import confirmatory_settings
+-    return confirmatory_settings(asdict(config))
+-
+-
+-def _target_analysis(frame, calibration, metadata, target, config):
+-    ids = [h for h in TITLES if h not in {"H5"} and (h != "H2" or target == "monthly")]
+-    rows = {h: _blank(h, target) for h in ids}
+-    if frame.empty or "actual_won" not in frame or "prediction_won" not in frame or "region" not in frame:
+-        return list(rows.values()), {}
+-    if "date" not in frame:
+-        raise ValueError("가설 테스트의 계약일이 없어 고정 2025년 분리를 확인할 수 없습니다")
+-    y, prediction = _numbers(frame, "actual_won"), _numbers(frame, "prediction_won")
+-    if (y <= 0).any() or frame.region.isna().any() or frame.region.astype(str).str.strip().eq("").any():
+-        raise ValueError("가설 평가에는 양수 정답과 관측 지역이 필요합니다")
+-    n = len(frame)
+-    regions = frame.region.astype(str).to_numpy()
+-    region_codes, region_labels = pd.factorize(regions, sort=True)
+-    gcount = len(region_labels)
+-    cluster_available = "cluster_id" in frame and frame.cluster_id.notna().all() and frame.cluster_id.astype(str).str.strip().ne("").all()
+-    cluster_labels = frame.cluster_id.astype(str).to_numpy() if cluster_available else regions
+-    cluster_codes, cluster_names = pd.factorize(cluster_labels, sort=True)
+-    k = len(cluster_names)
+-    mapping = pd.DataFrame({"cluster": cluster_codes, "region": region_codes}).groupby("cluster").region
+-    if mapping.nunique().gt(1).any():
+-        raise ValueError("같은 단지 식별자가 여러 지역에 연결되었습니다")
+-    cluster_regions = mapping.first().to_numpy()
+-    # 열: 표본, AI오차, 기준오차, 보증금제외오차, 전체/지역포함, 전체/지역구간점수,
+-    # 하위가격표본/오차, 상위가격표본/오차, 상반기표본/포함, 하반기표본/포함, 선택모델오차.
+-    features = np.zeros((n, 17), dtype=float)
+-    features[:, 0] = 1
+-    features[:, 16] = np.abs(y - prediction)
+-    available = set()
+-    ai = _numbers(frame, "prediction_ai_won")
+-    baseline_name = metadata.get("best_baseline_model")
+-    if not baseline_name:
+-        validation = metadata.get("validation", {})
+-        names = [name for name in ("global_median", "region_median") if name in validation]
+-        baseline_name = min(names, key=lambda name: (validation[name]["mae"], name)) if names else None
+-    baseline = _numbers(frame, f"prediction_{baseline_name}_won") if baseline_name else None
+-    if ai is not None:
+-        features[:, 1] = np.abs(y - ai)
+-    if ai is not None and baseline is not None:
+-        features[:, 2] = np.abs(y - baseline)
+-        available.add("H1")
+-    no_deposit = _numbers(frame, "prediction_no_deposit_won")
+-    if target == "monthly" and ai is not None and no_deposit is not None:
+-        features[:, 3] = np.abs(y - no_deposit)
+-        available.add("H2")
+-    global_radius = None
+-    radii = {}
+-    region_radius = None
+-    if not calibration.empty and {"actual_won", "prediction_won", "region"}.issubset(calibration):
+-        if "date" not in calibration:
+-            raise ValueError("보정 자료의 계약일이 없어 시간 분리를 확인할 수 없습니다")
+-        cal_dates = pd.to_datetime(calibration.date, errors="raise")
+-        if cal_dates.isna().any() or not cal_dates.between("2024-07-01", "2024-12-31").all():
+-            raise ValueError("보정 자료는 고정된 2024년 하반기 계약만 허용합니다")
+-        if "source_row_id" in calibration and "source_row_id" in frame and set(calibration.source_row_id) & set(frame.source_row_id):
+-            raise ValueError("같은 계약 행을 보정과 테스트에 중복 사용할 수 없습니다")
+-        residuals = np.abs(_numbers(calibration, "actual_won") - _numbers(calibration, "prediction_won"))
+-        global_radius = finite_radius(residuals, config.alpha)
+-    if global_radius is not None:
+-        lo, hi = prediction - global_radius, prediction + global_radius
+-        features[:, 4] = (lo <= y) & (y <= hi)
+-        features[:, 6] = interval_score(y, lo, hi, config.alpha)
+-        available.update(["H3", "H4", "H8"])
+-        for region, positions in calibration.groupby("region", sort=False).indices.items():
+-            if len(positions) >= config.regional_calibration_min:
+-                radius = finite_radius(residuals[positions], config.alpha)
+-                if radius is not None:
+-                    radii[str(region)] = radius
+-        region_radius = np.asarray([radii.get(region, global_radius) for region in regions])
+-        features[:, 5] = (prediction - region_radius <= y) & (y <= prediction + region_radius)
+-        features[:, 7] = interval_score(y, prediction - region_radius, prediction + region_radius, config.alpha)
+-        if any(region in radii for region in regions):
+-            available.add("H7")
+-        else:
+-            rows["H7"]["reason"] = "테스트 지역에 지역별 보정이 적용되지 않아 비교 효과는 미산출"
+-    scale = metadata.get("train_target_median_won")
+-    scale = float(scale) if scale is not None else float("nan")
+-    edges = metadata.get("train_price_quantiles_won", metadata.get("train_price_edges_won", []))
+-    if np.isfinite(scale) and scale > 0 and len(edges) == 6 and np.isfinite(edges).all() and np.all(np.diff(edges) >= 0) and edges[1] < edges[-2]:
+-        low, high = y <= edges[1], y > edges[-2]
+-        features[:, 8], features[:, 9] = low, low * features[:, 16]
+-        features[:, 10], features[:, 11] = high, high * features[:, 16]
+-        if low.any() and high.any():
+-            available.add("H6")
+-    if "date" in frame:
+-        dates = pd.to_datetime(frame.date, errors="raise")
+-        if dates.isna().any() or not dates.dt.year.eq(2025).all():
+-            raise ValueError("가설 테스트는 고정된 2025년 계약만 허용합니다")
+-        first = dates.dt.month.le(6).to_numpy()
+-        features[:, 12], features[:, 13] = first, first * features[:, 4]
+-        features[:, 14], features[:, 15] = ~first, (~first) * features[:, 4]
+-    else:
+-        available.discard("H8")
+-    aggregate = np.zeros((k, features.shape[1]), dtype=float)
+-    np.add.at(aggregate, cluster_codes, features)
+-    base_group_n = np.bincount(region_codes, minlength=gcount)
+-    group_clusters = np.bincount(cluster_regions, minlength=gcount)
+-    price_clusters = {"low": int((aggregate[:, 8] > 0).sum()), "high": int((aggregate[:, 10] > 0).sum())} if cluster_available else {"low": 0, "high": 0}
+-    eligible = (base_group_n >= config.minimum_group_n) & (group_clusters >= config.minimum_group_clusters) if cluster_available else np.zeros(gcount, dtype=bool)
+-    calibrated_eligible = set(region_labels[eligible]) & set(radii)
+-    if not calibrated_eligible:
+-        available.discard("H7")
+-        rows["H7"]["reason"] = "적격 테스트 지역에 지역별 보정이 적용되지 않아 비교 효과는 미산출"
+-    temporal_eligible = eligible.copy()
+-    for column in (12, 14):
+-        ns = np.bincount(cluster_regions, weights=aggregate[:, column], minlength=gcount)
+-        cs = np.bincount(cluster_regions, weights=(aggregate[:, column] > 0), minlength=gcount)
+-        temporal_eligible &= (ns >= config.minimum_group_n) & (cs >= config.minimum_group_clusters)
+-
+-    def estimates(weights):
+-        total = weights @ aggregate
+-        out = {}
+-        for h, numerator in (("H1", total[2] - total[1]), ("H2", total[3] - total[1])):
+-            out[h] = numerator / total[0]
+-        out["H3"] = total[4] / total[0] - (1 - config.alpha)
+-        out["H6"] = (total[11] / total[10] - total[9] / total[8]) / scale if min(total[8], total[10]) > 0 and scale > 0 else np.nan
+-        gn = np.bincount(cluster_regions, weights=weights * aggregate[:, 0], minlength=gcount)
+-        gc = np.bincount(cluster_regions, weights=weights * aggregate[:, 4], minlength=gcount)
+-        gr = np.bincount(cluster_regions, weights=weights * aggregate[:, 5], minlength=gcount)
+-        if eligible.any() and (gn[eligible] > 0).all():
+-            gap = np.mean(np.abs(gc[eligible] / gn[eligible] - (1 - config.alpha)))
+-            r_gap = np.mean(np.abs(gr[eligible] / gn[eligible] - (1 - config.alpha)))
+-            out["H4"], out["H7"] = gap - config.coverage_tolerance, gap - r_gap
+-        else:
+-            out["H4"], out["H7"] = np.nan, np.nan
+-        temporal = []
+-        for count_column, covered_column in ((12, 13), (14, 15)):
+-            tn = np.bincount(cluster_regions, weights=weights * aggregate[:, count_column], minlength=gcount)
+-            tc = np.bincount(cluster_regions, weights=weights * aggregate[:, covered_column], minlength=gcount)
+-            temporal.append(tc[temporal_eligible] / tn[temporal_eligible] if temporal_eligible.any() and (tn[temporal_eligible] > 0).all() else np.array([np.nan]))
+-        out["H8"] = float(np.mean(temporal[0] - temporal[1]))
+-        return out
+-
+-    base = estimates(np.ones(k))
+-    samples = {h: [] for h in ids}
+-    can_bootstrap = cluster_available and k >= config.minimum_clusters
+-    if can_bootstrap:
+-        rng = np.random.default_rng(config.seed + (0 if target == "jeonse" else 1))
+-        strata = [np.flatnonzero(cluster_regions == region) for region in np.flatnonzero(eligible)]
+-        for _ in range(config.bootstrap_replicates):
+-            weights = rng.multinomial(k, np.full(k, 1 / k)).astype(float)
+-            values = estimates(weights)
+-            for h in ("H1", "H2", "H3", "H6"):
+-                if h in samples:
+-                    samples[h].append(values[h])
+-            # 지역 구성을 고정하는 지표는 각 지역 안에서 단지 군집을 재표집한다.
+-            weights = np.zeros(k)
+-            for positions in strata:
+-                weights[positions] = rng.multinomial(len(positions), np.full(len(positions), 1 / len(positions)))
+-            regional = estimates(weights) if strata else {}
+-            for h in ("H4", "H7", "H8"):
+-                samples[h].append(regional.get(h, np.nan))
+-    for h in ids:
+-        if h not in available:
+-            continue
+-        used_n = int(base_group_n[temporal_eligible if h == "H8" else eligible].sum()) if h in {"H4", "H7", "H8"} else n
+-        reason = "지역 지표는 사전에 정한 최소 표본·단지 군집 조건을 충족한 지역만 평가" if h in {"H4", "H7", "H8"} else ""
+-        used_clusters = int(group_clusters[temporal_eligible if h == "H8" else eligible].sum()) if h in {"H4", "H7", "H8"} else k
+-        sufficient = can_bootstrap and used_clusters >= config.minimum_clusters
+-        if h == "H6":
+-            sufficient &= min(price_clusters.values()) >= config.minimum_clusters
+-            rows[h]["subgroup_clusters"] = price_clusters
+-        _finish(rows[h], base[h], samples[h] if sufficient else None, config, used_n, used_clusters if cluster_available else None, reason)
+-    supplementary = {"cluster_available": bool(cluster_available), "eligible_regions": int(eligible.sum()),
+-                     "temporal_eligible_regions": int(temporal_eligible.sum()), "total_regions": gcount,
+-                     "baseline_selected_on_validation": baseline_name,
+-                     "regional_calibration_fallback": "표본 부족 지역은 전체 보정 반경 사용", "balance_score": None}
+-    supplementary["regional_calibration"] = {"calibrated_test_regions": len(set(regions) & set(radii)),
+-        "calibrated_eligible_regions": len(calibrated_eligible),
+-        "fallback_n": int(sum(region not in radii for region in regions)) if global_radius is not None else None,
+-        "fallback_rate": float(np.mean([region not in radii for region in regions])) if global_radius is not None else None}
+-    if global_radius is not None and scale > 0 and eligible.any():
+-        total = aggregate.sum(axis=0)
+-        gap = base["H4"] + config.coverage_tolerance
+-        supplementary["balance_score"] = balance_score(total[16] / n, total[6] / n, gap, scale, config.alpha)
+-        supplementary["balance_score_status"] = "검증 전 제안 요약지표 · 모델 선택에 사용하지 않음"
+-        supplementary["weight_sensitivity"] = [{"weights": list(w), "value": balance_score(total[16] / n, total[6] / n, gap, scale, config.alpha, w)} for w in ((.5, .25, .25), (.25, .5, .25), (.25, .25, .5))]
+-    return list(rows.values()), supplementary
+-
+-
+-def evaluate_frames(test_frames, calibration_frames, target_metadata, *, config=None, holdout_frames=None):
+-    config = config or AnalysisConfig()
+-    hypotheses, supplementary = [], {}
+-    for target in ("jeonse", "monthly"):
+-        frame = test_frames.get(target, pd.DataFrame())
+-        rows, extra = _target_analysis(frame, calibration_frames.get(target, pd.DataFrame()), target_metadata.get(target, {}), target, config)
+-        hypotheses.extend(rows)
+-        supplementary[target] = extra
+-        h5 = _blank("H5", target, "같은 계약 행의 지역 홀드아웃 비교 결과가 없습니다")
+-        held = (holdout_frames or {}).get(target)
+-        if held is not None and not held.empty and not frame.empty and "source_row_id" in frame and "source_row_id" in held:
+-            if not {"date", "region"}.issubset(frame) or not {"date", "region"}.issubset(held):
+-                raise ValueError("홀드아웃 비교의 날짜·지역 근거가 없습니다")
+-            if frame.source_row_id.duplicated().any() or held.source_row_id.duplicated().any():
+-                raise ValueError("홀드아웃 비교의 원행 식별자가 중복됩니다")
+-            pair = frame.merge(held, on="source_row_id", suffixes=("_seen", "_held"), validate="one_to_one")
+-            if len(pair) != len(held) or pair.empty or not np.array_equal(_numbers(pair, "actual_won_seen"), _numbers(pair, "actual_won_held")):
+-                raise ValueError("홀드아웃 비교의 계약 행·정답이 일치하지 않습니다")
+-            for field in ("date", "region", "cluster_id"):
+-                if f"{field}_seen" in pair and f"{field}_held" in pair and not pair[f"{field}_seen"].astype(str).equals(pair[f"{field}_held"].astype(str)):
+-                    raise ValueError(f"홀드아웃 비교의 {field} 값이 일치하지 않습니다")
+-            delta = np.abs(_numbers(pair, "actual_won_seen") - _numbers(pair, "prediction_won_held")) - np.abs(_numbers(pair, "actual_won_seen") - _numbers(pair, "prediction_won_seen"))
+-            boot, clusters = None, None
+-            if "cluster_id_seen" in pair and pair.cluster_id_seen.notna().all() and pair.cluster_id_seen.astype(str).str.strip().ne("").all():
+-                stats = pd.DataFrame({"id": pair.cluster_id_seen, "loss": delta, "n": 1}).groupby("id")[["loss", "n"]].sum().to_numpy()
+-                clusters = len(stats)
+-                if clusters >= config.minimum_clusters:
+-                    rng = np.random.default_rng(config.seed + 5)
+-                    boot = []
+-                    for _ in range(config.bootstrap_replicates):
+-                        values = stats[rng.integers(0, clusters, size=clusters)].sum(axis=0)
+-                        boot.append(values[0] / values[1])
+-            _finish(h5, float(delta.mean()), boot, config, len(pair), clusters)
+-        hypotheses.append(h5)
+-    hypotheses.sort(key=lambda row: (int(row["id"][1:]), row["target"]))
+-    return {"config": asdict(config), "hypotheses": hypotheses, "supplementary": supplementary, "sources": SOURCES,
+-            "inference": {"method": "단지 군집 percentile bootstrap; 지역 지표는 지역 내 군집 재표집", "family_size": 15,
+-                          "marginal_interval_confidence": 1 - (1 - config.confidence) / 15,
+-                          "target_family_confidence": config.confidence,
+-                          "warning": "근사적·학습된 모델 조건부 추론입니다. 시간 이동·군집 간 의존·작은 표본에서 보장하지 않습니다. 유의확률은 산출하지 않습니다."}}
+-
+-
+-def _snapshot_fingerprints(summary):
+-    """선언한 입력 식별 근거를 검사한다. REAL 자료의 사실성 인증은 별도다."""
+-    provenance = summary.get("provenance", {})
+-    if not isinstance(provenance, dict):
+-        raise ValueError("입력 출처 provenance 형식 오류")
+-    sources = provenance.get("sources", [])
+-    if not isinstance(sources, list):
+-        raise ValueError("입력 출처 provenance 목록 오류")
+-    result = []
+-    for source in sources:
+-        if not isinstance(source, dict):
+-            raise ValueError("입력 출처 스냅숏 형식 오류")
+-        digest = str(source.get("verified_sha256", source.get("sha256", "")))
+-        snapshot, count = source.get("snapshot_id"), source.get("rows")
+-        if (len(digest) != 64 or any(c not in "0123456789abcdefABCDEF" for c in digest)
+-                or not isinstance(snapshot, str) or not snapshot.strip()
+-                or type(count) is not int or count <= 0):
+-            raise ValueError("입력 출처 스냅숏 근거가 유효하지 않습니다")
+-        result.append((digest.lower(), snapshot.strip(), count))
+-    if len(result) != len(set(result)):
+-        raise ValueError("입력 출처 스냅숏 중복")
+-    return sorted(result)
+-
+-
+-def _read_persisted_frames(folder, summary, role, evidence):
+-    """실제 읽은 동일 바이트를 해시하며 앞자리 0을 포함한 문자열 ID를 보존한다."""
+-    if not isinstance(summary, dict) or summary.get("mode") not in {"REAL", "SYNTHETIC"}:
+-        raise ValueError("연구 결과 mode/모드는 REAL 또는 SYNTHETIC이어야 합니다")
+-    if summary["mode"] == "REAL" and not _snapshot_fingerprints(summary):
+-        raise ValueError("REAL 연구 결과의 입력 출처 스냅숏 근거가 없습니다")
+-    targets = summary.get("targets")
+-    if not isinstance(targets, dict) or not set(targets).issubset({"jeonse", "monthly"}):
+-        raise ValueError("연구 결과의 목표 목록 오류")
+-    frames = {"test": {}, "calibration": {}}
+-    all_ids = set()
+-    for target in ("jeonse", "monthly"):
+-        metadata = targets.get(target)
+-        names = {"test": f"{target}_predictions.csv", "calibration": f"{target}_calibration_predictions.csv"}
+-        if metadata is None:
+-            if any((folder / name).exists() for name in names.values()):
+-                raise ValueError("선언하지 않은 목표의 예측 파일")
+-            continue
+-        if not isinstance(metadata, dict):
+-            raise ValueError("목표별 연구 메타데이터 오류")
+-        counts = metadata.get("split_counts")
+-        if (not isinstance(counts, dict) or set(counts) != {"train", "validation", "calibration", "test"}
+-                or any(type(n) is not int or n < 0 for n in counts.values())):
+-            raise ValueError("목표별 분할 건수 근거 누락/오류")
+-        if "split_counts" in summary and (not isinstance(summary["split_counts"], dict) or summary["split_counts"].get(target) != counts):
+-            raise ValueError("상위/목표별 분할 건수 불일치")
+-        for split, name in names.items():
+-            path = folder / name
+-            if not path.is_file():
+-                raise ValueError("선언한 분할 예측 CSV 누락: " + name)
+-            raw = path.read_bytes()
+-            from .input_contracts import strict_csv
+-            required = {"source_row_id", "cluster_id", "region", "date", "actual_won", "prediction_won"}
+-            frame = strict_csv(raw, required=required,dtype={key:str for key in ('source_row_id','cluster_id','region','date')})
+-            if not required.issubset(frame):
+-                raise ValueError("저장 예측의 원행 ID/지역/날짜/정답/예측 칼럼 누락")
+-            ids = frame.source_row_id
+-            if ids.str.strip().eq("").any() or ids.duplicated().any():
+-                raise ValueError("저장 예측 원행 식별 ID 누락/중복")
+-            if len(frame) != counts[split]:
+-                raise ValueError("저장 예측과 분할 건수 불일치")
+-            if all_ids.intersection(ids):
+-                raise ValueError("보정/테스트 또는 목표 간 같은 원행 ID 중복")
+-            all_ids.update(ids)
+-            dates = pd.to_datetime(frame.date, errors="raise", format="%Y-%m-%d")
+-            start, end = ("2025-01-01", "2025-12-31") if split == "test" else ("2024-07-01", "2024-12-31")
+-            if dates.isna().any() or not dates.between(start, end).all():
+-                raise ValueError("저장 예측의 고정 시간 분할 위반")
+-            if frame.region.str.strip().eq("").any():
+-                raise ValueError("저장 예측의 지역 누락")
+-            _numbers(frame, "actual_won"); _numbers(frame, "prediction_won")
+-            if (pd.to_numeric(frame.actual_won) <= 0).any():
+-                raise ValueError("저장 예측의 양수 정답 필요")
+-            frames[split][target] = frame
+-            evidence.append({"role": role, "path": name, "rows": len(frame),
+-                             "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()})
+-    return frames["test"], frames["calibration"]
+-
+-
+-def write_research_results(output: Path, summary: dict, *, config=None, holdout_result=None):
+-    output = Path(output)
+-    evidence = []
+-    tests, calibrations = _read_persisted_frames(output, summary, "ordinary", evidence)
+-    held = {}
+-    if holdout_result is not None:
+-        held_folder = Path(holdout_result)
+-        raw = (held_folder / "summary.json").read_bytes()
+-        held_summary = json.loads(raw.decode("utf-8-sig"))
+-        if (summary.get("holdout_region") is not None or not isinstance(held_summary, dict)
+-                or held_summary.get("holdout_region") != "서울특별시"
+-                or held_summary.get("mode") != summary.get("mode")):
+-            raise ValueError("일반 시간분할과 고정 서울 홀드아웃만 비교할 수 있습니다")
+-        from .input_contracts import validate_holdout_settings
+-        validate_holdout_settings(summary,held_summary)
+-        if not _snapshot_fingerprints(summary) or _snapshot_fingerprints(summary) != _snapshot_fingerprints(held_summary):
+-            raise ValueError("홀드아웃 비교의 입력 스냅숏 근거가 없거나 서로 다릅니다")
+-        evidence.append({"role": "holdout", "path": "summary.json", "bytes": len(raw),
+-                         "sha256": hashlib.sha256(raw).hexdigest()})
+-        held, held_cal = _read_persisted_frames(held_folder, held_summary, "holdout", evidence)
+-        if set(held) != set(tests):
+-            raise ValueError("서울 홀드아웃 목표 집합 불일치")
+-        for target, frame in tests.items():
+-            seoul = frame.region.eq("서울특별시") | frame.region.str.startswith("서울특별시 ")
+-            expected = set(frame.loc[seoul, "source_row_id"])
+-            if not expected or set(held[target].source_row_id) != expected:
+-                raise ValueError("서울 홀드아웃의 전체 테스트 행 집합 불일치")
+-            other = held_cal[target]
+-            if (other.region.eq("서울특별시") | other.region.str.startswith("서울특별시 ")).any():
+-                raise ValueError("서울 홀드아웃 보정 자료에 제외 지역이 포함됨")
+-    result = evaluate_frames(tests, calibrations, summary.get("targets", {}), config=config, holdout_frames=held)
+-    result["mode"] = summary.get("mode")
+-    result["input_files"] = evidence
+-    result["analysis_code_sha256"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+-    if summary.get("mode") == "SYNTHETIC":
+-        for row in result["hypotheses"]:
+-            row["decision"] = "inconclusive" if row["effect"] is not None else "unmeasured"
+-            row["reason"] = "합성 기술 검증이며 논문 가설의 실측 지지 근거가 아닙니다. " + row["reason"]
+-    records = [{**row, "ci": json.dumps(row["ci"], ensure_ascii=False)} for row in result["hypotheses"]]
+-    pd.DataFrame(records).to_csv(output / "hypothesis_results.csv", index=False, encoding="utf-8-sig")
+-    measured = any(row["effect"] is not None for row in result["hypotheses"])
+-    result["artifacts"] = [{"id": "hypothesis_results", "title": "8개 가설의 15개 목표별 평가",
+-                            "status": "measured" if measured else "unmeasured",
+-                            "csv": "hypothesis_results.csv", "png": None}]
+-    (output / "hypothesis_results.json").write_text(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+-    return result
++"""사전에 정한 가설에 저장된 예측을 적용한다. 이 모듈은 모델을 학습하지 않는다."""
++from __future__ import annotations
++from dataclasses import dataclass, asdict
++from pathlib import Path
++import hashlib
++import io
++import json
++import math
++
++import numpy as np
++import pandas as pd
++
++TITLES = {
++    "H1": "미래 계약에서 AI와 중앙값 기준의 오차 차이",
++    "H2": "관측 보증금의 월세 예측 기여",
++    "H3": "명목 90% 예측구간과 실제 포함률의 동등성",
++    "H4": "지역 동일 가중 포함률 편차",
++    "H5": "미학습 지역으로 이동할 때의 오차 증가",
++    "H6": "학습기 가격 구간에 따른 정규화 오차 차이",
++    "H7": "지역별 보정에 따른 포함률 편차 감소",
++    "H8": "지역 구성을 맞춘 상·하반기 포함률 감소",
++}
++FORMULAS = {"H1": "MAE(검증 선택 기준모델) − MAE(검증 선택 AI)",
++            "H2": "MAE(보증금 제외 AI) − MAE(보증금 포함 AI)",
++            "H3": "실제 포함률 − (1 − α), 동등성 범위 ±ε",
++            "H4": "mean_g |coverage_g − (1−α)| − ε",
++            "H5": "MAE(지역 홀드아웃) − MAE(일반 시간분할)",
++            "H6": "[MAE(학습기 상위 가격구간) − MAE(하위 구간)] / median_train(y)",
++            "H7": "macro_gap(전체 보정) − macro_gap(지역 보정)",
++            "H8": "mean_g [coverage_g,상반기 − coverage_g,하반기]"}
++SOURCES = [
++    {"id": "Lei2018", "title": "Distribution-Free Predictive Inference for Regression", "url": "https://doi.org/10.1080/01621459.2017.1307116", "use": "분할 conformal의 순위와 구간"},
++    {"id": "Gneiting2007", "title": "Strictly Proper Scoring Rules, Prediction, and Estimation", "url": "https://doi.org/10.1198/016214506000001437", "use": "예측구간 폭과 미포함 벌점을 결합한 interval score"},
++    {"id": "Vovk2012", "title": "Conditional Validity of Inductive Conformal Predictors", "url": "https://proceedings.mlr.press/v25/vovk12.html", "use": "조건부·그룹별 보정의 근거와 한계"},
++    {"id": "Cameron2008", "title": "Bootstrap-Based Improvements for Inference with Clustered Errors", "url": "https://www.nber.org/papers/t0344", "use": "군집 의존성 고려의 동기. 논문의 bootstrap-t를 그대로 구현한 것은 아님"},
++]
++
++
++@dataclass(frozen=True)
++class AnalysisConfig:
++    alpha: float = .1
++    coverage_tolerance: float = .02
++    confidence: float = .95
++    family_size: int = 15
++    bootstrap_replicates: int = 9999
++    minimum_clusters: int = 20
++    minimum_group_n: int = 30
++    minimum_group_clusters: int = 5
++    regional_calibration_min: int = 100
++    seed: int = 20261126
++
++    def __post_init__(self):
++        for field in ('family_size','bootstrap_replicates','minimum_clusters','minimum_group_n',
++                      'minimum_group_clusters','regional_calibration_min','seed'):
++            value=getattr(self,field)
++            if type(value) is not int or value < (0 if field=='seed' else 1):
++                raise ValueError('분석 설정의 개수·군집·시드는 범위에 맞는 정수여야 합니다')
++        if not 0 < self.alpha < 1 or not 0 < self.confidence < 1:
++            raise ValueError("alpha와 신뢰수준은 0과 1 사이여야 합니다")
++        if not 0 < self.coverage_tolerance < 1 or self.family_size != 15:
++            raise ValueError("동등성 허용오차와 고정 15개 평가 가족을 확인하십시오")
++        if self.bootstrap_replicates < 99 or self.minimum_clusters < 2 or self.minimum_group_clusters < 2:
++            raise ValueError("부트스트랩 반복·군집 조건이 부족합니다")
++        if self.minimum_group_n < 1 or self.regional_calibration_min < 1:
++            raise ValueError("최소 표본 수는 양수여야 합니다")
++
++
++def interval_score(actual, lower, upper, alpha=.1):
++    y, lo, hi = [np.asarray(v, dtype=float) for v in (actual, lower, upper)]
++    if y.shape != lo.shape or y.shape != hi.shape or not 0 < alpha < 1:
++        raise ValueError("구간 점수의 모양 또는 alpha 오류")
++    if not all(np.isfinite(v).all() for v in (y, lo, hi)) or (lo > hi).any():
++        raise ValueError("구간 점수에는 유한한 값과 올바른 하한·상한이 필요합니다")
++    return hi - lo + 2 / alpha * np.maximum(lo - y, 0) + 2 / alpha * np.maximum(y - hi, 0)
++
++
++def finite_radius(residuals, alpha=.1):
++    values = np.asarray(residuals, dtype=float)
++    if values.ndim != 1 or not np.isfinite(values).all() or (values < 0).any() or not 0 < alpha < 1:
++        raise ValueError("보정 잔차 또는 alpha 오류")
++    rank = math.ceil((len(values) + 1) * (1 - alpha))
++    return None if rank > len(values) or not len(values) else float(np.partition(values, rank - 1)[rank - 1])
++
++
++def balance_score(mae, mean_interval_score, macro_gap, train_scale, alpha=.1, weights=(.5, .25, .25)):
++    """연구용 제안 지표. proper score나 검증된 신규 통계량이라고 주장하지 않는다."""
++    if len(weights) != 3:
++        raise ValueError("균형 손실은 정확히 3개 가중치가 필요합니다")
++    values = np.asarray([mae, mean_interval_score, macro_gap, train_scale, alpha, *weights], dtype=float)
++    if not np.isfinite(values).all() or train_scale <= 0 or not 0 < alpha < 1:
++        raise ValueError("균형 손실의 척도와 입력은 유효해야 합니다")
++    if min(mae, mean_interval_score, macro_gap, *weights) < 0 or not np.isclose(sum(weights), 1):
++        raise ValueError("음수가 아닌 손실과 합계 1인 가중치가 필요합니다")
++    return float(weights[0] * mae / train_scale + weights[1] * mean_interval_score / train_scale + weights[2] * macro_gap / alpha)
++
++
++def _numbers(frame, column):
++    if column not in frame:
++        return None
++    values = pd.to_numeric(frame[column], errors="raise").to_numpy(dtype=float)
++    if not np.isfinite(values).all():
++        raise ValueError(f"유한하지 않은 예측·정답 칼럼: {column}")
++    return values
++
++
++def _blank(hypothesis, target, reason="필요한 입력 또는 비교 결과가 없습니다"):
++    return {"id": hypothesis, "target": target, "title": TITLES[hypothesis], "formula": FORMULAS[hypothesis],
++            "status": "unmeasured", "effect": None, "ci": None, "decision": "unmeasured", "reason": reason,
++            "n": None, "clusters": None, "unit": "원" if hypothesis in {"H1", "H2", "H5"} else "무차원"}
++
++
++def _interval(samples, config):
++    values = np.asarray(samples, dtype=float)
++    values = values[np.isfinite(values)]
++    if len(values) < math.ceil(.8 * config.bootstrap_replicates):
++        return None
++    tail = (1 - config.confidence) / config.family_size / 2
++    return [float(v) for v in np.quantile(values, [tail, 1 - tail])]
++
++
++def _finish(row, value, samples, config, n, clusters, reason=""):
++    if not np.isfinite(value):
++        return row
++    row.update(status="measured", effect=float(value), n=int(n), clusters=clusters, reason=reason)
++    row["bootstrap_requested"] = config.bootstrap_replicates
++    row["bootstrap_valid"] = int(np.isfinite(samples).sum()) if samples is not None else 0
++    row["ci"] = _interval(samples, config) if samples is not None else None
++    row["decision"] = "inconclusive"
++    if row["ci"] is None:
++        row["status"] = "partial"
++        row["reason"] = (reason + " · " if reason else "") + "군집 식별·표본·유효 재표집이 부족하여 신뢰구간과 확정 판정은 미산출"
++    elif not _confirmatory_config(config):
++        row["status"] = "partial"
++        row["reason"] = (reason + " · " if reason else "") + "기술 확인용 반복수 또는 변경된 분석 조건입니다. 논문용 확정 판정에 사용하지 않습니다"
++    elif row["id"] == "H3":
++        lo, hi = row["ci"]
++        eps = config.coverage_tolerance
++        row["decision"] = "support" if lo > -eps and hi < eps else "not_support" if lo > eps or hi < -eps else "inconclusive"
++    else:
++        lo, hi = row["ci"]
++        row["decision"] = "support" if lo > 0 else "not_support" if hi <= 0 else "inconclusive"
++    return row
++
++
++def _confirmatory_config(config):
++    from .research_protocol import confirmatory_settings
++    return confirmatory_settings(asdict(config))
++
++
++def _target_analysis(frame, calibration, metadata, target, config):
++    ids = [h for h in TITLES if h not in {"H5"} and (h != "H2" or target == "monthly")]
++    rows = {h: _blank(h, target) for h in ids}
++    if frame.empty or "actual_won" not in frame or "prediction_won" not in frame or "region" not in frame:
++        return list(rows.values()), {}
++    if "date" not in frame:
++        raise ValueError("가설 테스트의 계약일이 없어 고정 2025년 분리를 확인할 수 없습니다")
++    y, prediction = _numbers(frame, "actual_won"), _numbers(frame, "prediction_won")
++    if (y <= 0).any() or frame.region.isna().any() or frame.region.astype(str).str.strip().eq("").any():
++        raise ValueError("가설 평가에는 양수 정답과 관측 지역이 필요합니다")
++    n = len(frame)
++    regions = frame.region.astype(str).to_numpy()
++    region_codes, region_labels = pd.factorize(regions, sort=True)
++    gcount = len(region_labels)
++    cluster_available = "cluster_id" in frame and frame.cluster_id.notna().all() and frame.cluster_id.astype(str).str.strip().ne("").all()
++    cluster_labels = frame.cluster_id.astype(str).to_numpy() if cluster_available else regions
++    cluster_codes, cluster_names = pd.factorize(cluster_labels, sort=True)
++    k = len(cluster_names)
++    mapping = pd.DataFrame({"cluster": cluster_codes, "region": region_codes}).groupby("cluster").region
++    if mapping.nunique().gt(1).any():
++        raise ValueError("같은 단지 식별자가 여러 지역에 연결되었습니다")
++    cluster_regions = mapping.first().to_numpy()
++    # 열: 표본, AI오차, 기준오차, 보증금제외오차, 전체/지역포함, 전체/지역구간점수,
++    # 하위가격표본/오차, 상위가격표본/오차, 상반기표본/포함, 하반기표본/포함, 선택모델오차.
++    features = np.zeros((n, 17), dtype=float)
++    features[:, 0] = 1
++    features[:, 16] = np.abs(y - prediction)
++    available = set()
++    ai = _numbers(frame, "prediction_ai_won")
++    baseline_name = metadata.get("best_baseline_model")
++    if not baseline_name:
++        validation = metadata.get("validation", {})
++        names = [name for name in ("global_median", "region_median") if name in validation]
++        baseline_name = min(names, key=lambda name: (validation[name]["mae"], name)) if names else None
++    baseline = _numbers(frame, f"prediction_{baseline_name}_won") if baseline_name else None
++    if ai is not None:
++        features[:, 1] = np.abs(y - ai)
++    if ai is not None and baseline is not None:
++        features[:, 2] = np.abs(y - baseline)
++        available.add("H1")
++    no_deposit = _numbers(frame, "prediction_no_deposit_won")
++    if target == "monthly" and ai is not None and no_deposit is not None:
++        features[:, 3] = np.abs(y - no_deposit)
++        available.add("H2")
++    global_radius = None
++    radii = {}
++    region_radius = None
++    if not calibration.empty and {"actual_won", "prediction_won", "region"}.issubset(calibration):
++        if "date" not in calibration:
++            raise ValueError("보정 자료의 계약일이 없어 시간 분리를 확인할 수 없습니다")
++        cal_dates = pd.to_datetime(calibration.date, errors="raise")
++        if cal_dates.isna().any() or not cal_dates.between("2024-07-01", "2024-12-31").all():
++            raise ValueError("보정 자료는 고정된 2024년 하반기 계약만 허용합니다")
++        if "source_row_id" in calibration and "source_row_id" in frame and set(calibration.source_row_id) & set(frame.source_row_id):
++            raise ValueError("같은 계약 행을 보정과 테스트에 중복 사용할 수 없습니다")
++        residuals = np.abs(_numbers(calibration, "actual_won") - _numbers(calibration, "prediction_won"))
++        global_radius = finite_radius(residuals, config.alpha)
++    if global_radius is not None:
++        lo, hi = prediction - global_radius, prediction + global_radius
++        features[:, 4] = (lo <= y) & (y <= hi)
++        features[:, 6] = interval_score(y, lo, hi, config.alpha)
++        available.update(["H3", "H4", "H8"])
++        for region, positions in calibration.groupby("region", sort=False).indices.items():
++            if len(positions) >= config.regional_calibration_min:
++                radius = finite_radius(residuals[positions], config.alpha)
++                if radius is not None:
++                    radii[str(region)] = radius
++        region_radius = np.asarray([radii.get(region, global_radius) for region in regions])
++        features[:, 5] = (prediction - region_radius <= y) & (y <= prediction + region_radius)
++        features[:, 7] = interval_score(y, prediction - region_radius, prediction + region_radius, config.alpha)
++        if any(region in radii for region in regions):
++            available.add("H7")
++        else:
++            rows["H7"]["reason"] = "테스트 지역에 지역별 보정이 적용되지 않아 비교 효과는 미산출"
++    scale = metadata.get("train_target_median_won")
++    scale = float(scale) if scale is not None else float("nan")
++    edges = metadata.get("train_price_quantiles_won", metadata.get("train_price_edges_won", []))
++    if np.isfinite(scale) and scale > 0 and len(edges) == 6 and np.isfinite(edges).all() and np.all(np.diff(edges) >= 0) and edges[1] < edges[-2]:
++        low, high = y <= edges[1], y > edges[-2]
++        features[:, 8], features[:, 9] = low, low * features[:, 16]
++        features[:, 10], features[:, 11] = high, high * features[:, 16]
++        if low.any() and high.any():
++            available.add("H6")
++    if "date" in frame:
++        dates = pd.to_datetime(frame.date, errors="raise")
++        if dates.isna().any() or not dates.dt.year.eq(2025).all():
++            raise ValueError("가설 테스트는 고정된 2025년 계약만 허용합니다")
++        first = dates.dt.month.le(6).to_numpy()
++        features[:, 12], features[:, 13] = first, first * features[:, 4]
++        features[:, 14], features[:, 15] = ~first, (~first) * features[:, 4]
++    else:
++        available.discard("H8")
++    aggregate = np.zeros((k, features.shape[1]), dtype=float)
++    np.add.at(aggregate, cluster_codes, features)
++    base_group_n = np.bincount(region_codes, minlength=gcount)
++    group_clusters = np.bincount(cluster_regions, minlength=gcount)
++    price_clusters = {"low": int((aggregate[:, 8] > 0).sum()), "high": int((aggregate[:, 10] > 0).sum())} if cluster_available else {"low": 0, "high": 0}
++    eligible = (base_group_n >= config.minimum_group_n) & (group_clusters >= config.minimum_group_clusters) if cluster_available else np.zeros(gcount, dtype=bool)
++    calibrated_eligible = set(region_labels[eligible]) & set(radii)
++    if not calibrated_eligible:
++        available.discard("H7")
++        rows["H7"]["reason"] = "적격 테스트 지역에 지역별 보정이 적용되지 않아 비교 효과는 미산출"
++    temporal_eligible = eligible.copy()
++    for column in (12, 14):
++        ns = np.bincount(cluster_regions, weights=aggregate[:, column], minlength=gcount)
++        cs = np.bincount(cluster_regions, weights=(aggregate[:, column] > 0), minlength=gcount)
++        temporal_eligible &= (ns >= config.minimum_group_n) & (cs >= config.minimum_group_clusters)
++
++    def estimates(weights):
++        total = weights @ aggregate
++        out = {}
++        for h, numerator in (("H1", total[2] - total[1]), ("H2", total[3] - total[1])):
++            out[h] = numerator / total[0]
++        out["H3"] = total[4] / total[0] - (1 - config.alpha)
++        out["H6"] = (total[11] / total[10] - total[9] / total[8]) / scale if min(total[8], total[10]) > 0 and scale > 0 else np.nan
++        gn = np.bincount(cluster_regions, weights=weights * aggregate[:, 0], minlength=gcount)
++        gc = np.bincount(cluster_regions, weights=weights * aggregate[:, 4], minlength=gcount)
++        gr = np.bincount(cluster_regions, weights=weights * aggregate[:, 5], minlength=gcount)
++        if eligible.any() and (gn[eligible] > 0).all():
++            gap = np.mean(np.abs(gc[eligible] / gn[eligible] - (1 - config.alpha)))
++            r_gap = np.mean(np.abs(gr[eligible] / gn[eligible] - (1 - config.alpha)))
++            out["H4"], out["H7"] = gap - config.coverage_tolerance, gap - r_gap
++        else:
++            out["H4"], out["H7"] = np.nan, np.nan
++        temporal = []
++        for count_column, covered_column in ((12, 13), (14, 15)):
++            tn = np.bincount(cluster_regions, weights=weights * aggregate[:, count_column], minlength=gcount)
++            tc = np.bincount(cluster_regions, weights=weights * aggregate[:, covered_column], minlength=gcount)
++            temporal.append(tc[temporal_eligible] / tn[temporal_eligible] if temporal_eligible.any() and (tn[temporal_eligible] > 0).all() else np.array([np.nan]))
++        out["H8"] = float(np.mean(temporal[0] - temporal[1]))
++        return out
++
++    base = estimates(np.ones(k))
++    samples = {h: [] for h in ids}
++    can_bootstrap = cluster_available and k >= config.minimum_clusters
++    if can_bootstrap:
++        rng = np.random.default_rng(config.seed + (0 if target == "jeonse" else 1))
++        strata = [np.flatnonzero(cluster_regions == region) for region in np.flatnonzero(eligible)]
++        for _ in range(config.bootstrap_replicates):
++            weights = rng.multinomial(k, np.full(k, 1 / k)).astype(float)
++            values = estimates(weights)
++            for h in ("H1", "H2", "H3", "H6"):
++                if h in samples:
++                    samples[h].append(values[h])
++            # 지역 구성을 고정하는 지표는 각 지역 안에서 단지 군집을 재표집한다.
++            weights = np.zeros(k)
++            for positions in strata:
++                weights[positions] = rng.multinomial(len(positions), np.full(len(positions), 1 / len(positions)))
++            regional = estimates(weights) if strata else {}
++            for h in ("H4", "H7", "H8"):
++                samples[h].append(regional.get(h, np.nan))
++    for h in ids:
++        if h not in available:
++            continue
++        used_n = int(base_group_n[temporal_eligible if h == "H8" else eligible].sum()) if h in {"H4", "H7", "H8"} else n
++        reason = "지역 지표는 사전에 정한 최소 표본·단지 군집 조건을 충족한 지역만 평가" if h in {"H4", "H7", "H8"} else ""
++        used_clusters = int(group_clusters[temporal_eligible if h == "H8" else eligible].sum()) if h in {"H4", "H7", "H8"} else k
++        sufficient = can_bootstrap and used_clusters >= config.minimum_clusters
++        if h == "H6":
++            sufficient &= min(price_clusters.values()) >= config.minimum_clusters
++            rows[h]["subgroup_clusters"] = price_clusters
++        _finish(rows[h], base[h], samples[h] if sufficient else None, config, used_n, used_clusters if cluster_available else None, reason)
++    supplementary = {"cluster_available": bool(cluster_available), "eligible_regions": int(eligible.sum()),
++                     "temporal_eligible_regions": int(temporal_eligible.sum()), "total_regions": gcount,
++                     "baseline_selected_on_validation": baseline_name,
++                     "regional_calibration_fallback": "표본 부족 지역은 전체 보정 반경 사용", "balance_score": None}
++    supplementary["regional_calibration"] = {"calibrated_test_regions": len(set(regions) & set(radii)),
++        "calibrated_eligible_regions": len(calibrated_eligible),
++        "fallback_n": int(sum(region not in radii for region in regions)) if global_radius is not None else None,
++        "fallback_rate": float(np.mean([region not in radii for region in regions])) if global_radius is not None else None}
++    if global_radius is not None and scale > 0 and eligible.any():
++        total = aggregate.sum(axis=0)
++        gap = base["H4"] + config.coverage_tolerance
++        supplementary["balance_score"] = balance_score(total[16] / n, total[6] / n, gap, scale, config.alpha)
++        supplementary["balance_score_status"] = "검증 전 제안 요약지표 · 모델 선택에 사용하지 않음"
++        supplementary["weight_sensitivity"] = [{"weights": list(w), "value": balance_score(total[16] / n, total[6] / n, gap, scale, config.alpha, w)} for w in ((.5, .25, .25), (.25, .5, .25), (.25, .25, .5))]
++    return list(rows.values()), supplementary
++
++
++def evaluate_frames(test_frames, calibration_frames, target_metadata, *, config=None, holdout_frames=None):
++    config = config or AnalysisConfig()
++    hypotheses, supplementary = [], {}
++    for target in ("jeonse", "monthly"):
++        frame = test_frames.get(target, pd.DataFrame())
++        rows, extra = _target_analysis(frame, calibration_frames.get(target, pd.DataFrame()), target_metadata.get(target, {}), target, config)
++        hypotheses.extend(rows)
++        supplementary[target] = extra
++        h5 = _blank("H5", target, "같은 계약 행의 지역 홀드아웃 비교 결과가 없습니다")
++        held = (holdout_frames or {}).get(target)
++        if held is not None and not held.empty and not frame.empty and "source_row_id" in frame and "source_row_id" in held:
++            if not {"date", "region"}.issubset(frame) or not {"date", "region"}.issubset(held):
++                raise ValueError("홀드아웃 비교의 날짜·지역 근거가 없습니다")
++            if frame.source_row_id.duplicated().any() or held.source_row_id.duplicated().any():
++                raise ValueError("홀드아웃 비교의 원행 식별자가 중복됩니다")
++            pair = frame.merge(held, on="source_row_id", suffixes=("_seen", "_held"), validate="one_to_one")
++            if len(pair) != len(held) or pair.empty or not np.array_equal(_numbers(pair, "actual_won_seen"), _numbers(pair, "actual_won_held")):
++                raise ValueError("홀드아웃 비교의 계약 행·정답이 일치하지 않습니다")
++            for field in ("date", "region", "cluster_id"):
++                if f"{field}_seen" in pair and f"{field}_held" in pair and not pair[f"{field}_seen"].astype(str).equals(pair[f"{field}_held"].astype(str)):
++                    raise ValueError(f"홀드아웃 비교의 {field} 값이 일치하지 않습니다")
++            delta = np.abs(_numbers(pair, "actual_won_seen") - _numbers(pair, "prediction_won_held")) - np.abs(_numbers(pair, "actual_won_seen") - _numbers(pair, "prediction_won_seen"))
++            boot, clusters = None, None
++            if "cluster_id_seen" in pair and pair.cluster_id_seen.notna().all() and pair.cluster_id_seen.astype(str).str.strip().ne("").all():
++                stats = pd.DataFrame({"id": pair.cluster_id_seen, "loss": delta, "n": 1}).groupby("id")[["loss", "n"]].sum().to_numpy()
++                clusters = len(stats)
++                if clusters >= config.minimum_clusters:
++                    rng = np.random.default_rng(config.seed + 5)
++                    boot = []
++                    for _ in range(config.bootstrap_replicates):
++                        values = stats[rng.integers(0, clusters, size=clusters)].sum(axis=0)
++                        boot.append(values[0] / values[1])
++            _finish(h5, float(delta.mean()), boot, config, len(pair), clusters)
++        hypotheses.append(h5)
++    hypotheses.sort(key=lambda row: (int(row["id"][1:]), row["target"]))
++    return {"config": asdict(config), "hypotheses": hypotheses, "supplementary": supplementary, "sources": SOURCES,
++            "inference": {"method": "단지 군집 percentile bootstrap; 지역 지표는 지역 내 군집 재표집", "family_size": 15,
++                          "marginal_interval_confidence": 1 - (1 - config.confidence) / 15,
++                          "target_family_confidence": config.confidence,
++                          "warning": "근사적·학습된 모델 조건부 추론입니다. 시간 이동·군집 간 의존·작은 표본에서 보장하지 않습니다. 유의확률은 산출하지 않습니다."}}
++
++
++def _snapshot_fingerprints(summary):
++    """선언한 입력 식별 근거를 검사한다. REAL 자료의 사실성 인증은 별도다."""
++    provenance = summary.get("provenance", {})
++    if not isinstance(provenance, dict):
++        raise ValueError("입력 출처 provenance 형식 오류")
++    sources = provenance.get("sources", [])
++    if not isinstance(sources, list):
++        raise ValueError("입력 출처 provenance 목록 오류")
++    result = []
++    for source in sources:
++        if not isinstance(source, dict):
++            raise ValueError("입력 출처 스냅숏 형식 오류")
++        digest = str(source.get("verified_sha256", source.get("sha256", "")))
++        snapshot, count = source.get("snapshot_id"), source.get("rows")
++        if (len(digest) != 64 or any(c not in "0123456789abcdefABCDEF" for c in digest)
++                or not isinstance(snapshot, str) or not snapshot.strip()
++                or type(count) is not int or count <= 0):
++            raise ValueError("입력 출처 스냅숏 근거가 유효하지 않습니다")
++        result.append((digest.lower(), snapshot.strip(), count))
++    if len(result) != len(set(result)):
++        raise ValueError("입력 출처 스냅숏 중복")
++    return sorted(result)
++
++
++def _read_persisted_frames(folder, summary, role, evidence):
++    """실제 읽은 동일 바이트를 해시하며 앞자리 0을 포함한 문자열 ID를 보존한다."""
++    if not isinstance(summary, dict) or summary.get("mode") not in {"REAL", "SYNTHETIC"}:
++        raise ValueError("연구 결과 mode/모드는 REAL 또는 SYNTHETIC이어야 합니다")
++    if summary["mode"] == "REAL" and not _snapshot_fingerprints(summary):
++        raise ValueError("REAL 연구 결과의 입력 출처 스냅숏 근거가 없습니다")
++    targets = summary.get("targets")
++    if not isinstance(targets, dict) or not set(targets).issubset({"jeonse", "monthly"}):
++        raise ValueError("연구 결과의 목표 목록 오류")
++    frames = {"test": {}, "calibration": {}}
++    all_ids = set()
++    for target in ("jeonse", "monthly"):
++        metadata = targets.get(target)
++        names = {"test": f"{target}_predictions.csv", "calibration": f"{target}_calibration_predictions.csv"}
++        if metadata is None:
++            if any((folder / name).exists() for name in names.values()):
++                raise ValueError("선언하지 않은 목표의 예측 파일")
++            continue
++        if not isinstance(metadata, dict):
++            raise ValueError("목표별 연구 메타데이터 오류")
++        counts = metadata.get("split_counts")
++        if (not isinstance(counts, dict) or set(counts) != {"train", "validation", "calibration", "test"}
++                or any(type(n) is not int or n < 0 for n in counts.values())):
++            raise ValueError("목표별 분할 건수 근거 누락/오류")
++        if "split_counts" in summary and (not isinstance(summary["split_counts"], dict) or summary["split_counts"].get(target) != counts):
++            raise ValueError("상위/목표별 분할 건수 불일치")
++        for split, name in names.items():
++            path = folder / name
++            if not path.is_file():
++                raise ValueError("선언한 분할 예측 CSV 누락: " + name)
++            raw = path.read_bytes()
++            from .input_contracts import strict_csv
++            required = {"source_row_id", "cluster_id", "region", "date", "actual_won", "prediction_won"}
++            frame = strict_csv(raw, required=required,dtype={key:str for key in ('source_row_id','cluster_id','region','date')})
++            if not required.issubset(frame):
++                raise ValueError("저장 예측의 원행 ID/지역/날짜/정답/예측 칼럼 누락")
++            ids = frame.source_row_id
++            if ids.str.strip().eq("").any() or ids.duplicated().any():
++                raise ValueError("저장 예측 원행 식별 ID 누락/중복")
++            if len(frame) != counts[split]:
++                raise ValueError("저장 예측과 분할 건수 불일치")
++            if all_ids.intersection(ids):
++                raise ValueError("보정/테스트 또는 목표 간 같은 원행 ID 중복")
++            all_ids.update(ids)
++            dates = pd.to_datetime(frame.date, errors="raise", format="%Y-%m-%d")
++            start, end = ("2025-01-01", "2025-12-31") if split == "test" else ("2024-07-01", "2024-12-31")
++            if dates.isna().any() or not dates.between(start, end).all():
++                raise ValueError("저장 예측의 고정 시간 분할 위반")
++            if frame.region.str.strip().eq("").any():
++                raise ValueError("저장 예측의 지역 누락")
++            _numbers(frame, "actual_won"); _numbers(frame, "prediction_won")
++            if (pd.to_numeric(frame.actual_won) <= 0).any():
++                raise ValueError("저장 예측의 양수 정답 필요")
++            frames[split][target] = frame
++            evidence.append({"role": role, "path": name, "rows": len(frame),
++                             "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()})
++    return frames["test"], frames["calibration"]
++
++
++def write_research_results(output: Path, summary: dict, *, config=None, holdout_result=None):
++    output = Path(output)
++    evidence = []
++    tests, calibrations = _read_persisted_frames(output, summary, "ordinary", evidence)
++    held = {}
++    if holdout_result is not None:
++        held_folder = Path(holdout_result)
++        raw = (held_folder / "summary.json").read_bytes()
++        held_summary = json.loads(raw.decode("utf-8-sig"))
++        if (summary.get("holdout_region") is not None or not isinstance(held_summary, dict)
++                or held_summary.get("holdout_region") != "서울특별시"
++                or held_summary.get("mode") != summary.get("mode")):
++            raise ValueError("일반 시간분할과 고정 서울 홀드아웃만 비교할 수 있습니다")
++        from .input_contracts import validate_holdout_settings
++        validate_holdout_settings(summary,held_summary)
++        if not _snapshot_fingerprints(summary) or _snapshot_fingerprints(summary) != _snapshot_fingerprints(held_summary):
++            raise ValueError("홀드아웃 비교의 입력 스냅숏 근거가 없거나 서로 다릅니다")
++        evidence.append({"role": "holdout", "path": "summary.json", "bytes": len(raw),
++                         "sha256": hashlib.sha256(raw).hexdigest()})
++        held, held_cal = _read_persisted_frames(held_folder, held_summary, "holdout", evidence)
++        if set(held) != set(tests):
++            raise ValueError("서울 홀드아웃 목표 집합 불일치")
++        for target, frame in tests.items():
++            seoul = frame.region.eq("서울특별시") | frame.region.str.startswith("서울특별시 ")
++            expected = set(frame.loc[seoul, "source_row_id"])
++            if not expected or set(held[target].source_row_id) != expected:
++                raise ValueError("서울 홀드아웃의 전체 테스트 행 집합 불일치")
++            other = held_cal[target]
++            if (other.region.eq("서울특별시") | other.region.str.startswith("서울특별시 ")).any():
++                raise ValueError("서울 홀드아웃 보정 자료에 제외 지역이 포함됨")
++            ordinary_cal = calibrations[target]
++            cal_seoul = ordinary_cal.region.eq("서울특별시") | ordinary_cal.region.str.startswith("서울특별시 ")
++            expected_cal = ordinary_cal.loc[~cal_seoul].set_index("source_row_id")
++            held_cal_index = other.set_index("source_row_id")
++            if set(held_cal_index.index) != set(expected_cal.index):
++                raise ValueError("서울 홀드아웃 보정 원행 집합 불일치")
++            aligned = held_cal_index.reindex(expected_cal.index)
++            for field in ("date", "region", "cluster_id"):
++                if not expected_cal[field].equals(aligned[field]):
++                    raise ValueError(f"서울 홀드아웃 보정 {field} 불일치")
++            if not np.array_equal(_numbers(expected_cal, "actual_won"), _numbers(aligned, "actual_won")):
++                raise ValueError("서울 홀드아웃 보정 정답 불일치")
++    result = evaluate_frames(tests, calibrations, summary.get("targets", {}), config=config, holdout_frames=held)
++    result["mode"] = summary.get("mode")
++    result["input_files"] = evidence
++    result["analysis_code_sha256"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
++    if summary.get("mode") == "SYNTHETIC":
++        for row in result["hypotheses"]:
++            row["decision"] = "inconclusive" if row["effect"] is not None else "unmeasured"
++            row["reason"] = "합성 기술 검증이며 논문 가설의 실측 지지 근거가 아닙니다. " + row["reason"]
++    records = [{**row, "ci": json.dumps(row["ci"], ensure_ascii=False)} for row in result["hypotheses"]]
++    pd.DataFrame(records).to_csv(output / "hypothesis_results.csv", index=False, encoding="utf-8-sig")
++    measured = any(row["effect"] is not None for row in result["hypotheses"])
++    result["artifacts"] = [{"id": "hypothesis_results", "title": "8개 가설의 15개 목표별 평가",
++                            "status": "measured" if measured else "unmeasured",
++                            "csv": "hypothesis_results.csv", "png": None}]
++    (output / "hypothesis_results.json").write_text(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
++    return result
+--- 8차/tests/test_result_binding_v9.py
++++ 9차/tests/test_result_binding_v9.py
+@@ -0,0 +1,63 @@
++"""원본 학습 없이 저장 요약·보정 집합의 불일치를 재현한다."""
++import json
++from pathlib import Path
++import tempfile
++import unittest
++from unittest.mock import Mock
++import test_runtime_v3 as runtime_cases
++import test_research_input_validation as research_cases
++from rentlab.experiment_runner import combine_results
++
++
++class ResultBindingTests(unittest.TestCase):
++    def test_both_saved_summaries_must_match_before_analysis_folder(self):
++        for role in ("결과", "홀드아웃결과"):
++            for damage in ("missing", "changed", "changed_type"):
++                with self.subTest(role=role, damage=damage), tempfile.TemporaryDirectory() as tmp:
++                    fixture = runtime_cases.HoldoutExecutionTests()
++                    root = fixture.root(tmp)
++                    run, _ = fixture.controlled(root)
++                    ordinary = run(root/"결과", root/"자료_manifest.json")
++                    held = run(root/"홀드아웃결과", root/"자료_manifest.json", "서울특별시")
++                    path = root/role/"summary.json"
++                    if damage == "missing":
++                        path.unlink()
++                    else:
++                        value=json.loads(path.read_text(encoding="utf8"))
++                        if damage == "changed_type":value["targets"]["jeonse"]["split_counts"]["validation"]=True
++                        else:value["rows"]=999
++                        path.write_text(json.dumps(value),encoding="utf8")
++                    writer=Mock()
++                    with self.assertRaisesRegex(ValueError, "summary"):
++                        combine_results(root,ordinary,held,root/"자료_manifest.json","서울특별시",writer=writer)
++                    writer.assert_not_called()
++                    self.assertFalse((root/"가설통합결과").exists())
++
++    def test_holdout_calibration_requires_exact_non_seoul_rows(self):
++        for damage in ("replace", "remove", "actual_won", "region", "date", "cluster_id"):
++            with self.subTest(damage=damage), tempfile.TemporaryDirectory() as tmp:
++                fixture=research_cases.PersistedResearchTests();root=Path(tmp)
++                _,_,summary=fixture.fixture(root/"ordinary")
++                _,cal,hs=fixture.fixture(root/"held",region="서울특별시")
++                if damage=="replace":cal.loc[0,"source_row_id"]="foreign:row"
++                elif damage=="remove":
++                    cal=cal.iloc[1:]
++                    hs["targets"]["jeonse"]["split_counts"]["calibration"]=len(cal)
++                    (root/"held/summary.json").write_text(json.dumps(hs),encoding="utf8")
++                else:cal.loc[0,damage]={"actual_won":101.,"region":"대구광역시 중구","date":"2024-08-02","cluster_id":"foreign:cluster"}[damage]
++                cal.to_csv(root/"held/jeonse_calibration_predictions.csv",index=False)
++                with self.assertRaisesRegex(ValueError,"보정"):
++                    fixture.run_writer(root/"ordinary",summary,root/"held")
++                self.assertFalse((root/"ordinary/hypothesis_results.json").exists())
++
++    def test_holdout_calibration_allows_new_predictions_and_reordering(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            fixture=research_cases.PersistedResearchTests();root=Path(tmp)
++            _,_,summary=fixture.fixture(root/"ordinary")
++            _,cal,_=fixture.fixture(root/"held",region="서울특별시")
++            cal["prediction_won"]=95.
++            cal.iloc[::-1].to_csv(root/"held/jeonse_calibration_predictions.csv",index=False)
++            result=fixture.run_writer(root/"ordinary",summary,root/"held")
++            self.assertEqual(len(result["hypotheses"]),15)
++
++if __name__=="__main__":unittest.main()
+--- 8차/web/index.html
++++ 9차/web/index.html
+@@ -1,13 +1,13 @@
+-<!doctype html>
+-<html lang="ko" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Balance Compass · 임대료 연구</title><link rel="stylesheet" href="style.css"><script src="app.js" defer></script></head>
+-<body><header><div class="brand"><span class="mark" aria-hidden="true">↗</span><div>Balance Compass<small>전국 아파트 임대료 연구 · 새 연구 8차</small></div></div><div class="toolbar"><span id="updated">결과 연결 확인 중</span><button id="refresh">새로고침</button><button id="theme" aria-label="다크 모드로 전환">다크 모드</button></div></header>
+-<div class="layout"><aside><p class="eyebrow">연구 작업공간</p><nav aria-label="연구 화면"><button data-page="overview" aria-current="page"><span>01</span>연구 현황</button><button data-page="data"><span>02</span>데이터 점검</button><button data-page="evaluation"><span>03</span>AI 평가</button><button data-page="artifacts"><span>04</span>표와 그림</button><button data-page="guide"><span>05</span>실행 안내</button></nav><div class="aside-note">원본은 그대로.<br>결과는 근거와 함께.<p>실측 자료와 합성 검증을 구분해 표시합니다.</p></div></aside>
+-<main><div class="page-heading"><div><p class="eyebrow" id="section-number">연구 / 01</p><h1 id="heading">연구 현황</h1><p id="subtitle">자료 확보부터 모델 평가까지, 현재 상태를 확인합니다.</p></div><span class="badge" id="mode">확인 중</span></div>
+-<p id="freshness" class="notice" hidden role="status"></p><div id="notice" class="notice" role="status">결과를 읽고 있습니다.</div>
+-<section id="overview" class="page"><div class="stats"><div><span>연결된 입력 행</span><strong id="rows">—</strong><small>파일 검사에 근거한 행 수</small></div><div><span>평가한 계약 유형</span><strong id="target-count">—</strong><small>전세와 월세를 각각 평가</small></div><div><span>분석 목적</span><strong id="artifact-count">—</strong><small>동일 표·그림은 한 종류로 집계</small></div></div>
+-<article class="panel"><h2>수집·실행 상태</h2><p id="collection-status">수집 기록 미연결</p><p id="execution-status">학습 기록 미연결</p><p id="evaluation-scope">완료 결과 미연결</p></article><div class="columns"><article class="panel"><div class="panel-heading"><h2>연구 진행</h2><span>입력 → 처리 → 평가</span></div><ol class="steps"><li><b>01</b><div><h3>원본 자료와 출처 확인</h3><p>파일 해시·취득 시각·범위를 확인하고 원본을 보존합니다.</p></div><span id="step-data">대기</span></li><li><b>02</b><div><h3>시간을 나눈 AI 비교</h3><p>과거 자료로 학습하고 검증 기간에서 모델을 선택합니다.</p></div><span id="step-model">대기</span></li><li><b>03</b><div><h3>예측구간과 지역별 오차</h3><p>보정 기간과 최종 테스트를 나누어 결과를 확인합니다.</p></div><span id="step-test">대기</span></li></ol></article><article class="panel research-question"><p class="eyebrow">이번 연구의 질문</p><h2>예측한 임대료,<br>어디까지 믿을 수 있을까요?</h2><p>평균 오차와 함께 예측구간의 실제 포함률을 봅니다. 지역이 바뀌거나 시간이 흘렀을 때 신뢰성이 유지되는지 확인합니다.</p><div class="rule"></div><span>전국 본실험</span><strong>아직 미완료</strong><p>실제 자료 연결만으로 전국 수집 완료가 입증되지는 않습니다.</p></article></div><article class="panel"><h2>고정 평가 일정</h2><div class="timeline"><div><b>2022–2023</b><span>학습</span></div><div><b>2024 상반기</b><span>모델 선택</span></div><div><b>2024 하반기</b><span>구간 보정</span></div><div><b>2025</b><span>최종 테스트</span></div></div></article></section>
+-<section id="data" class="page" hidden><article class="panel"><h2>분할별 표본 수</h2><div id="splits" class="table-wrap"></div></article><article class="panel"><h2>입력 검사 기록</h2><div id="audit" class="table-wrap"></div><p class="muted">정확히 같은 공개 행도 서로 다른 실제 계약일 수 있어 자동으로 삭제하지 않습니다.</p></article><article class="panel"><h2>해석할 때 확인할 점</h2><ul id="limitations"></ul></article></section>
+-<section id="evaluation" class="page" hidden><p id="evaluation-condition" class="notice"></p><div class="filters"><label>계약 유형<select id="target"><option value="jeonse">전세 · 보증금 예측</option><option value="monthly">월세 · 월임대료 예측</option></select></label></div><article class="panel"><div class="panel-heading"><h2>검증 기간 모델 비교</h2><span>낮은 평균 절대오차가 우선입니다</span></div><div id="model-chart" class="chart" aria-label="모델별 검증 오차"></div><div id="validation" class="table-wrap"></div></article><article class="panel"><h2>최종 테스트</h2><p id="selection" class="muted"></p><div id="metrics" class="table-wrap"></div><p class="muted">90%는 명목수준입니다. 시간·지역 이동에서도 90%를 보장한다는 뜻은 아닙니다.</p></article><article class="panel"><h2>지역별 결과</h2><div id="groups" class="table-wrap"></div></article></section>
+-<section id="hypotheses" hidden class="panel"><h2>고정 연구 가설 8개 · 목표별 평가 15개</h2><p class="muted">자동 산출된 효과와 불확실성을 확인합니다. 입력이 없으면 미산출입니다. <a href="/formulas.html">가설·수식·출처 읽기</a></p><div id="hypothesis-list"></div></section><section id="artifacts" class="page" hidden><div class="filters"><label>분석 목적 검색<input type="search" id="search" placeholder="제목이나 분석 번호로 찾기"></label><label>생성 상태<select id="artifact-state"><option value="all">전체</option><option value="ready">파일 있음</option><option value="missing">미산출</option></select></label></div><article class="panel"><h2>분석 산출물</h2><p class="muted">측정되지 않은 항목은 빈 상태로 남깁니다. CSV와 그림은 같은 분석의 두 형식입니다.</p><div id="artifact-list" class="table-wrap"></div></article></section>
+-<section id="guide" class="page" hidden><article class="panel"><h2>자료를 연결하는 순서</h2><ol class="guide-list"><li>공식 원본 CSV와 취득 조건을 보존합니다.</li><li>manifest에 경로·SHA-256·출처·취득 시각·스냅숏을 기록합니다.</li><li>입력 검사를 통과한 자료로 연구 CLI를 실행합니다.</li><li>새 결과 폴더를 선택해 이 읽기 전용 화면을 시작합니다.</li></ol><p>화면에서 수집·학습을 실행하지 않습니다. 실행 명령과 입력 양식은 차수 폴더의 사용 안내에 있습니다.</p></article><article class="panel"><h2>지표를 읽는 방법</h2><div class="table-wrap"><table><thead><tr><th>지표</th><th>뜻</th><th>읽는 방법</th></tr></thead><tbody><tr><td>MAE</td><td>평균 절대오차</td><td>예측과 실제 금액 차이의 평균, 원 단위</td></tr><tr><td>RMSE</td><td>제곱평균제곱근오차</td><td>큰 오차에 더 민감한 금액 지표</td></tr><tr><td>포함률</td><td>실제값이 구간 안에 든 비율</td><td>소수 첫째 자리 반올림, 원비율은 설명 카드에서 확인</td></tr><tr><td>구간 폭</td><td>상한과 하한의 평균 차이</td><td>포함률과 함께 비교</td></tr></tbody></table></div></article></section>
+-<footer>Balance Compass · 새 연구 8차 <span>실제 저장된 결과만 표시합니다.</span></footer></main></div><div id="tooltip" role="tooltip" hidden></div><dialog id="preview" aria-labelledby="preview-title"><div class="dialog-heading"><h2 id="preview-title">그림 보기</h2><button id="close-preview">닫기</button></div><img id="preview-image" alt="선택한 분석 그림"><p id="preview-status" role="status"></p><p id="preview-meta"></p><div id="preview-csv"></div></dialog></body></html>
++<!doctype html>
++<html lang="ko" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Balance Compass · 임대료 연구</title><link rel="stylesheet" href="style.css"><script src="app.js" defer></script></head>
++<body><header><div class="brand"><span class="mark" aria-hidden="true">↗</span><div>Balance Compass<small>전국 아파트 임대료 연구 · 새 연구 9차</small></div></div><div class="toolbar"><span id="updated">결과 연결 확인 중</span><button id="refresh">새로고침</button><button id="theme" aria-label="다크 모드로 전환">다크 모드</button></div></header>
++<div class="layout"><aside><p class="eyebrow">연구 작업공간</p><nav aria-label="연구 화면"><button data-page="overview" aria-current="page"><span>01</span>연구 현황</button><button data-page="data"><span>02</span>데이터 점검</button><button data-page="evaluation"><span>03</span>AI 평가</button><button data-page="artifacts"><span>04</span>표와 그림</button><button data-page="guide"><span>05</span>실행 안내</button></nav><div class="aside-note">원본은 그대로.<br>결과는 근거와 함께.<p>실측 자료와 합성 검증을 구분해 표시합니다.</p></div></aside>
++<main><div class="page-heading"><div><p class="eyebrow" id="section-number">연구 / 01</p><h1 id="heading">연구 현황</h1><p id="subtitle">자료 확보부터 모델 평가까지, 현재 상태를 확인합니다.</p></div><span class="badge" id="mode">확인 중</span></div>
++<p id="freshness" class="notice" hidden role="status"></p><div id="notice" class="notice" role="status">결과를 읽고 있습니다.</div>
++<section id="overview" class="page"><div class="stats"><div><span>연결된 입력 행</span><strong id="rows">—</strong><small>파일 검사에 근거한 행 수</small></div><div><span>평가한 계약 유형</span><strong id="target-count">—</strong><small>전세와 월세를 각각 평가</small></div><div><span>분석 목적</span><strong id="artifact-count">—</strong><small>동일 표·그림은 한 종류로 집계</small></div></div>
++<article class="panel"><h2>수집·실행 상태</h2><p id="collection-status">수집 기록 미연결</p><p id="execution-status">학습 기록 미연결</p><p id="evaluation-scope">완료 결과 미연결</p></article><div class="columns"><article class="panel"><div class="panel-heading"><h2>연구 진행</h2><span>입력 → 처리 → 평가</span></div><ol class="steps"><li><b>01</b><div><h3>원본 자료와 출처 확인</h3><p>파일 해시·취득 시각·범위를 확인하고 원본을 보존합니다.</p></div><span id="step-data">대기</span></li><li><b>02</b><div><h3>시간을 나눈 AI 비교</h3><p>과거 자료로 학습하고 검증 기간에서 모델을 선택합니다.</p></div><span id="step-model">대기</span></li><li><b>03</b><div><h3>예측구간과 지역별 오차</h3><p>보정 기간과 최종 테스트를 나누어 결과를 확인합니다.</p></div><span id="step-test">대기</span></li></ol></article><article class="panel research-question"><p class="eyebrow">이번 연구의 질문</p><h2>예측한 임대료,<br>어디까지 믿을 수 있을까요?</h2><p>평균 오차와 함께 예측구간의 실제 포함률을 봅니다. 지역이 바뀌거나 시간이 흘렀을 때 신뢰성이 유지되는지 확인합니다.</p><div class="rule"></div><span>전국 본실험</span><strong>아직 미완료</strong><p>실제 자료 연결만으로 전국 수집 완료가 입증되지는 않습니다.</p></article></div><article class="panel"><h2>고정 평가 일정</h2><div class="timeline"><div><b>2022–2023</b><span>학습</span></div><div><b>2024 상반기</b><span>모델 선택</span></div><div><b>2024 하반기</b><span>구간 보정</span></div><div><b>2025</b><span>최종 테스트</span></div></div></article></section>
++<section id="data" class="page" hidden><article class="panel"><h2>분할별 표본 수</h2><div id="splits" class="table-wrap"></div></article><article class="panel"><h2>입력 검사 기록</h2><div id="audit" class="table-wrap"></div><p class="muted">정확히 같은 공개 행도 서로 다른 실제 계약일 수 있어 자동으로 삭제하지 않습니다.</p></article><article class="panel"><h2>해석할 때 확인할 점</h2><ul id="limitations"></ul></article></section>
++<section id="evaluation" class="page" hidden><p id="evaluation-condition" class="notice"></p><div class="filters"><label>계약 유형<select id="target"><option value="jeonse">전세 · 보증금 예측</option><option value="monthly">월세 · 월임대료 예측</option></select></label></div><article class="panel"><div class="panel-heading"><h2>검증 기간 모델 비교</h2><span>낮은 평균 절대오차가 우선입니다</span></div><div id="model-chart" class="chart" aria-label="모델별 검증 오차"></div><div id="validation" class="table-wrap"></div></article><article class="panel"><h2>최종 테스트</h2><p id="selection" class="muted"></p><div id="metrics" class="table-wrap"></div><p class="muted">90%는 명목수준입니다. 시간·지역 이동에서도 90%를 보장한다는 뜻은 아닙니다.</p></article><article class="panel"><h2>지역별 결과</h2><div id="groups" class="table-wrap"></div></article></section>
++<section id="hypotheses" hidden class="panel"><h2>고정 연구 가설 8개 · 목표별 평가 15개</h2><p class="muted">자동 산출된 효과와 불확실성을 확인합니다. 입력이 없으면 미산출입니다. <a href="/formulas.html">가설·수식·출처 읽기</a></p><div id="hypothesis-list"></div></section><section id="artifacts" class="page" hidden><div class="filters"><label>분석 목적 검색<input type="search" id="search" placeholder="제목이나 분석 번호로 찾기"></label><label>생성 상태<select id="artifact-state"><option value="all">전체</option><option value="ready">파일 있음</option><option value="missing">미산출</option></select></label></div><article class="panel"><h2>분석 산출물</h2><p class="muted">측정되지 않은 항목은 빈 상태로 남깁니다. CSV와 그림은 같은 분석의 두 형식입니다.</p><div id="artifact-list" class="table-wrap"></div></article></section>
++<section id="guide" class="page" hidden><article class="panel"><h2>자료를 연결하는 순서</h2><ol class="guide-list"><li>공식 원본 CSV와 취득 조건을 보존합니다.</li><li>manifest에 경로·SHA-256·출처·취득 시각·스냅숏을 기록합니다.</li><li>입력 검사를 통과한 자료로 연구 CLI를 실행합니다.</li><li>새 결과 폴더를 선택해 이 읽기 전용 화면을 시작합니다.</li></ol><p>화면에서 수집·학습을 실행하지 않습니다. 실행 명령과 입력 양식은 차수 폴더의 사용 안내에 있습니다.</p></article><article class="panel"><h2>지표를 읽는 방법</h2><div class="table-wrap"><table><thead><tr><th>지표</th><th>뜻</th><th>읽는 방법</th></tr></thead><tbody><tr><td>MAE</td><td>평균 절대오차</td><td>예측과 실제 금액 차이의 평균, 원 단위</td></tr><tr><td>RMSE</td><td>제곱평균제곱근오차</td><td>큰 오차에 더 민감한 금액 지표</td></tr><tr><td>포함률</td><td>실제값이 구간 안에 든 비율</td><td>소수 첫째 자리 반올림, 원비율은 설명 카드에서 확인</td></tr><tr><td>구간 폭</td><td>상한과 하한의 평균 차이</td><td>포함률과 함께 비교</td></tr></tbody></table></div></article></section>
++<footer>Balance Compass · 새 연구 9차 <span>실제 저장된 결과만 표시합니다.</span></footer></main></div><div id="tooltip" role="tooltip" hidden></div><dialog id="preview" aria-labelledby="preview-title"><div class="dialog-heading"><h2 id="preview-title">그림 보기</h2><button id="close-preview">닫기</button></div><img id="preview-image" alt="선택한 분석 그림"><p id="preview-status" role="status"></p><p id="preview-meta"></p><div id="preview-csv"></div></dialog></body></html>
+--- 8차/변경기록.md
++++ 9차/변경기록.md
+@@ -1,17 +1,12 @@
+-# 새 연구8차 변경 기록
+-
+-| 검증 대상 | 직접 확인 | 해석 |
+-|---|---|---|
+-| 48개월 원문→확장 입력 | 4,845,086행·21항목/원행ID/군집ID 전수 일치 | 다운로드한 원문과 일치; 당시 신고판 입증 아님 |
+-| 기존 정제 | 2,857,449행; 비신규1,964,806/건축연도오류22,831 제외 | 배제 기준 변경 없음 |
+-| 외부 표 | 14개 CSV·427,418행; 행수/해시/행 폭 일치 | 원응답 전체 재검사와 구별 |
+-| 현재 단지 연결 | 385,030/2,857,449 = 13.4746% | 위치 정답 정확도·전국 대표성 아님 |
+-| 군집 미상 | 적격31행; 최종 테스트 월세1/전세3행 | 행 유지; 군집 추론의 부족 근거를 숨기지 않음 |
+-| 보정 집중 | 100행 이상이면서5단지 미만: 월세20/전세29지역 | 100행은100독립단지와 다름 |
+-| 금리 역사 문서 | 초기값+변경12건의 공식 문서13건 대조 | 발표일/값 근거; 모든 통계의 과거판 승인 아님 |
+-| 실행 입력 선택 | --manifest 경로·SHA 추적/166개 검사 통과 | 실제 학습·원자료 변경 없음 |
+-| 실제 학습 | stopped_by_user 원문 동일 | 성능/가설지지 미산출 |
+-
+-실제 48개월 원문/구형/확장 입력 대조·14개 외부 표 검사·금리 역사 13문서 대조와 출처 상태 정정. 실행기의 입력 선택·경로/SHA 기록 및 변경 차단을 수정하고 제어 검사 5개를 추가했다. 통합166개 검사 통과. 기존 모델·수식·가설·분할·포함 규칙은 유지했다.
+-
+-[차수상세](docs/차수설명.md) · [전체차이](docs/전체차이.diff) · [검증전체](docs/8차_전수검증.md)
++# 새 연구 9차 변경 기록
++
++양쪽 저장 summary 사전 대조 및 동일 바이트 보관, 홀드아웃 보정 원행 집합/관측값 대조를 추가했다. 새 회귀 검사3개와 전체171개 검사를 통과했다. 이전8차의 완료 가드·영어/읽기 수준 보완을 보존했다.
++
++| 검증 경로 | 9차 처리 | 한계 |
++|---|---|---|
++| 양쪽 저장 summary | 반환값과 저장 JSON을 분석 폴더 생성 전에 대조 | 원자료의 과거 사실성을 인증하지 않음 |
++| 홀드아웃 보정 계약 | 일반 보정 자료에서 서울 제외 후 원행 집합·관측값 일치 확인 | 예측값은 모델별 차이를 허용 |
++| 회귀 검사 | 기존 168개에 3개 검사 추가, 총 171개 통과 | 제어 입력 검사이며 실제 학습 아님 |
++| 연구 상태 | 8가설·15개 평가·분할·수식·문턱 유지 | 실제 학습 중지·성능 미측정 |
++
++[직전 비교](docs/차수비교.md) · [전체 차이](docs/전체차이.diff)
+--- 8차/사용안내.md
++++ 9차/사용안내.md
+@@ -1,19 +1,18 @@
+-# 새 연구8차 사용 안내
+-
+-[수준1](docs/차수설명.md#user-content-reading-level-1) · [수준2](docs/차수설명.md#user-content-reading-level-2) · [수준3](docs/차수설명.md#user-content-reading-level-3) · [수준4](docs/차수설명.md#user-content-reading-level-4) · [수준5](docs/차수설명.md#user-content-reading-level-5)
+-
+-| 검증 대상 | 직접 확인 | 해석 |
+-|---|---|---|
+-| 48개월 원문→확장 입력 | 4,845,086행·21항목/원행ID/군집ID 전수 일치 | 다운로드한 원문과 일치; 당시 신고판 입증 아님 |
+-| 기존 정제 | 2,857,449행; 비신규1,964,806/건축연도오류22,831 제외 | 배제 기준 변경 없음 |
+-| 외부 표 | 14개 CSV·427,418행; 행수/해시/행 폭 일치 | 원응답 전체 재검사와 구별 |
+-| 현재 단지 연결 | 385,030/2,857,449 = 13.4746% | 위치 정답 정확도·전국 대표성 아님 |
+-| 군집 미상 | 적격31행; 최종 테스트 월세1/전세3행 | 행 유지; 군집 추론의 부족 근거를 숨기지 않음 |
+-| 보정 집중 | 100행 이상이면서5단지 미만: 월세20/전세29지역 | 100행은100독립단지와 다름 |
+-| 금리 역사 문서 | 초기값+변경12건의 공식 문서13건 대조 | 발표일/값 근거; 모든 통계의 과거판 승인 아님 |
+-| 실행 입력 선택 | --manifest 경로·SHA 추적/166개 검사 통과 | 실제 학습·원자료 변경 없음 |
+-| 실제 학습 | stopped_by_user 원문 동일 | 성능/가설지지 미산출 |
+-
+-[감사방법·전체수치·해석](docs/8차_전수검증.md) · [학습없는사전검사](docs/7차_입력무결성.md) · [고정조건기록](docs/연구조건_동결.json)
+-
+-실제 학습 중지를 유지한다. 8차는 자료 검증과 실행 입력 선택 보강이다. --manifest로 검증한 확장 명세를 명시하고 계획 JSON의 경로를 확인한다. 31행의 군집을 가짜로 채우거나 기준을 바꾸지 않았다. 실측 CI·성능·논문 PDF를 만들지 않는다.
++# 9차 검증과 실행 안내
++
++실제 학습 중지를 유지한다. Python 3.12·고정 requirements·Rust 금액 파서 환경에서 아래 명령은 제어 입력 검사만 실행한다.
++
++```powershell
++python -B -X utf8 -m unittest discover -s tests -v
++```
++
++결과: 171개 통과. 실제 데이터 학습은 실행하지 않았다. 기존 --manifest 입력 선택은 유지된다. --execute 없는 명령은 계획만 출력하며 중지를 해제하지 않는다.
++
++| 검증 경로 | 9차 처리 | 한계 |
++|---|---|---|
++| 양쪽 저장 summary | 반환값과 저장 JSON을 분석 폴더 생성 전에 대조 | 원자료의 과거 사실성을 인증하지 않음 |
++| 홀드아웃 보정 계약 | 일반 보정 자료에서 서울 제외 후 원행 집합·관측값 일치 확인 | 예측값은 모델별 차이를 허용 |
++| 회귀 검사 | 기존 168개에 3개 검사 추가, 총 171개 통과 | 제어 입력 검사이며 실제 학습 아님 |
++| 연구 상태 | 8가설·15개 평가·분할·수식·문턱 유지 | 실제 학습 중지·성능 미측정 |
++
++[오류와 저장 파일](docs/9차_결과대조.md) · [8차 입력 안내](docs/8차_전수검증.md)

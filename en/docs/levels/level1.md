@@ -1,7 +1,7 @@
 # LEVEL 1 - Beginner
 
 
-**Latest: Round 8.** [Read the current round at this level](../round8.md#user-content-reading-level-1). The Round 4 foundation below is retained for context.
+**Latest: Round 9.** [Read the current round at this level](../round9.md#user-content-reading-level-1). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨1.md)
 
@@ -60,10 +60,26 @@ Revision 7 adds strict CSV/feature input validation, frozen-condition evidence a
 
 Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics and partial historical-rate evidence. Round 8 is available in Korean and English. Real training is stopped; complete research approval and measured outcomes are unavailable. [Revision 8 · Korean](../../../8차/docs/차수설명.md#user-content-reading-level-1).
 
-## Latest · Round 8
+## Round 8 record
 
 | Focus | Current checks | Boundary |
 |---|---|---|
 | Input lineage and completion | Full 48-month audit, selected manifest and post-analysis hash checks | Data integrity is not independent location truth, historical-vintage approval or measured performance |
 
-[Round 8 at this level](../round8.md#user-content-reading-level-1) · [Current source](../../../8차/)
+[Round 8 at this level](../round8.md#user-content-reading-level-1) · [Current source](../../../9차/)
+
+
+Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../../../9차/docs/차수설명.md#user-content-reading-level-1).
+
+
+## Latest Round 9
+
+A result file and its saved description must tell the same story. Before comparing the two experiments, the program checks both descriptions. A different contract cannot quietly replace a calibration example. Different predictions are expected when a different model is trained.
+
+| Situation | Check | Outcome |
+|---|---|---|
+| Description and stored result disagree | Both saved summaries | Stop before combined analysis |
+| A different contract is substituted | Contract identity | Reject the comparison |
+| A new model predicts a different amount | Observed contract is unchanged | Allow the comparison |
+
+[Round 9 at this level](../round9.md#user-content-reading-level-1) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-1)

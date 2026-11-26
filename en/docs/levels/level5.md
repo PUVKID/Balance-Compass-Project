@@ -1,7 +1,7 @@
 # LEVEL 5 - Expert
 
 
-**Latest: Round 8.** [Read the current round at this level](../round8.md#user-content-reading-level-5). The Round 4 foundation below is retained for context.
+**Latest: Round 9.** [Read the current round at this level](../round9.md#user-content-reading-level-5). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨5.md)
 
@@ -61,10 +61,27 @@ Revision 7 adds strict CSV/feature input validation, frozen-condition evidence a
 
 Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics and partial historical-rate evidence. Round 8 is available in Korean and English. Real training is stopped; complete research approval and measured outcomes are unavailable. [Revision 8 · Korean](../../../8차/docs/차수설명.md#user-content-reading-level-5).
 
-## Latest · Round 8
+## Round 8 record
 
 | Focus | Current checks | Boundary |
 |---|---|---|
 | Input lineage and completion | Full 48-month audit, selected manifest and post-analysis hash checks | Data integrity is not independent location truth, historical-vintage approval or measured performance |
 
-[Round 8 at this level](../round8.md#user-content-reading-level-5) · [Current source](../../../8차/)
+[Round 8 at this level](../round8.md#user-content-reading-level-5) · [Current source](../../../9차/)
+
+
+Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../../../9차/docs/차수설명.md#user-content-reading-level-5).
+
+
+## Latest Round 9
+
+This change strengthens H5 input traceability; it does not change the estimand, eight hypotheses, fifteen evaluations, fixed time splits or statistical thresholds. Identical declared provenance alone is insufficient when persisted observations disagree. Matching files does not prove historical availability, between-cluster independence, exchangeability under time shift or causal regional effects.
+
+| Research condition | Verified in this revision | Not established |
+|---|---|---|
+| H5 comparison inputs | Exact non-Seoul calibration population and observations | Causal effect of regional transfer |
+| Traceability | Returned metadata, saved JSON and preserved hashes | Historical truth or publication vintage |
+| Uncertainty | Existing cluster bootstrap and 15-evaluation rules retained | Coverage guarantees under dependence or shift |
+| Outcome claims | 171 controlled tests pass | Real performance, supported hypotheses or completed paper |
+
+[Round 9 at this level](../round9.md#user-content-reading-level-5) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-5)

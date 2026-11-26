@@ -1,7 +1,7 @@
 # Balance Compass
 
 
-The latest round audits all 48 months of input lineage, distinguishes cluster dependence from independent evidence, and guards selected inputs through analysis completion. [Read Round 8 in English](docs/round8.md).
+The latest round binds saved summaries and holdout calibration observations before combined analysis. [Read Round 9 in English](docs/round9.md).
 
 [한국어](../README.md) · **English**
 
@@ -43,7 +43,7 @@ Balance Compass studies **apartment lease deposits, monthly rent, and prediction
 
 Rounds 1–3 remain in Korean and are explicitly labeled. Rounds 4–8 and the five current reading guides have English explanations.
 
-[Current source](../8차/) · [Current execution and remaining conditions](docs/round8.md#user-content-reading-level-3) · [Formulas and interpretation · Korean](../4차/docs/확장분석_수식과해석.md)
+[Current source](../9차/) · [Current execution and remaining conditions](docs/round9.md#user-content-reading-level-3) · [Formulas and interpretation · Korean](../4차/docs/확장분석_수식과해석.md)
 
 Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. Revision 6 is available in Korean and English. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../6차/docs/차수설명.md).
 
@@ -52,3 +52,11 @@ Revision 7 adds strict CSV/feature input validation, frozen-condition evidence a
 
 
 Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics and partial historical-rate evidence. Round 8 is available in Korean and English. Real training is stopped; complete research approval and measured outcomes are unavailable. [Revision 8 · Korean](../8차/docs/차수설명.md).
+
+
+Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../9차/docs/차수설명.md).
+
+
+| Latest revision | English | Korean | Status |
+|---|---|---|---|
+| Round 9 | [Five reading levels](docs/round9.md) | [Detailed source revision](../9차/docs/차수설명.md) | 171 controlled tests; real training stopped |
