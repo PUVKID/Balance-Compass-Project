@@ -1,8 +1,7 @@
 # LEVEL 2 - Explorer
 
-Latest overall: Revision 6 (Korean). Latest English coverage: Round 5. The Round 5 guide below is retained as the latest English edition. Real training remains stopped. [Current source](../../../6차/) · [Revision 6 details](../../../6차/docs/차수설명.md#user-content-reading-level-2).
 
-**Latest: Round 5.** [Read the current round at this level](../round5.md#user-content-reading-level-2). The Round 4 foundation below is retained for context.
+**Latest: Round 6.** [Read the current round at this level](../round6.md#user-content-reading-level-2). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨2.md)
 
@@ -30,12 +29,20 @@ Round 4 adds 21-column preservation and exploratory information-group comparison
 | 2 | [Round 2](../../../2차/docs/차수설명.md#user-content-reading-level-2) |
 | 3 | [Round 3](../../../3차/docs/차수설명.md#user-content-reading-level-2) |
 
-## Latest · Round 5
+## Round 5 · Data Acquisition
 
 | Focus | Current behavior | Boundary |
 |---|---|---|
 | Linkage units | Contracts, region-months, complex codes and map points remain separate | 13.47% complex linkage does not prove representativeness |
 
-[Round 5 at this level](../round5.md#user-content-reading-level-2) · [Current source](../../../5차/)
+[Round 5 at this level](../round5.md#user-content-reading-level-2) · [Round 5 source](../../../5차/)
 
-Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. Revision 6 currently has Korean documentation only. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../../../6차/docs/차수설명.md#user-content-reading-level-2).
+Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. Revision 6 is available in Korean and English. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../../../6차/docs/차수설명.md#user-content-reading-level-2).
+
+## Latest · Round 6
+
+| Focus | Current behavior | Boundary |
+|---|---|---|
+| Prediction and facility integrity | Validate identities, splits, modes, Seoul comparisons and hash-bound facility reports | 145 technical checks do not establish measured hypothesis results or historical facility truth |
+
+[Round 6 at this level](../round6.md#user-content-reading-level-2) · [Current source](../../../6차/)
