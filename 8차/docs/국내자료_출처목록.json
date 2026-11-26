@@ -1,0 +1,281 @@
+{
+  "checked_date": "2026-11-27",
+  "status": "reconciled_inventory_not_feature_approval",
+  "sources": [
+    {
+      "id": "RTMS_RENT",
+      "title": "국토교통부 실거래가 공개시스템 전월세",
+      "url": "https://rt.molit.go.kr/pt/xls/xls.do",
+      "status": "snapshot_lineage_verified",
+      "coverage_evidence": "48개월4,845,086행;21원문항목/원행ID/군집ID전수대조.적격2,857,449행",
+      "limitation": "현재취득한사후수정판;과거라벨공개이력미입증"
+    },
+    {
+      "id": "RTMS_SALE",
+      "title": "국토교통부 아파트 매매 실거래가 상세 자료",
+      "url": "https://www.data.go.kr/data/15126468/openapi.do",
+      "status": "candidate",
+      "coverage_evidence": "법정동코드·계약월별 매매; 아직 미취득",
+      "limitation": "자기 정답·미래거래 제외; 신고시점 근거 없으면 후향적 민감도만"
+    },
+    {
+      "id": "KAPT",
+      "title": "국토교통부 공동주택 기본 정보제공 서비스",
+      "url": "https://www.data.go.kr/data/15058453/openapi.do",
+      "status": "candidate_route_not_acquired",
+      "coverage_evidence": "이API/포털파일경로취득과실제KAPT사이트Excel취득은별도",
+      "limitation": "가입 단지 한정; 현재 정보를 과거 확정정보로 간주하지 않음"
+    },
+    {
+      "id": "KAPT_FILE",
+      "title": "국토교통부 공동주택 단지 기본 정보",
+      "url": "https://www.data.go.kr/data/15073271/fileData.do",
+      "status": "candidate_route_not_acquired",
+      "coverage_evidence": "이API/포털파일경로취득과실제KAPT사이트Excel취득은별도",
+      "limitation": "파일기준일과 칼럼별 유효기간 확인 필요"
+    },
+    {
+      "id": "BUILDING",
+      "title": "국토교통부 건축HUB 건축물대장정보",
+      "url": "https://www.data.go.kr/data/15134735/openapi.do",
+      "status": "candidate",
+      "coverage_evidence": "표제부·총괄표제부·층별개요; 아직 미취득",
+      "limitation": "현재 월 현황, PK전환·다대다 결합·변경이력 점검"
+    },
+    {
+      "id": "COMPLEX_ID",
+      "title": "한국부동산원 공동주택 단지 식별정보 기본정보",
+      "url": "https://www.data.go.kr/data/15106861/fileData.do",
+      "status": "quarantined_count_mismatch",
+      "coverage_evidence": "보유 CSV 1개; 합계307,834행. 전수행수/SHA대조",
+      "limitation": "전년도 공시대상 기준; 매칭 누락·명칭차이 가능",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "id": "RAIL",
+      "title": "전국도시철도역사정보표준데이터",
+      "url": "https://www.data.go.kr/data/15013205/standard.do",
+      "status": "acquired_current_snapshot",
+      "coverage_evidence": "보유 CSV 1개; 합계898행. 전수행수/SHA대조",
+      "limitation": "개통·폐역·이전 시점 별도 필요; 최신목록을 과거에 소급하지 않음",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "id": "SCHOOL",
+      "title": "전국초중등학교위치표준데이터",
+      "url": "https://www.data.go.kr/data/15021148/standard.do",
+      "status": "acquired_current_snapshot",
+      "coverage_evidence": "보유 CSV 1개; 합계12,004행. 전수행수/SHA대조",
+      "limitation": "설립일만으로 과거 좌표·학군·학교질을 확정할 수 없음",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "id": "PARK",
+      "title": "전국도시공원정보표준데이터",
+      "url": "https://www.data.go.kr/data/15012890/standard.do",
+      "status": "acquired_current_snapshot",
+      "coverage_evidence": "보유 CSV 1개; 합계18,376행. 전수행수/SHA대조",
+      "limitation": "지정고시일은 실제 조성·개방일과 다를 수 있음",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "id": "HOSPITAL",
+      "title": "건강보험심사평가원 병원정보서비스",
+      "url": "https://www.data.go.kr/data/15001698/openapi.do",
+      "status": "candidate",
+      "coverage_evidence": "요양기관 위치·유형 후보; 아직 미취득",
+      "limitation": "원문 명세·개설/폐업/이전 이력과 과거 좌표 확인 후 채택"
+    },
+    {
+      "id": "POPULATION",
+      "title": "행정안전부 주민등록 인구·세대",
+      "url": "https://jumin.mois.go.kr/statMonth.do",
+      "status": "acquired_current_snapshot",
+      "coverage_evidence": "보유 CSV 6개; 합계21,156행. 전수행수/SHA대조",
+      "limitation": "월말 기준, 다음달1일12시이후 공표(휴일이연); 행정동과 법정동 구분",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "id": "ECOS",
+      "title": "한국은행 ECOS",
+      "url": "https://ecos.bok.or.kr/api/",
+      "status": "candidate_not_acquired",
+      "coverage_evidence": "ECOS대출금리·CPI미취득.실제기준금리는별도BOK_BASE_RATE항목",
+      "limitation": "관측월·공표일·수정판 별도; 실제 통계표코드와 항목은 취득 전 검증"
+    },
+    {
+      "id": "RONE",
+      "title": "한국부동산원 R-ONE",
+      "url": "https://www.reb.or.kr/r-one/portal/openapi/openApiDevPage.do",
+      "status": "candidate",
+      "coverage_evidence": "전세·월세지수 등 지역시장 시계열 후보; 아직 미취득",
+      "limitation": "항목코드·지역코드·공표일·최초판 보존; 무키sample 전체자료 취급금지"
+    },
+    {
+      "id": "SUPPLY",
+      "title": "국토교통 통계누리 미분양주택현황보고",
+      "url": "https://stat.molit.go.kr/portal/cate/statMetaView.do?hRsId=32",
+      "status": "candidate",
+      "coverage_evidence": "월별 공급압력 보조지표; 아직 미취득",
+      "limitation": "익월말 공표. 해당월말에 이미 안 것으로 처리하면 누수"
+    },
+    {
+      "id": "GEOCODE",
+      "title": "SGIS 공식 지오코딩 API 정의서",
+      "url": "https://sgis.mods.go.kr/developer/upload/doc/SGIS_OpenAPI_%EC%A0%95%EC%9D%98%EC%84%9C.pdf",
+      "status": "candidate",
+      "coverage_evidence": "주소→좌표 연결 보조; 아직 호출 안함",
+      "limitation": "동 중심점과 단지좌표 구별; 인증·허용범위와 실제 명세 확인 필요"
+    },
+    {
+      "id": "BOK_BASE_RATE",
+      "title": "한국은행 기준금리 변경표",
+      "url": "https://www.bok.or.kr/portal/singl/baseRate/list.do?dataSecd=00001&menuNo=200643",
+      "status": "acquired_current_snapshot",
+      "coverage_evidence": "63행/acquired_current_snapshot",
+      "historical_availability_proven": false,
+      "feature_ready": false,
+      "limitation": "현재취득판.금리역사문서13건부분대조;시설·라벨·수정판역사승인아님"
+    },
+    {
+      "id": "KAPT_BASIC_XLSX",
+      "title": "KAPT 사이트 단지기본정보 Excel",
+      "url": "https://www.k-apt.go.kr/",
+      "status": "acquired_current_snapshot",
+      "coverage_evidence": "21,805행/acquired_current_snapshot",
+      "historical_availability_proven": false,
+      "feature_ready": false,
+      "limitation": "현재정보이며독립정답·과거운영·완전성미입증"
+    },
+    {
+      "id": "KAPT_PUBLIC_MAP",
+      "title": "KAPT 공개 지도 현재 단지점",
+      "url": "https://www.k-apt.go.kr/cmmn/knewMapView.do",
+      "status": "validated_current_coordinates_not_feature_approval",
+      "coverage_evidence": "22,641행/validated_current_coordinates_not_feature_approval; 22,641행/validated_current_coordinates_not_feature_approval",
+      "historical_availability_proven": false,
+      "feature_ready": false,
+      "limitation": "현재정보이며독립정답·과거운영·완전성미입증"
+    }
+  ],
+  "historical_availability_proven": false,
+  "actual_csv_inventory": [
+    {
+      "source_id": "PARK",
+      "status": "acquired_current_snapshot",
+      "rows": 18376,
+      "sha256": "089022458d2adb9184dba5c37a0a02e3a5c6d9511b741ee136194a652326e21d",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "COMPLEX_ID",
+      "status": "quarantined_count_mismatch",
+      "rows": 307834,
+      "sha256": "87272863d9c2edcd69d1a5319eb5755c288f13e8d0525dafb92c10a54c3cb00d",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "RAIL",
+      "status": "acquired_current_snapshot",
+      "rows": 898,
+      "sha256": "318b43c20e2e8cda24fa786cd69044155bdcff003e25f8e1ca2e6aeb1a89ddd6",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "SCHOOL",
+      "status": "acquired_current_snapshot",
+      "rows": 12004,
+      "sha256": "552417262377a9df462468e1f870edc5caf206545265ee4b80f5d9d8d495b7bf",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "BOK_BASE_RATE",
+      "status": "acquired_current_snapshot",
+      "rows": 63,
+      "sha256": "76d1d1efceed21cddf89e26b9c5033030a5bc8d1c7e7cd9d14db717eec50e9e7",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "KAPT_FILE",
+      "status": "acquired_current_snapshot",
+      "rows": 21805,
+      "sha256": "38d27bd001281b1d120721974efa4613ea00da2f8e8d893225c24a0e1e9746d3",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "KAPT_PUBLIC_MAP",
+      "status": "validated_current_coordinates_not_feature_approval",
+      "rows": 22641,
+      "sha256": "85236a80d8d79138e77981df90ddb4364b33bd301fc8f0439e2787cf8c2a2030",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "KAPT_PUBLIC_MAP",
+      "status": "validated_current_coordinates_not_feature_approval",
+      "rows": 22641,
+      "sha256": "85236a80d8d79138e77981df90ddb4364b33bd301fc8f0439e2787cf8c2a2030",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "MOIS_POPULATION",
+      "status": "acquired_current_snapshot",
+      "rows": 3480,
+      "sha256": "d2f8d06b4ef8f9878d1a0ef29243c0cd3b4b5d91ff4b7b03e01909aab4fd7e06",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "MOIS_POPULATION",
+      "status": "acquired_current_snapshot",
+      "rows": 3480,
+      "sha256": "73131aee3772edd3ff02ca37937360da38c4d294786cf9911763993e9fc93519",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "MOIS_POPULATION",
+      "status": "acquired_current_snapshot",
+      "rows": 3480,
+      "sha256": "7cc1a7ac2c855b5e6561b797c62e1227fc052be7ffc132502bb808c1e1bc8be2",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "MOIS_POPULATION",
+      "status": "acquired_current_snapshot",
+      "rows": 3708,
+      "sha256": "9ea6d2224ab0573e9d087ba768045f3f83fbabd4303d31e10c4f45991edb864c",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "MOIS_POPULATION",
+      "status": "acquired_current_snapshot",
+      "rows": 3504,
+      "sha256": "02d91d4ab47faec9e3cdd3af6d1c78890d5bc891c8945e2938751fc7160246ce",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    },
+    {
+      "source_id": "MOIS_POPULATION",
+      "status": "acquired_current_snapshot",
+      "rows": 3504,
+      "sha256": "eab55b06e572a4788ffde99ff828c10e046668cdc823a2a5a7ac2c1fc490d343",
+      "historical_availability_proven": false,
+      "feature_ready": false
+    }
+  ]
+}

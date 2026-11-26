@@ -1,7 +1,7 @@
 # LEVEL 4 - Advanced
 
 
-**Latest: Round 7.** [Read the current round at this level](../round7.md#user-content-reading-level-4). The Round 4 foundation below is retained for context.
+**Latest overall: Round 8 (Korean). Latest English: Round 7.** [Read the English round at this level](../round7.md#user-content-reading-level-4). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨4.md)
 
@@ -45,7 +45,7 @@ Revision 6 adds persisted-result, dashboard consistency and facility eligibility
 |---|---|---|
 | Prediction and facility integrity | Validate identities, splits, modes, Seoul comparisons and hash-bound facility reports | 145 technical checks do not establish measured hypothesis results or historical facility truth |
 
-[Round 6 at this level](../round6.md#user-content-reading-level-4) · [Current source](../../../7차/)
+[Round 6 at this level](../round6.md#user-content-reading-level-4) · [Current source](../../../8차/)
 
 
 Revision 7 adds strict CSV/feature input validation, frozen-condition evidence and a model-free preflight CLI. It is available in Korean and English. Real training remains stopped and measured paper outcomes are unavailable. [Revision 7](../../../7차/docs/차수설명.md#user-content-reading-level-4).
@@ -56,4 +56,7 @@ Revision 7 adds strict CSV/feature input validation, frozen-condition evidence a
 |---|---|---|
 | Input and inference integrity | Strict CSV, complete feature observations, fixed H5 methods and bootstrap evidence | Model-free preflight does not grant experiment readiness or authorize stopped training |
 
-[Round 7 at this level](../round7.md#user-content-reading-level-4) · [Current source](../../../7차/)
+[Round 7 at this level](../round7.md#user-content-reading-level-4) · [Current source](../../../8차/)
+
+
+Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics and partial historical-rate evidence. English coverage remains Round 7. Real training is stopped; complete research approval and measured outcomes are unavailable. [Revision 8 · Korean](../../../8차/docs/차수설명.md#user-content-reading-level-4).

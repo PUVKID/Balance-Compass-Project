@@ -1,0 +1,15 @@
+.venv/
+.codex/
+evidence/
+__pycache__/
+.pytest_cache/
+rust_money/target/
+비공개*/
+data/
+results/
+*.csv
+*.log
+.env
+.env.*
+*.key
+*.pem

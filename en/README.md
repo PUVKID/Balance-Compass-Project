@@ -1,7 +1,7 @@
 # Balance Compass
 
 
-The latest round checks strict feature inputs, fixed inference evidence and model-free preflight. [Read Round 7 in English](docs/round7.md).
+The latest English round (Round 7) checks strict feature inputs, fixed inference evidence and model-free preflight. [Read Round 7 in English](docs/round7.md).
 
 [한국어](../README.md) · **English**
 
@@ -42,9 +42,12 @@ Balance Compass studies **apartment lease deposits, monthly rent, and prediction
 
 Rounds 1–3 remain in Korean and are explicitly labeled. Rounds 4–7 and the five current reading guides have English explanations.
 
-[Current source](../7차/) · [Current execution and remaining conditions](docs/round7.md#user-content-reading-level-3) · [Formulas and interpretation · Korean](../4차/docs/확장분석_수식과해석.md)
+[Current source](../8차/) · [Current execution and remaining conditions](docs/round7.md#user-content-reading-level-3) · [Formulas and interpretation · Korean](../4차/docs/확장분석_수식과해석.md)
 
 Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. Revision 6 is available in Korean and English. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../6차/docs/차수설명.md).
 
 
 Revision 7 adds strict CSV/feature input validation, frozen-condition evidence and a model-free preflight CLI. It is available in Korean and English. Real training remains stopped and measured paper outcomes are unavailable. [Revision 7](../7차/docs/차수설명.md).
+
+
+Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics and partial historical-rate evidence. English coverage remains Round 7. Real training is stopped; complete research approval and measured outcomes are unavailable. [Revision 8 · Korean](../8차/docs/차수설명.md).
