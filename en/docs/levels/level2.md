@@ -1,7 +1,7 @@
 # LEVEL 2 - Explorer
 
 
-**Latest overall: Round 7 (Korean). Latest English: Round 6.** [Read the English round at this level](../round6.md#user-content-reading-level-2). The Round 4 foundation below is retained for context.
+**Latest: Round 7.** [Read the current round at this level](../round7.md#user-content-reading-level-2). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨2.md)
 
@@ -39,7 +39,7 @@ Round 4 adds 21-column preservation and exploratory information-group comparison
 
 Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. Revision 6 is available in Korean and English. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../../../6차/docs/차수설명.md#user-content-reading-level-2).
 
-## Latest · Round 6
+## Round 6 · Prediction Integrity
 
 | Focus | Current behavior | Boundary |
 |---|---|---|
@@ -48,4 +48,12 @@ Revision 6 adds persisted-result, dashboard consistency and facility eligibility
 [Round 6 at this level](../round6.md#user-content-reading-level-2) · [Current source](../../../7차/)
 
 
-Revision 7 adds strict CSV/feature input validation, frozen-condition evidence and a model-free preflight CLI. It is documented in Korean; English coverage remains Round 6. Real training remains stopped and measured paper outcomes are unavailable. [Revision 7](../../../7차/docs/차수설명.md#user-content-reading-level-2).
+Revision 7 adds strict CSV/feature input validation, frozen-condition evidence and a model-free preflight CLI. It is available in Korean and English. Real training remains stopped and measured paper outcomes are unavailable. [Revision 7](../../../7차/docs/차수설명.md#user-content-reading-level-2).
+
+## Latest · Round 7
+
+| Focus | Current checks | Boundary |
+|---|---|---|
+| Input and inference integrity | Strict CSV, complete feature observations, fixed H5 methods and bootstrap evidence | Model-free preflight does not grant experiment readiness or authorize stopped training |
+
+[Round 7 at this level](../round7.md#user-content-reading-level-2) · [Current source](../../../7차/)
