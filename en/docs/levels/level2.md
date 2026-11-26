@@ -1,6 +1,8 @@
 # LEVEL 2 - Explorer
 
-This English guide covers revisions 1–4. [Revision 5 is currently documented in Korean](../../../5차/docs/차수설명.md#user-content-reading-level-2); its English translation is not yet available.
+Latest overall: Revision 6 (Korean). Latest English coverage: Round 5. The Round 5 guide below is retained as the latest English edition. Real training remains stopped. [Current source](../../../6차/) · [Revision 6 details](../../../6차/docs/차수설명.md#user-content-reading-level-2).
+
+**Latest: Round 5.** [Read the current round at this level](../round5.md#user-content-reading-level-2). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨2.md)
 
@@ -20,7 +22,7 @@ The pipeline separates source verification, feature construction, model selectio
 
 Round 4 adds 21-column preservation and exploratory information-group comparisons. The candidate feature catalog does not mean all 62 candidates have been acquired. Current public snapshots must not be relabeled as proven historical observations.
 
-[Round 4 at this level](../round4.md#user-content-reading-level-2) · [Current source](../../../4차/)
+[Round 4 at this level](../round4.md#user-content-reading-level-2) · [Round 4 source](../../../4차/)
 
 | Earlier round · Korean | Same-level detail |
 |---|---|
@@ -28,5 +30,12 @@ Round 4 adds 21-column preservation and exploratory information-group comparison
 | 2 | [Round 2](../../../2차/docs/차수설명.md#user-content-reading-level-2) |
 | 3 | [Round 3](../../../3차/docs/차수설명.md#user-content-reading-level-2) |
 
+## Latest · Round 5
 
-Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. The English guide covers revisions 1–4; revisions 5–6 currently have Korean documentation only. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../../../6차/docs/차수설명.md).
+| Focus | Current behavior | Boundary |
+|---|---|---|
+| Linkage units | Contracts, region-months, complex codes and map points remain separate | 13.47% complex linkage does not prove representativeness |
+
+[Round 5 at this level](../round5.md#user-content-reading-level-2) · [Current source](../../../5차/)
+
+Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. Revision 6 currently has Korean documentation only. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../../../6차/docs/차수설명.md#user-content-reading-level-2).

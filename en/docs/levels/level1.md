@@ -1,6 +1,8 @@
 # LEVEL 1 - Beginner
 
-This English guide covers revisions 1–4. [Revision 5 is currently documented in Korean](../../../5차/docs/차수설명.md#user-content-reading-level-1); its English translation is not yet available.
+Latest overall: Revision 6 (Korean). Latest English coverage: Round 5. The Round 5 guide below is retained as the latest English edition. Real training remains stopped. [Current source](../../../6차/) · [Revision 6 details](../../../6차/docs/차수설명.md#user-content-reading-level-1).
+
+**Latest: Round 5.** [Read the current round at this level](../round5.md#user-content-reading-level-1). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨1.md)
 
@@ -19,7 +21,7 @@ A collected file is like a box of receipts: having the receipts does not mean a 
 
 Start with the status table, then read the round at this same level. Treat missing results as unavailable; they are not zero. A facility-data download is not a verified link to a home, and a current facility list does not prove its historical state.
 
-[Round 4 at this level](../round4.md#user-content-reading-level-1) · [Current source](../../../4차/)
+[Round 4 at this level](../round4.md#user-content-reading-level-1) · [Round 4 source](../../../4차/)
 
 | Earlier round · Korean | Same-level detail |
 |---|---|
@@ -27,5 +29,12 @@ Start with the status table, then read the round at this same level. Treat missi
 | 2 | [Round 2](../../../2차/docs/차수설명.md#user-content-reading-level-1) |
 | 3 | [Round 3](../../../3차/docs/차수설명.md#user-content-reading-level-1) |
 
+## Latest · Round 5
 
-Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. The English guide covers revisions 1–4; revisions 5–6 currently have Korean documentation only. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../../../6차/docs/차수설명.md).
+| Focus | Current behavior | Boundary |
+|---|---|---|
+| Collected information | Six population years, earlier policy-rate decisions, and current apartment information | A download is not a tested price prediction |
+
+[Round 5 at this level](../round5.md#user-content-reading-level-1) · [Current source](../../../5차/)
+
+Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. Revision 6 currently has Korean documentation only. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../../../6차/docs/차수설명.md#user-content-reading-level-1).

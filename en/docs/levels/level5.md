@@ -1,6 +1,8 @@
 # LEVEL 5 - Expert
 
-This English guide covers revisions 1–4. [Revision 5 is currently documented in Korean](../../../5차/docs/차수설명.md#user-content-reading-level-5); its English translation is not yet available.
+Latest overall: Revision 6 (Korean). Latest English coverage: Round 5. The Round 5 guide below is retained as the latest English edition. Real training remains stopped. [Current source](../../../6차/) · [Revision 6 details](../../../6차/docs/차수설명.md#user-content-reading-level-5).
+
+**Latest: Round 5.** [Read the current round at this level](../round5.md#user-content-reading-level-5). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨5.md)
 
@@ -20,7 +22,7 @@ Strict joins require both a valid interval `[from, to)` and publication strictly
 
 Cluster resampling does not resolve every common spatial/temporal shock or model-fitting uncertainty. Candidate input completeness, nationwide performance and coverage under distribution shift are not established by the synthetic regression checks. Read missing or blocked outputs explicitly, and retain the distinction between current snapshots and historical reconstruction.
 
-[Round 4 at this level](../round4.md#user-content-reading-level-5) · [Current source](../../../4차/)
+[Round 4 at this level](../round4.md#user-content-reading-level-5) · [Round 4 source](../../../4차/)
 
 | Earlier round · Korean | Same-level detail |
 |---|---|
@@ -28,5 +30,12 @@ Cluster resampling does not resolve every common spatial/temporal shock or model
 | 2 | [Round 2](../../../2차/docs/차수설명.md#user-content-reading-level-5) |
 | 3 | [Round 3](../../../3차/docs/차수설명.md#user-content-reading-level-5) |
 
+## Latest · Round 5
 
-Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. The English guide covers revisions 1–4; revisions 5–6 currently have Korean documentation only. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../../../6차/docs/차수설명.md).
+| Focus | Current behavior | Boundary |
+|---|---|---|
+| Eligibility and inference | Historical availability and feature readiness remain false | 9,999-replicate approximate intervals are not an exact simultaneous coverage guarantee |
+
+[Round 5 at this level](../round5.md#user-content-reading-level-5) · [Current source](../../../5차/)
+
+Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. Revision 6 currently has Korean documentation only. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../../../6차/docs/차수설명.md#user-content-reading-level-5).
