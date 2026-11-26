@@ -1,7 +1,7 @@
 # LEVEL 2 - Explorer
 
 
-**Latest overall: Round 8 (Korean). Latest English: Round 7.** [Read the English round at this level](../round7.md#user-content-reading-level-2). The Round 4 foundation below is retained for context.
+**Latest: Round 8.** [Read the current round at this level](../round8.md#user-content-reading-level-2). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨2.md)
 
@@ -45,18 +45,26 @@ Revision 6 adds persisted-result, dashboard consistency and facility eligibility
 |---|---|---|
 | Prediction and facility integrity | Validate identities, splits, modes, Seoul comparisons and hash-bound facility reports | 145 technical checks do not establish measured hypothesis results or historical facility truth |
 
-[Round 6 at this level](../round6.md#user-content-reading-level-2) · [Current source](../../../8차/)
+[Round 6 at this level](../round6.md#user-content-reading-level-2) · [Round 6 source](../../../6차/)
 
 
 Revision 7 adds strict CSV/feature input validation, frozen-condition evidence and a model-free preflight CLI. It is available in Korean and English. Real training remains stopped and measured paper outcomes are unavailable. [Revision 7](../../../7차/docs/차수설명.md#user-content-reading-level-2).
 
-## Latest · Round 7
+## Round 7 · Input Integrity
 
 | Focus | Current checks | Boundary |
 |---|---|---|
 | Input and inference integrity | Strict CSV, complete feature observations, fixed H5 methods and bootstrap evidence | Model-free preflight does not grant experiment readiness or authorize stopped training |
 
-[Round 7 at this level](../round7.md#user-content-reading-level-2) · [Current source](../../../8차/)
+[Round 7 at this level](../round7.md#user-content-reading-level-2) · [Round 7 source](../../../7차/)
 
 
-Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics and partial historical-rate evidence. English coverage remains Round 7. Real training is stopped; complete research approval and measured outcomes are unavailable. [Revision 8 · Korean](../../../8차/docs/차수설명.md#user-content-reading-level-2).
+Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics and partial historical-rate evidence. Round 8 is available in Korean and English. Real training is stopped; complete research approval and measured outcomes are unavailable. [Revision 8 · Korean](../../../8차/docs/차수설명.md#user-content-reading-level-2).
+
+## Latest · Round 8
+
+| Focus | Current checks | Boundary |
+|---|---|---|
+| Input lineage and completion | Full 48-month audit, selected manifest and post-analysis hash checks | Data integrity is not independent location truth, historical-vintage approval or measured performance |
+
+[Round 8 at this level](../round8.md#user-content-reading-level-2) · [Current source](../../../8차/)

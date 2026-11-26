@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "0ebed64e049dc7422bce4f38d5c068e5bd8240e4",
+  "original_conditions": "연구조건_동결.json",
+  "original_conditions_sha256": "7f9d095cab44f8f72cc8e18cc5f95cad6e965f82fa23d45d167837c246bb37d4",
+  "change": "Reject manifest or engine mutation after combined analysis before completed status",
+  "files": {
+    "rentlab/experiment_runner.py": "8e4bda80671cd603b59fb25aaf7750de69c060701bca3b917b93399a88b16700",
+    "tests/test_analysis_completion_guard.py": "c46900bc26a519518117410d115edd3eaf75f113ddcbd202496554bc738626d3"
+  },
+  "tests": {
+    "original": 166,
+    "added": 2,
+    "total": 168,
+    "actual_training": false
+  },
+  "training_started": false,
+  "scientific_protocol_changed": false,
+  "raw_input_changed": false
+}

@@ -65,6 +65,10 @@ def execute(root, run_dir, run=None, with_holdout=None, analysis_writer=None, ma
                         if hashlib.sha256((ROOT / "rentlab" / "engine.py").read_bytes()).hexdigest() != state["engine_sha256"]:
                             raise ValueError("홀드아웃 실행 후 엔진 코드 변경")
                         combine_results(run_dir, result, held, manifest, with_holdout, writer=analysis_writer)
+                        if hashlib.sha256(manifest.read_bytes()).hexdigest() != state["manifest_sha256"]:
+                            raise ValueError("통합 분석 후 manifest 변경")
+                        if hashlib.sha256((ROOT / "rentlab" / "engine.py").read_bytes()).hexdigest() != state["engine_sha256"]:
+                            raise ValueError("통합 분석 후 엔진 코드 변경")
                         state["analysis"] = str(run_dir / "가설통합결과")
                     state.update(status="completed", stage="completed", mode=result["mode"], rows=result["rows"])
                 except KeyboardInterrupt:
