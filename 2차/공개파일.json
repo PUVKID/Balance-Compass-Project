@@ -1,0 +1,200 @@
+{
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 135,
+      "sha256": "1b5742b635af479db5a6ce6ff379766a3242bff4366b03f197e8b39ff499863c"
+    },
+    {
+      "path": "docs/구현계획.md",
+      "bytes": 1444,
+      "sha256": "cf63701a8b5c4e5ed4f2e786276f11e11d4bbff19770af3cd6bcd5034bcaafae"
+    },
+    {
+      "path": "docs/연구설계.md",
+      "bytes": 5072,
+      "sha256": "86cf8d6b28ac4263efc1bc160c33ac8e91386f858e97b2a643a7b605db07d0b1"
+    },
+    {
+      "path": "docs/읽기안내/레벨1.md",
+      "bytes": 2090,
+      "sha256": "c07b85871fe38b46b8c49ca1b5915c6d9d08cbbd74445e9b1767fe457b040757"
+    },
+    {
+      "path": "docs/읽기안내/레벨2.md",
+      "bytes": 2106,
+      "sha256": "e2074eadf8c03e4b94084025f17535ee96f6e44a9b2ad24092dcad7aae5a2c2b"
+    },
+    {
+      "path": "docs/읽기안내/레벨3.md",
+      "bytes": 2262,
+      "sha256": "23bc0be7a871be2f573c333c4c647197bcda4e44cdb1b0c6f3875623508d2ac9"
+    },
+    {
+      "path": "docs/읽기안내/레벨4.md",
+      "bytes": 2202,
+      "sha256": "9f4deba57740f50e08b15385d5a1a9696a75c153cad579367c4e1380bc656694"
+    },
+    {
+      "path": "docs/읽기안내/레벨5.md",
+      "bytes": 2579,
+      "sha256": "31fbf95d7d5c58a75df2398a66bdbec116de39577ec2e19953d85a71fbd12e3d"
+    },
+    {
+      "path": "docs/전체차이.diff",
+      "bytes": 130385,
+      "sha256": "a7a92e03d186c7158aaa94c88f4f15007471258e72267c3dce4b874917f8309f"
+    },
+    {
+      "path": "docs/차수목록.md",
+      "bytes": 839,
+      "sha256": "5ae90cf77962acd6c6fa27fc8e6bc773c9ca559f2a1590b93440e4a6ce1556fe"
+    },
+    {
+      "path": "docs/차수비교.md",
+      "bytes": 1441,
+      "sha256": "032d33e8d6943eab6108e74e71d6c4356fa5e50265ec796747c02d656e7283cc"
+    },
+    {
+      "path": "docs/차수설명.md",
+      "bytes": 9485,
+      "sha256": "fec8b9424cedc28dbe308d9336007bb3e7f8c55b933898be5fa022827c35bb54"
+    },
+    {
+      "path": "history/1차/docs/구현계획.md",
+      "bytes": 1281,
+      "sha256": "de2e89c850feb811419418d55038bfece7fdc5993006ad0baeec67664a27e7ef"
+    },
+    {
+      "path": "history/1차/docs/연구설계.md",
+      "bytes": 5072,
+      "sha256": "86cf8d6b28ac4263efc1bc160c33ac8e91386f858e97b2a643a7b605db07d0b1"
+    },
+    {
+      "path": "history/1차/rust_money/Cargo.lock",
+      "bytes": 152,
+      "sha256": "2e7f3a833da840ed9ca6f61f82bd853d3acd971c609b603903f53125ea1d665a"
+    },
+    {
+      "path": "history/1차/rust_money/Cargo.toml",
+      "bytes": 79,
+      "sha256": "97e0eb7ac769aef5f79cdf5337e46a05d8291b08404f6df53b0350c2b1ae472a"
+    },
+    {
+      "path": "history/1차/rust_money/src/main.rs",
+      "bytes": 2540,
+      "sha256": "f8cd29fe9679d0cd98253ee95584774d35f4bfc705f959ca5aa5d4084c3f663c"
+    },
+    {
+      "path": "history/1차/scripts/build_rust.ps1",
+      "bytes": 391,
+      "sha256": "6251e7019c123b7387cf6c64377c6047b68f2313c48b3f36663c1472acee5b34"
+    },
+    {
+      "path": "history/1차/차수설명.md",
+      "bytes": 6754,
+      "sha256": "bedf94a4feb3ee815963f7a0eadaa51879c1effbaea01dd14457fc3db6713482"
+    },
+    {
+      "path": "README.md",
+      "bytes": 11416,
+      "sha256": "f60cb929cfef4beaca9bd6317c23760a0922304082815a2897f32d29d0a97538"
+    },
+    {
+      "path": "rentlab/__init__.py",
+      "bytes": 48,
+      "sha256": "006383028a4f9dccb86b45dda19253d78ec205b1b0bcd3214c5ece2a593bc605"
+    },
+    {
+      "path": "rentlab/__main__.py",
+      "bytes": 82,
+      "sha256": "f2365dbefed48b78354d2610cc1debc9c0e0d097a831e175286c3889fba2184e"
+    },
+    {
+      "path": "rentlab/engine.py",
+      "bytes": 25895,
+      "sha256": "ebae1f9f82da8ceb25011197b68e5f96d6da0d3c18d37398e9fe1190b4ebb0a8"
+    },
+    {
+      "path": "requirements.txt",
+      "bytes": 66,
+      "sha256": "36f228243262274d2ac1aca612d0c0172953601cac5739c5736902d9e824bf4c"
+    },
+    {
+      "path": "run_dashboard.py",
+      "bytes": 5679,
+      "sha256": "547d814e9934fb6e34e7e0fdddae02b654bca14da2e37a039cbed947b81b2349"
+    },
+    {
+      "path": "rust_money/Cargo.lock",
+      "bytes": 152,
+      "sha256": "2e7f3a833da840ed9ca6f61f82bd853d3acd971c609b603903f53125ea1d665a"
+    },
+    {
+      "path": "rust_money/Cargo.toml",
+      "bytes": 79,
+      "sha256": "97e0eb7ac769aef5f79cdf5337e46a05d8291b08404f6df53b0350c2b1ae472a"
+    },
+    {
+      "path": "rust_money/src/main.rs",
+      "bytes": 2540,
+      "sha256": "f8cd29fe9679d0cd98253ee95584774d35f4bfc705f959ca5aa5d4084c3f663c"
+    },
+    {
+      "path": "scripts/build_rust.ps1",
+      "bytes": 1724,
+      "sha256": "bad07cc0f51329a3e8c0e86fb8975acbf6cbe302a53e95d7e2a5fc98f00caeec"
+    },
+    {
+      "path": "tests/test_engine.py",
+      "bytes": 9766,
+      "sha256": "5dc3b03c661e951d792346a506186d467d315285bc162e7b616e1ca6774dfc7e"
+    },
+    {
+      "path": "web/app.js",
+      "bytes": 10023,
+      "sha256": "021ab026bcabed124abb4d8eb1340d7064a9efe316f42ddb8b01c2435e1b5094"
+    },
+    {
+      "path": "web/index.html",
+      "bytes": 7404,
+      "sha256": "d452fa8de0baa6f311ce009900b08d7dc745427122dbf4fb6b7facaefbbf3643"
+    },
+    {
+      "path": "web/NanumGothic-Bold.ttf",
+      "bytes": 2073868,
+      "sha256": "f96298f9fb18e364d2370f4c3ce948ac67a2b61af992d7234bc15c42b033c674"
+    },
+    {
+      "path": "web/OFL.txt",
+      "bytes": 4534,
+      "sha256": "eeacf16032901d0ed0456876ec77b8f0fda6b3fecec7d972f8543eb602e6c30f"
+    },
+    {
+      "path": "web/style.css",
+      "bytes": 9458,
+      "sha256": "794350b2a31486aa14234ebe68ec28f3ec6a9407e74c6e8f41e4e1ce8399fa19"
+    },
+    {
+      "path": "대시보드_시작.ps1",
+      "bytes": 581,
+      "sha256": "0f2e83969310b585682965b495b00830d90a15fe1033b47129d994f9ff1f2f30"
+    },
+    {
+      "path": "변경기록.md",
+      "bytes": 1274,
+      "sha256": "8e9b18f24eb46a90048211c9feebc00d3c20f21bfb7373d20216e6177b862913"
+    },
+    {
+      "path": "사용안내.md",
+      "bytes": 5874,
+      "sha256": "22b41b27861425b3dfa98a4d0124bf19d1fdc640a2b657f7ad4630559dc8cace"
+    },
+    {
+      "path": "연구_실행.ps1",
+      "bytes": 608,
+      "sha256": "2b07511bd47b19881683fb9d046919c41a91b7676c79439625bdc19ec8973b62"
+    }
+  ],
+  "note": "자신은 제외. 실제 자료·운영 로그·인증·대화 없음."
+}

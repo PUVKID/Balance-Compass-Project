@@ -1,0 +1,1648 @@
+--- /dev/null
++++ 2차/.gitignore
+@@ -0,0 +1,15 @@
++.venv/
++.codex/
++evidence/
++__pycache__/
++.pytest_cache/
++rust_money/target/
++비공개*/
++data/
++results/
++*.csv
++*.log
++.env
++.env.*
++*.key
++*.pem
+--- 1차/docs/구현계획.md
++++ 2차/docs/구현계획.md
+@@ -1,14 +1,15 @@
+-# 신규 연구 1차 구현 계획
++# 새 연구 2차 재구성 계획
+ 
+-명세: 연구설계.md. Python 연구 처리, Rust 금액 처리, 로컬 읽기 전용 조회로 역할을 나눈다. 구 소스 복원으로 표기하지 않는다.
++2026-11-26. 기존 채팅 대신 새 로컬 채팅에서 진행한다. 구 V10 원본 복구와 신규 구현을 구분한다.
+ 
+-1. 공식 원천·선행연구·이용조건을 확인하고 출처와 제약을 저장한다.
+-2. 원본 SHA와 출처 manifest를 검증하는 CSV 로더 및 전처리 감사를 구현한다.
+-3. 고정 시간 분할, 지역 홀드아웃, train-only 전처리와 비교 모델을 구현한다.
+-4. 유한표본 순위 보정·포함률·구간 폭·interval score를 구현하고 단위/누수/실패 검사를 수행한다.
+-5. Rust 금액 정규화 CLI를 실제 로더와 연결하고 빌드/오류/정확한 원 단위 일치를 확인한다.
+-6. 30종 이상 분석 목적 registry와 미측정 상태를 연결한다. 입력/실행 근거가 없는 결과를 채우지 않는다.
+-7. 코드 전용 Graphify를 생성하고 호출 관계를 소스와 대조한다. 독립 검토로 누락·과학적 한계를 기록한다.
+-8. 사용자용 실행 안내·실제 완료/미완료 상태·패키지 및 공개 가능 코드 범위를 정리한다.
++| 구성 | 구현과 확인 |
++|---|---|
++| 연구 엔진 | manifest 해시 확인 → Rust 원 단위 변환 → 고정 시간 분할 → 검증셋 모델 선택 → 보정 → 최종 평가 |
++| 실행 연결 | Python CLI, Rust 빌드, 읽기 전용 로컬 HTTP 서버. 이전 차수 환경을 재사용하되 새 설치 환경도 안내 |
++| 화면 | 지정 블루·퍼플, 나눔고딕700, 왼쪽 탐색, 라이트·다크 저장, 실제 결과와 합성 결과 구분 |
++| 결과 보존 | 기존 입력과 출력 덮어쓰기 금지. 실측 자료가 없으면 전국 완료·성과로 표시하지 않음 |
++| 확인 | 금액 오류·해시 불일치·시간 누수·작은 보정 표본·서버 파일 경계·테마·좁은 화면 |
+ 
+-이 문서 작성 자체는 구현·실험 완료 근거가 아니다. 유효한 동일 검사 결과를 반복하지 않는다.
++연구설계.md를 계승한다. 구현 방법은 Python + Rust + 별도 빌드가 필요 없는 HTML/CSS/JavaScript로 결정했다. 서버는 127.0.0.1에만 바인딩하며 실행·학습·수집 API를 제공하지 않는다.
++
++과거 CSV 209개와 클라우드 결과는 로컬에 없으며 이번 차수의 입력으로 사용하지 않는다. 실제 자료 수집·전국 커버리지 확인·본실험과 논문은 별도의 미완료 항목으로 기록한다. 자동 생성한 합성 자료는 처리 기능 확인에만 사용한다.
+--- /dev/null
++++ 2차/docs/읽기안내/레벨1.md
+@@ -0,0 +1,26 @@
++# LEVEL 1 - Beginner
++
++현재 수준: LEVEL 1 · 새 연구 2차. [프로젝트 첫 화면](../../README.md) · [같은 수준의 1차](../../history/1차/차수설명.md#user-content-reading-level-1) · [같은 수준의 2차](../차수설명.md#user-content-reading-level-1) · [같은 수준의 프로필](https://github.com/PUVKID/PUVKID/blob/main/docs/읽기안내/레벨1.md)
++
++다른 수준: [LEVEL 2](레벨2.md) · [LEVEL 3](레벨3.md) · [LEVEL 4](레벨4.md) · [LEVEL 5](레벨5.md)
++
++**전국 실측 본실험은 미실행이다.** 아래 구현과 합성 검증을 실측 성능으로 해석하지 않는다.
++
++<a id="reading-level-1"></a>
++
++
++
++
++
++
++집의 임대료를 한 숫자로 맞히는 것과, 오차가 어느 정도인지 설명하는 것은 다른 문제다. 이 연구는 전세 보증금과 월세를 따로 예측하고 실제값이 예측 범위 안에 얼마나 들어오는지 확인한다. 화면의 MAE는 실제 금액과 예측 금액 사이 평균 차이다. 숫자가 작으면 평균 오차가 작다는 뜻이지만 모든 집을 정확히 맞힌다는 뜻은 아니다.
++
++| 화면 | 확인할 내용 | 해석 |
++|---|---|---|
++| 연구 현황 | 실제 자료·합성 자료·미연결 상태 | 합성 결과를 전국 결과로 읽지 않는다 |
++| 데이터 점검 | 원본 행 수와 제외 사유 | 제외된 계약도 감사 기록으로 남는다 |
++| AI 평가 | 비교 모델의 오차와 포함률 | 포함률과 구간 폭을 함께 본다 |
++| 표와 그림 | 계산된 분석과 미산출 목적 | 없는 결과를 0으로 채우지 않는다 |
++
++현재 전국 본실험이 끝나지 않았으므로 이 도구의 예시 수치로 실제 주거 계약을 판단할 수 없다. 월세 예측은 이미 관측한 보증금 조건을 사용한다. 보증금을 바꾸면 월세가 반드시 그만큼 달라진다는 인과관계를 계산하는 기능은 아니다. 실행은 [사용 안내](../../사용안내.md)에 따라 준비한다. 같은 차수의 실제 구현은 [2차 비교](../차수비교.md)에서 확인한다.
++
+--- /dev/null
++++ 2차/docs/읽기안내/레벨2.md
+@@ -0,0 +1,27 @@
++# LEVEL 2 - Explorer
++
++현재 수준: LEVEL 2 · 새 연구 2차. [프로젝트 첫 화면](../../README.md) · [같은 수준의 1차](../../history/1차/차수설명.md#user-content-reading-level-2) · [같은 수준의 2차](../차수설명.md#user-content-reading-level-2) · [같은 수준의 프로필](https://github.com/PUVKID/PUVKID/blob/main/docs/읽기안내/레벨2.md)
++
++다른 수준: [LEVEL 1](레벨1.md) · [LEVEL 3](레벨3.md) · [LEVEL 4](레벨4.md) · [LEVEL 5](레벨5.md)
++
++**전국 실측 본실험은 미실행이다.** 아래 구현과 합성 검증을 실측 성능으로 해석하지 않는다.
++
++<a id="reading-level-2"></a>
++
++
++
++
++
++
++입력은 국토교통부 공개 CSV와 파일별 manifest다. manifest에는 파일 이름뿐 아니라 SHA-256, 행 수, 취득 시각, 출처와 스냅숏 식별자가 들어간다. 해시는 프로그램이 읽는 파일과 기록한 파일이 같은지 검사한다. 그 내용이 실제 모집단을 완전히 대표한다는 뜻은 아니다.
++
++| 단계 | 입력 | 출력 |
++|---|---|---|
++| 자료 검사 | 원본 CSV·manifest | 해시·행 수·중복 범위 검사 |
++| 정제 | 금액·날짜·계약구분 | 분석 행과 제외 사유 |
++| 비교 학습 | 2022–2023 계약 | 중앙값·지역 중앙값·Ridge·트리 부스팅 |
++| 선택·보정 | 2024 상반기·하반기 | 선택 모델과 보정 반경 |
++| 최종 평가 | 2025 계약 | 오차·구간·지역 집계·표·그림 |
++
++학습에 쓰는 기간, 모델을 고르는 기간, 예측구간을 보정하는 기간, 마지막 평가 기간을 나눈다. 나중에 나온 답을 미리 학습에 넣는 일을 줄이기 위해서다. 실제 자료가 없을 때 `smoke` 명령으로 기술 흐름을 확인할 수 있지만 결과에는 SYNTHETIC이 표시된다. 현재 목록은 35 분석 목적이며 계산 가능한 30종과 구현·입력이 부족한 5종을 구분한다. CSV와 PNG가 한 쌍이면 한 분석이다. 상세 실행은 [사용 안내](../../사용안내.md), 연구 목적은 [연구설계](../연구설계.md)를 따른다.
++
+--- /dev/null
++++ 2차/docs/읽기안내/레벨3.md
+@@ -0,0 +1,27 @@
++# LEVEL 3 - Practitioner
++
++현재 수준: LEVEL 3 · 새 연구 2차. [프로젝트 첫 화면](../../README.md) · [같은 수준의 1차](../../history/1차/차수설명.md#user-content-reading-level-3) · [같은 수준의 2차](../차수설명.md#user-content-reading-level-3) · [같은 수준의 프로필](https://github.com/PUVKID/PUVKID/blob/main/docs/읽기안내/레벨3.md)
++
++다른 수준: [LEVEL 1](레벨1.md) · [LEVEL 2](레벨2.md) · [LEVEL 4](레벨4.md) · [LEVEL 5](레벨5.md)
++
++**전국 실측 본실험은 미실행이다.** 아래 구현과 합성 검증을 실측 성능으로 해석하지 않는다.
++
++<a id="reading-level-3"></a>
++
++
++
++
++
++
++Python 3.12와 의존성, Rust MSVC 빌드 환경을 준비한다. 먼저 Rust 바이너리를 만들고 실제 자료를 검사한 뒤 새 출력 경로로 연구를 실행한다. 화면 서버는 기존 결과를 읽을 뿐 연구·수집 API를 제공하지 않는다. 기본 바인딩은 127.0.0.1이며 외부 서비스 배포를 위한 인증 서버가 아니다.
++
++| 명령 | 목적 | 실패 조건 |
++|---|---|---|
++| `scripts/build_rust.ps1` | 금액 CLI 빌드 | 링커·SDK 부재 |
++| `python -m rentlab validate --manifest 경로` | 실제 입력 검사 | 해시·행 수·칼럼·금액 오류 |
++| `python -m rentlab run --manifest 경로 --output 새폴더` | 실측 입력 평가 | 기존 출력·빈 분할·신규계약 부재 |
++| `python -m rentlab smoke --output 새폴더` | 합성 기술 검증 | 기존 결과 덮어쓰기 거부 |
++| `python run_dashboard.py --result 결과폴더` | 결과 조회 | summary 부재·유형 오류 |
++
++금액은 만원 문자열에서 원 정수로 변환한다. 쉼표 위치·정밀도·범위를 Rust에서 검사하며 임의 실수 변환으로 대체하지 않는다. 잘못된 금액 한 행은 전체 처리를 실패시키며 부분 출력을 남기지 않는다. 기타 날짜·계약구분 이상은 감사 사유로 제외한다. 원본과 기존 결과는 보존한다. 셋업·manifest 예시·홀드아웃 명령은 [사용 안내](../../사용안내.md)를 참조한다. 루트 실행 스크립트는 자기 차수의 `.venv`를 우선하며 로컬 1차 환경이 있으면 명시적으로 재사용한다.
++
+--- /dev/null
++++ 2차/docs/읽기안내/레벨4.md
+@@ -0,0 +1,27 @@
++# LEVEL 4 - Advanced
++
++현재 수준: LEVEL 4 · 새 연구 2차. [프로젝트 첫 화면](../../README.md) · [같은 수준의 1차](../../history/1차/차수설명.md#user-content-reading-level-4) · [같은 수준의 2차](../차수설명.md#user-content-reading-level-4) · [같은 수준의 프로필](https://github.com/PUVKID/PUVKID/blob/main/docs/읽기안내/레벨4.md)
++
++다른 수준: [LEVEL 1](레벨1.md) · [LEVEL 2](레벨2.md) · [LEVEL 3](레벨3.md) · [LEVEL 5](레벨5.md)
++
++**전국 실측 본실험은 미실행이다.** 아래 구현과 합성 검증을 실측 성능으로 해석하지 않는다.
++
++<a id="reading-level-4"></a>
++
++
++
++
++
++
++전처리의 중앙값·범주 사전·스케일러와 지역별 중앙값은 학습 분할에서만 추정한다. 검증 MAE로 모델을 선택하며 최종 테스트를 모델 선택에 사용하지 않는다. 선택 모델을 기준으로 보정 분할의 절대 잔차를 계산한다. 지역 홀드아웃에서는 지정 지역을 앞의 세 분할에서 모두 제외하고 그 지역의 2025 계약을 평가한다.
++
++| 요소 | 현재 구현 | 검토할 한계 |
++|---|---|---|
++| 기준 모델 | 전체·지역 중앙값 | 미관측 지역은 학습 전체 중앙값 |
++| AI 모델 | Ridge·HistGradientBoosting | 고정 설정, 광범위 탐색 미수행 |
++| 특징 | 지역·면적·층·건물 연령·월 | 월세에는 관측 보증금 추가 |
++| 보정 | 절대 잔차 split conformal | 지역별 별도 보정과 분위수 모델 미구현 |
++| 지역 집계 | 지역별 MAE·포함률·표본 | 적은 표본·지역 경계 변화에 주의 |
++
++시간 분할이 신고 시차와 공개 시점의 완전한 재현을 뜻하지 않는다. 사후 공개 스냅숏의 계약일을 쓰므로 실시간 예측 성과로 확대할 수 없다. 같은 공개 행이 실제로 별도 계약일 수 있어 행을 무조건 중복 삭제하지 않는다. 파일 간 같은 지역·계약월 범위는 병합 전에 거부한다. 최종 소스의 검사와 실측 연구의 통계적 타당성은 구분해야 한다. [연구설계](../연구설계.md)와 [전체 차이](../전체차이.diff)를 함께 검토한다.
++
+--- /dev/null
++++ 2차/docs/읽기안내/레벨5.md
+@@ -0,0 +1,28 @@
++# LEVEL 5 - Expert
++
++현재 수준: LEVEL 5 · 새 연구 2차. [프로젝트 첫 화면](../../README.md) · [같은 수준의 1차](../../history/1차/차수설명.md#user-content-reading-level-5) · [같은 수준의 2차](../차수설명.md#user-content-reading-level-5) · [같은 수준의 프로필](https://github.com/PUVKID/PUVKID/blob/main/docs/읽기안내/레벨5.md)
++
++다른 수준: [LEVEL 1](레벨1.md) · [LEVEL 2](레벨2.md) · [LEVEL 3](레벨3.md) · [LEVEL 4](레벨4.md)
++
++**전국 실측 본실험은 미실행이다.** 아래 구현과 합성 검증을 실측 성능으로 해석하지 않는다.
++
++<a id="reading-level-5"></a>
++
++
++
++
++
++
++보정 표본 n과 alpha=0.1에 대해 `ceil((n+1)*(1-alpha))` 순위의 절대 잔차를 선택한다. 순위가 n을 넘으면 구간을 산출하지 않고 null로 남긴다. 유한표본 포함률 보장은 교환가능성 등의 가정에 의존하며 시간·지역 이동 환경에 무조건 적용할 수 없다. 테스트에는 MAE, RMSE, 구간 포함률, 평균 폭, interval score와 표본 수를 저장한다. 원비율은 보존하며 UI 백분율만 소수 첫째 자리로 반올림한다.
++
++| 재현 요소 | 기록·동작 | 미완료 범위 |
++|---|---|---|
++| 입력 | 원본 SHA-256·출처·시각·스냅숏 | 전국 완결성 공식 코드 대조 |
++| 금액 | i64 원 단위, Rust 바이너리 해시 | 속도 향상 전후 실측 없음 |
++| 모델 | CPU, 부스팅 random_state=42 | 불확실성 반복실험·하이퍼파라미터 탐색 |
++| 평가 | train-only 전처리·고정 시간·지역 홀드아웃 | 단지 군집 부트스트랩 |
++| 민감도 | 미측정 상태를 결과 목록에 보존 | 신고 지연·갱신·지역 conformal·분위수 비교 |
++| 출력 | 기존 폴더 보호·임시 폴더 완성 후 이름 변경 | 대규모 전국 입력의 메모리·시간 실측 |
++
++공개 자료는 임차가구 모집단 전체가 아니다. 지역명은 행정구역 코드의 역사적 동등성을 보장하지 않는다. 금액의 정확한 정수 정규화 이후 회귀·평가에는 부동소수 계산을 사용한다. 실제 데이터·모델·내부 출처·개인정보·인증자료는 이 저장소에 넣지 않는다. 나눔고딕은 [OFL](../../web/OFL.txt)을 동봉했다. 현재 구현 상태와 남은 연구를 함께 해석하고, 합성 검사 성능을 실측 연구 성과로 인용하지 않는다. 구현 원문은 [엔진](../../rentlab/engine.py), 입력·실행 계약은 [사용 안내](../../사용안내.md)에서 확인한다.
++
+--- /dev/null
++++ 2차/docs/차수목록.md
+@@ -0,0 +1,10 @@
++# 확인된 전체 로컬 연구 차수
++
++| 차수 | 자료 폴더 | 상세 | 직전 비교 |
++|---|---|---|---|
++| 새 연구 1차 | [보존 원문](../history/1차/) | [1차 설명](../history/1차/차수설명.md) | [첫 차수 범위](../history/1차/차수설명.md) |
++| 새 연구 2차 | [현재 소스](../) | [2차 설명](차수설명.md) | [1차 → 2차](차수비교.md) |
++
++이 번호는 로컬 새 연구의 차수다. 1차의 설계·Rust 초기 소스를 실제 확인했고, 2차에서 연구 엔진과 조회 화면을 신규 구현했다. 과거 클라우드 V10 기록과 합쳐 임의로 번호를 만들지 않는다. 현재 실측 자료와 전국 결과는 미확보다. 실제 원고가 없으며 논문 게재를 주장하지 않는다.
++
++[프로젝트 첫 화면](../README.md) · [사용 안내](../사용안내.md)
+--- /dev/null
++++ 2차/docs/차수비교.md
+@@ -0,0 +1,15 @@
++# 새 연구 1차 → 2차 전체 비교 안내
++
++| 항목 | 1차 | 2차 |
++|---|---|---|
++| 연구설계 | 설계 문서 | 원문 계승, 실제 구현·한계 안내 추가 |
++| 금액 정규화 | Rust 소스만 있음 | 동일 소스 보존, Python 실제 호출 및 Windows 빌드 연결 |
++| 데이터 처리 | 구현 계획 | manifest 해시·행 수 검사, CSV 정제·감사 |
++| 평가 | 구현 계획 | 고정 시간 분할·지역 홀드아웃·네 모델·분할 conformal |
++| 산출물 | 계획 | 35 목적 목록, 계산 가능 30종과 미측정 5종 구분 |
++| 화면 | 없음 | 읽기 전용 서버, 5개 화면, 테마 저장·설명 카드·파일 조회 |
++| 실제 자료·전국 성능 | 미확보·미실행 | 미확보·미실행 유지 |
++
++Rust `src/main.rs`, `Cargo.toml`, `Cargo.lock`과 연구설계는 1차에서 가져왔습니다. `.venv`, 빌드 중간물과 공식 자료제공 HTML 사본은 신규 코드로 복제하지 않았습니다. 과거 V10 소스 조각을 복원한 것으로 표기하지 않습니다.
++
++실제 공개 가능한 텍스트의 전체 차이는 [전체차이.diff](전체차이.diff)에 저장합니다. 추가 파일은 전체 본문, 수정 파일은 공백·주석을 포함해 비교합니다. 글꼴 등 바이너리는 공개 파일 목록의 바이트·SHA-256으로 구분합니다. 비공개 원본·운영 로그·대화·실측 CSV·인증자료는 비교에서 제외합니다.
+--- /dev/null
++++ 2차/docs/차수설명.md
+@@ -0,0 +1,118 @@
++# 새 연구 2차 상세
++
++2026-11-26. 설계·금액 초기 소스를 이어 로컬 실행 가능한 연구 엔진과 조회 화면을 신규 구현했다. 전국 본실험·실측 원본 확보·미측정 민감도는 미완료다. [프로젝트](../README.md) · [전체 비교](차수비교.md)
++
++<details><summary>LEVEL 1 - Beginner · 연구와 결과 읽기</summary>
++<a id="reading-level-1"></a>
++
++[같은 수준의 1차](../history/1차/차수설명.md#user-content-reading-level-1) · [2차 전체 안내](읽기안내/레벨1.md)
++
++
++
++
++
++집의 임대료를 한 숫자로 맞히는 것과, 오차가 어느 정도인지 설명하는 것은 다른 문제다. 이 연구는 전세 보증금과 월세를 따로 예측하고 실제값이 예측 범위 안에 얼마나 들어오는지 확인한다. 화면의 MAE는 실제 금액과 예측 금액 사이 평균 차이다. 숫자가 작으면 평균 오차가 작다는 뜻이지만 모든 집을 정확히 맞힌다는 뜻은 아니다.
++
++| 화면 | 확인할 내용 | 해석 |
++|---|---|---|
++| 연구 현황 | 실제 자료·합성 자료·미연결 상태 | 합성 결과를 전국 결과로 읽지 않는다 |
++| 데이터 점검 | 원본 행 수와 제외 사유 | 제외된 계약도 감사 기록으로 남는다 |
++| AI 평가 | 비교 모델의 오차와 포함률 | 포함률과 구간 폭을 함께 본다 |
++| 표와 그림 | 계산된 분석과 미산출 목적 | 없는 결과를 0으로 채우지 않는다 |
++
++현재 전국 본실험이 끝나지 않았으므로 이 도구의 예시 수치로 실제 주거 계약을 판단할 수 없다. 월세 예측은 이미 관측한 보증금 조건을 사용한다. 보증금을 바꾸면 월세가 반드시 그만큼 달라진다는 인과관계를 계산하는 기능은 아니다. 실행은 [사용 안내](../사용안내.md)에 따라 준비한다. 같은 차수의 실제 구현은 [2차 비교](차수비교.md)에서 확인한다.
++
++</details>
++
++<details><summary>LEVEL 2 - Explorer · 자료와 실행 흐름</summary>
++<a id="reading-level-2"></a>
++
++[같은 수준의 1차](../history/1차/차수설명.md#user-content-reading-level-2) · [2차 전체 안내](읽기안내/레벨2.md)
++
++
++
++
++
++입력은 국토교통부 공개 CSV와 파일별 manifest다. manifest에는 파일 이름뿐 아니라 SHA-256, 행 수, 취득 시각, 출처와 스냅숏 식별자가 들어간다. 해시는 프로그램이 읽는 파일과 기록한 파일이 같은지 검사한다. 그 내용이 실제 모집단을 완전히 대표한다는 뜻은 아니다.
++
++| 단계 | 입력 | 출력 |
++|---|---|---|
++| 자료 검사 | 원본 CSV·manifest | 해시·행 수·중복 범위 검사 |
++| 정제 | 금액·날짜·계약구분 | 분석 행과 제외 사유 |
++| 비교 학습 | 2022–2023 계약 | 중앙값·지역 중앙값·Ridge·트리 부스팅 |
++| 선택·보정 | 2024 상반기·하반기 | 선택 모델과 보정 반경 |
++| 최종 평가 | 2025 계약 | 오차·구간·지역 집계·표·그림 |
++
++학습에 쓰는 기간, 모델을 고르는 기간, 예측구간을 보정하는 기간, 마지막 평가 기간을 나눈다. 나중에 나온 답을 미리 학습에 넣는 일을 줄이기 위해서다. 실제 자료가 없을 때 `smoke` 명령으로 기술 흐름을 확인할 수 있지만 결과에는 SYNTHETIC이 표시된다. 현재 목록은 35 분석 목적이며 계산 가능한 30종과 구현·입력이 부족한 5종을 구분한다. CSV와 PNG가 한 쌍이면 한 분석이다. 상세 실행은 [사용 안내](../사용안내.md), 연구 목적은 [연구설계](연구설계.md)를 따른다.
++
++</details>
++
++<details><summary>LEVEL 3 - Practitioner · 실행과 오류 처리</summary>
++<a id="reading-level-3"></a>
++
++[같은 수준의 1차](../history/1차/차수설명.md#user-content-reading-level-3) · [2차 전체 안내](읽기안내/레벨3.md)
++
++
++
++
++
++Python 3.12와 의존성, Rust MSVC 빌드 환경을 준비한다. 먼저 Rust 바이너리를 만들고 실제 자료를 검사한 뒤 새 출력 경로로 연구를 실행한다. 화면 서버는 기존 결과를 읽을 뿐 연구·수집 API를 제공하지 않는다. 기본 바인딩은 127.0.0.1이며 외부 서비스 배포를 위한 인증 서버가 아니다.
++
++| 명령 | 목적 | 실패 조건 |
++|---|---|---|
++| `scripts/build_rust.ps1` | 금액 CLI 빌드 | 링커·SDK 부재 |
++| `python -m rentlab validate --manifest 경로` | 실제 입력 검사 | 해시·행 수·칼럼·금액 오류 |
++| `python -m rentlab run --manifest 경로 --output 새폴더` | 실측 입력 평가 | 기존 출력·빈 분할·신규계약 부재 |
++| `python -m rentlab smoke --output 새폴더` | 합성 기술 검증 | 기존 결과 덮어쓰기 거부 |
++| `python run_dashboard.py --result 결과폴더` | 결과 조회 | summary 부재·유형 오류 |
++
++금액은 만원 문자열에서 원 정수로 변환한다. 쉼표 위치·정밀도·범위를 Rust에서 검사하며 임의 실수 변환으로 대체하지 않는다. 잘못된 금액 한 행은 전체 처리를 실패시키며 부분 출력을 남기지 않는다. 기타 날짜·계약구분 이상은 감사 사유로 제외한다. 원본과 기존 결과는 보존한다. 셋업·manifest 예시·홀드아웃 명령은 [사용 안내](../사용안내.md)를 참조한다. 루트 실행 스크립트는 자기 차수의 `.venv`를 우선하며 로컬 1차 환경이 있으면 명시적으로 재사용한다.
++
++</details>
++
++<details><summary>LEVEL 4 - Advanced · 분할과 모델 검토</summary>
++<a id="reading-level-4"></a>
++
++[같은 수준의 1차](../history/1차/차수설명.md#user-content-reading-level-4) · [2차 전체 안내](읽기안내/레벨4.md)
++
++
++
++
++
++전처리의 중앙값·범주 사전·스케일러와 지역별 중앙값은 학습 분할에서만 추정한다. 검증 MAE로 모델을 선택하며 최종 테스트를 모델 선택에 사용하지 않는다. 선택 모델을 기준으로 보정 분할의 절대 잔차를 계산한다. 지역 홀드아웃에서는 지정 지역을 앞의 세 분할에서 모두 제외하고 그 지역의 2025 계약을 평가한다.
++
++| 요소 | 현재 구현 | 검토할 한계 |
++|---|---|---|
++| 기준 모델 | 전체·지역 중앙값 | 미관측 지역은 학습 전체 중앙값 |
++| AI 모델 | Ridge·HistGradientBoosting | 고정 설정, 광범위 탐색 미수행 |
++| 특징 | 지역·면적·층·건물 연령·월 | 월세에는 관측 보증금 추가 |
++| 보정 | 절대 잔차 split conformal | 지역별 별도 보정과 분위수 모델 미구현 |
++| 지역 집계 | 지역별 MAE·포함률·표본 | 적은 표본·지역 경계 변화에 주의 |
++
++시간 분할이 신고 시차와 공개 시점의 완전한 재현을 뜻하지 않는다. 사후 공개 스냅숏의 계약일을 쓰므로 실시간 예측 성과로 확대할 수 없다. 같은 공개 행이 실제로 별도 계약일 수 있어 행을 무조건 중복 삭제하지 않는다. 파일 간 같은 지역·계약월 범위는 병합 전에 거부한다. 최종 소스의 검사와 실측 연구의 통계적 타당성은 구분해야 한다. [연구설계](연구설계.md)와 [전체 차이](전체차이.diff)를 함께 검토한다.
++
++</details>
++
++<details><summary>LEVEL 5 - Expert · 재현과 통계 가정</summary>
++<a id="reading-level-5"></a>
++
++[같은 수준의 1차](../history/1차/차수설명.md#user-content-reading-level-5) · [2차 전체 안내](읽기안내/레벨5.md)
++
++
++
++
++
++보정 표본 n과 alpha=0.1에 대해 `ceil((n+1)*(1-alpha))` 순위의 절대 잔차를 선택한다. 순위가 n을 넘으면 구간을 산출하지 않고 null로 남긴다. 유한표본 포함률 보장은 교환가능성 등의 가정에 의존하며 시간·지역 이동 환경에 무조건 적용할 수 없다. 테스트에는 MAE, RMSE, 구간 포함률, 평균 폭, interval score와 표본 수를 저장한다. 원비율은 보존하며 UI 백분율만 소수 첫째 자리로 반올림한다.
++
++| 재현 요소 | 기록·동작 | 미완료 범위 |
++|---|---|---|
++| 입력 | 원본 SHA-256·출처·시각·스냅숏 | 전국 완결성 공식 코드 대조 |
++| 금액 | i64 원 단위, Rust 바이너리 해시 | 속도 향상 전후 실측 없음 |
++| 모델 | CPU, 부스팅 random_state=42 | 불확실성 반복실험·하이퍼파라미터 탐색 |
++| 평가 | train-only 전처리·고정 시간·지역 홀드아웃 | 단지 군집 부트스트랩 |
++| 민감도 | 미측정 상태를 결과 목록에 보존 | 신고 지연·갱신·지역 conformal·분위수 비교 |
++| 출력 | 기존 폴더 보호·임시 폴더 완성 후 이름 변경 | 대규모 전국 입력의 메모리·시간 실측 |
++
++공개 자료는 임차가구 모집단 전체가 아니다. 지역명은 행정구역 코드의 역사적 동등성을 보장하지 않는다. 금액의 정확한 정수 정규화 이후 회귀·평가에는 부동소수 계산을 사용한다. 실제 데이터·모델·내부 출처·개인정보·인증자료는 이 저장소에 넣지 않는다. 나눔고딕은 [OFL](../web/OFL.txt)을 동봉했다. 현재 구현 상태와 남은 연구를 함께 해석하고, 합성 검사 성능을 실측 연구 성과로 인용하지 않는다. 구현 원문은 [엔진](../rentlab/engine.py), 입력·실행 계약은 [사용 안내](../사용안내.md)에서 확인한다.
++
++</details>
+--- /dev/null
++++ 2차/history/1차/차수설명.md
+@@ -0,0 +1,98 @@
++# 새 연구 1차 보존 설명
++
++2026-11-26 로컬에서 확인한 초기 차수다. 설계 문서 두 개, Rust 금액 정규화 소스·Cargo 설정과 빌드 스크립트가 있었다. 연구용 Python 파이프라인과 화면은 없었다. 이 폴더에는 그 공개 가능한 원문만 바이트를 보존해 넣었다.
++
++| 자료 | 당시 역할 | 다음 차수 |
++|---|---|---|
++| [연구설계](docs/연구설계.md) | 전국 시공간 예측·구간 신뢰성 계획 | [2차 구현](../../사용안내.md) |
++| [구현계획](docs/구현계획.md) | 데이터·모델·검증 구현 순서 | [차수 비교](../../docs/차수비교.md) |
++| [금액 소스](rust_money/src/main.rs) | 만원 문자열 → 원 정수 | [현재 엔진](../../rentlab/engine.py) |
++
++직전 로컬 신규 연구 차수는 확인되지 않았으므로 초기 차수로 기록한다. 과거 클라우드 V10의 실제 소스와 동일하다고 주장하지 않는다. 1차 빌드 스크립트는 당시 원문이며 현재 실행에는 2차의 스크립트를 사용한다.
++
++<!-- 수준별 설명 -->
++
++<details><summary>LEVEL 1 · 연구를 준비한 첫 차수</summary>
++<a id="reading-level-1"></a>
++
++[같은 수준의 2차](../../docs/차수설명.md#user-content-reading-level-1) · [2차 상세 안내](../../docs/읽기안내/레벨1.md)
++
++전세 보증금과 월세를 AI로 예측하고, 오차 범위가 실제 금액을 포함하는지 확인하는 연구를 계획했다. 이 차수에는 예측 결과가 없다.
++
++| 항목 | 1차의 내용 | 상태 |
++|---|---|---|
++| 연구 질문 | 시간이 흐르거나 지역이 달라져도 예측이 유지되는지 살핀다. | 원문 확인 |
++| 실제 구현 | 만원 문자열을 원 정수로 바꾸는 Rust 소스만 있었다. | 1차 범위 |
++| 아직 없는 것 | CSV 로더·모델 학습·평가·대시보드는 1차에서 구현되지 않았다. | 실측 완료 아님 |
++
++[설계 원문](docs/연구설계.md)과 [구현 계획 원문](docs/구현계획.md)은 문서 보존본이다. 원문에서 계획한 모든 기능이 당시 구현·실험된 것으로 해석하지 않는다. 후속 구현은 같은 수준의 2차 안내에서 구분해 읽는다.
++
++</details>
++
++<details><summary>LEVEL 2 · 자료와 기간 설계</summary>
++<a id="reading-level-2"></a>
++
++[같은 수준의 2차](../../docs/차수설명.md#user-content-reading-level-2) · [2차 상세 안내](../../docs/읽기안내/레벨2.md)
++
++공식 CSV와 파일별 출처·해시를 보존하고 미래 자료를 미리 보지 않는 평가를 계획했다.
++
++| 항목 | 1차의 내용 | 상태 |
++|---|---|---|
++| 입력 계획 | 2021–2025 확보를 검토하되 주분석 시작 후보는 2022년이다. | 원문 확인 |
++| 시간 구분 | 2022–2023 학습, 2024 상반기 검증·하반기 보정, 2025 테스트를 계획했다. | 1차 범위 |
++| 공개 스냅숏 | 실제 모집단 전체와 실시간 공개 이력을 그대로 재현하지 못한다. | 실측 완료 아님 |
++
++[설계 원문](docs/연구설계.md)과 [구현 계획 원문](docs/구현계획.md)은 문서 보존본이다. 원문에서 계획한 모든 기능이 당시 구현·실험된 것으로 해석하지 않는다. 후속 구현은 같은 수준의 2차 안내에서 구분해 읽는다.
++
++</details>
++
++<details><summary>LEVEL 3 · 당시 코드와 실행 조건</summary>
++<a id="reading-level-3"></a>
++
++[같은 수준의 2차](../../docs/차수설명.md#user-content-reading-level-3) · [2차 상세 안내](../../docs/읽기안내/레벨3.md)
++
++Cargo.toml과 Rust src/main.rs 및 build_rust.ps1을 확인한 차수다. 원본 파일은 이 history 폴더에 그대로 보존했다.
++
++| 항목 | 1차의 내용 | 상태 |
++|---|---|---|
++| 금액 규칙 | 쉼표 자리·소수 네 자리·정수 범위를 확인하도록 구현했다. | 원문 확인 |
++| 빌드 상태 | 소스 존재와 실제 호출은 다르며 1차의 성공 실행 증거는 이 공개 보존본에 없다. | 1차 범위 |
++| 다음 구현 | 정제·분할·모델·보정·화면은 2차에서 새로 연결했다. | 실측 완료 아님 |
++
++[설계 원문](docs/연구설계.md)과 [구현 계획 원문](docs/구현계획.md)은 문서 보존본이다. 원문에서 계획한 모든 기능이 당시 구현·실험된 것으로 해석하지 않는다. 후속 구현은 같은 수준의 2차 안내에서 구분해 읽는다.
++
++</details>
++
++<details><summary>LEVEL 4 · 모델과 검증의 계획</summary>
++<a id="reading-level-4"></a>
++
++[같은 수준의 2차](../../docs/차수설명.md#user-content-reading-level-4) · [2차 상세 안내](../../docs/읽기안내/레벨4.md)
++
++전세·월세를 별도 목표로 평가하고 전처리와 모델 선택에 최종 테스트를 사용하지 않는 원칙을 문서화했다.
++
++| 항목 | 1차의 내용 | 상태 |
++|---|---|---|
++| 비교 모델 | 전체·지역 중앙값, Ridge와 트리 부스팅을 계획했다. | 원문 확인 |
++| 누수 방지 | 범주 사전과 집계를 학습셋에서 추정하고 시간·지역 평가를 분리한다. | 1차 범위 |
++| 불확실성 | 구간 포함률·폭·interval score를 함께 보고할 계획이며 1차 실측값은 없다. | 실측 완료 아님 |
++
++[설계 원문](docs/연구설계.md)과 [구현 계획 원문](docs/구현계획.md)은 문서 보존본이다. 원문에서 계획한 모든 기능이 당시 구현·실험된 것으로 해석하지 않는다. 후속 구현은 같은 수준의 2차 안내에서 구분해 읽는다.
++
++</details>
++
++<details><summary>LEVEL 5 · 재현·통계 가정과 미구현</summary>
++<a id="reading-level-5"></a>
++
++[같은 수준의 2차](../../docs/차수설명.md#user-content-reading-level-5) · [2차 상세 안내](../../docs/읽기안내/레벨5.md)
++
++분할 conformal 보장은 교환가능성 등 가정에 의존한다. 시간·지역 이동에서 포함률을 무조건 보장하지 않도록 설계했다.
++
++| 항목 | 1차의 내용 | 상태 |
++|---|---|---|
++| 입력 추적 | 출처 URL·취득 시각·SHA-256·행 수·스냅숏 기록을 계획했다. | 원문 확인 |
++| 민감도 | 신고 지연·갱신·단지 군집·지역 보정·분위수 비교는 계획이며 구현 증거와 구분한다. | 1차 범위 |
++| 원본 보존 | 실제 자료·모델·실험 결과가 이 보존 소스에 포함됐다는 뜻이 아니다. | 실측 완료 아님 |
++
++[설계 원문](docs/연구설계.md)과 [구현 계획 원문](docs/구현계획.md)은 문서 보존본이다. 원문에서 계획한 모든 기능이 당시 구현·실험된 것으로 해석하지 않는다. 후속 구현은 같은 수준의 2차 안내에서 구분해 읽는다.
++
++</details>
+--- /dev/null
++++ 2차/README.md
+@@ -0,0 +1,143 @@
++<div align="center">
++
++# Balance Compass
++
++전국 아파트 임대료 예측과 예측구간 신뢰성 연구
++
++[사용 안내](사용안내.md) · [연구설계](docs/연구설계.md) · [전체 차수](docs/차수목록.md) · [차수 비교](docs/차수비교.md) · [변경 기록](변경기록.md)
++
++</div>
++
++공식 CSV의 출처와 무결성을 확인하고, 전세 보증금과 월임대료를 별도 예측한다. 시간 분할과 지역 홀드아웃으로 평균 오차와 예측구간 포함률을 평가한다. Python 연구 처리에 Rust 금액 정규화를 연결했고, 결과를 로컬 읽기 전용 화면에서 확인한다.
++
++**현재 실제 전국 자료는 미확보이며 전국 본실험은 미실행이다.** 합성 검증은 프로그램의 기술 확인이며 실제 예측 성능이 아니다. 이 저장소는 과거 V10 ZIP 복원본이 아닌 새 연구 2차의 신규 구현이다. 논문 원고·게재 성과는 아직 없다.
++
++| 읽기 수준 | 안내 |
++|---|---|
++| [LEVEL 1 · Beginner](#user-content-reading-level-1) | 어떤 문제를 다루고 결과를 어떻게 읽는가 |
++| [LEVEL 2 · Explorer](#user-content-reading-level-2) | 자료와 실행 순서를 살펴보기 |
++| [LEVEL 3 · Practitioner](#user-content-reading-level-3) | 직접 실행하고 입력 오류를 확인하기 |
++| [LEVEL 4 · Advanced](#user-content-reading-level-4) | 분할·모델 선택·구간 평가를 검토하기 |
++| [LEVEL 5 · Expert](#user-content-reading-level-5) | 재현 조건·통계 가정·남은 연구 범위 |
++
++| 확인된 차수 | 자료 | 설명 | 직전 비교 |
++|---|---|---|---|
++| 새 연구 1차 | [보존 원본](history/1차/) | [설계·Rust 초기 소스](history/1차/차수설명.md) | [첫 로컬 차수의 범위](history/1차/차수설명.md) |
++| 새 연구 2차 | [현재 소스](.) | [차수별 상세](docs/차수설명.md) | [1차 → 2차](docs/차수비교.md) |
++
++과거 클라우드 V10과 로컬 새 연구의 번호는 별개다. 과거 파일·데이터 실물 없이 3~10차를 새로 만들지 않는다. 현재 공개 소스는 새 연구 1차에서 확인한 설계와 Rust 원본을 보존하며 2차 실행 경로를 사용한다.
++
++<details><summary>LEVEL 1 - Beginner · 연구와 결과 읽기</summary>
++<a id="reading-level-1"></a>
++
++[같은 수준의 1차](history/1차/차수설명.md#user-content-reading-level-1) · [2차 전체 안내](docs/읽기안내/레벨1.md)
++
++
++
++
++
++집의 임대료를 한 숫자로 맞히는 것과, 오차가 어느 정도인지 설명하는 것은 다른 문제다. 이 연구는 전세 보증금과 월세를 따로 예측하고 실제값이 예측 범위 안에 얼마나 들어오는지 확인한다. 화면의 MAE는 실제 금액과 예측 금액 사이 평균 차이다. 숫자가 작으면 평균 오차가 작다는 뜻이지만 모든 집을 정확히 맞힌다는 뜻은 아니다.
++
++| 화면 | 확인할 내용 | 해석 |
++|---|---|---|
++| 연구 현황 | 실제 자료·합성 자료·미연결 상태 | 합성 결과를 전국 결과로 읽지 않는다 |
++| 데이터 점검 | 원본 행 수와 제외 사유 | 제외된 계약도 감사 기록으로 남는다 |
++| AI 평가 | 비교 모델의 오차와 포함률 | 포함률과 구간 폭을 함께 본다 |
++| 표와 그림 | 계산된 분석과 미산출 목적 | 없는 결과를 0으로 채우지 않는다 |
++
++현재 전국 본실험이 끝나지 않았으므로 이 도구의 예시 수치로 실제 주거 계약을 판단할 수 없다. 월세 예측은 이미 관측한 보증금 조건을 사용한다. 보증금을 바꾸면 월세가 반드시 그만큼 달라진다는 인과관계를 계산하는 기능은 아니다. 실행은 [사용 안내](사용안내.md)에 따라 준비한다. 같은 차수의 실제 구현은 [2차 비교](docs/차수비교.md)에서 확인한다.
++
++</details>
++
++<details><summary>LEVEL 2 - Explorer · 자료와 실행 흐름</summary>
++<a id="reading-level-2"></a>
++
++[같은 수준의 1차](history/1차/차수설명.md#user-content-reading-level-2) · [2차 전체 안내](docs/읽기안내/레벨2.md)
++
++
++
++
++
++입력은 국토교통부 공개 CSV와 파일별 manifest다. manifest에는 파일 이름뿐 아니라 SHA-256, 행 수, 취득 시각, 출처와 스냅숏 식별자가 들어간다. 해시는 프로그램이 읽는 파일과 기록한 파일이 같은지 검사한다. 그 내용이 실제 모집단을 완전히 대표한다는 뜻은 아니다.
++
++| 단계 | 입력 | 출력 |
++|---|---|---|
++| 자료 검사 | 원본 CSV·manifest | 해시·행 수·중복 범위 검사 |
++| 정제 | 금액·날짜·계약구분 | 분석 행과 제외 사유 |
++| 비교 학습 | 2022–2023 계약 | 중앙값·지역 중앙값·Ridge·트리 부스팅 |
++| 선택·보정 | 2024 상반기·하반기 | 선택 모델과 보정 반경 |
++| 최종 평가 | 2025 계약 | 오차·구간·지역 집계·표·그림 |
++
++학습에 쓰는 기간, 모델을 고르는 기간, 예측구간을 보정하는 기간, 마지막 평가 기간을 나눈다. 나중에 나온 답을 미리 학습에 넣는 일을 줄이기 위해서다. 실제 자료가 없을 때 `smoke` 명령으로 기술 흐름을 확인할 수 있지만 결과에는 SYNTHETIC이 표시된다. 현재 목록은 35 분석 목적이며 계산 가능한 30종과 구현·입력이 부족한 5종을 구분한다. CSV와 PNG가 한 쌍이면 한 분석이다. 상세 실행은 [사용 안내](사용안내.md), 연구 목적은 [연구설계](docs/연구설계.md)를 따른다.
++
++</details>
++
++<details><summary>LEVEL 3 - Practitioner · 실행과 오류 처리</summary>
++<a id="reading-level-3"></a>
++
++[같은 수준의 1차](history/1차/차수설명.md#user-content-reading-level-3) · [2차 전체 안내](docs/읽기안내/레벨3.md)
++
++
++
++
++
++Python 3.12와 의존성, Rust MSVC 빌드 환경을 준비한다. 먼저 Rust 바이너리를 만들고 실제 자료를 검사한 뒤 새 출력 경로로 연구를 실행한다. 화면 서버는 기존 결과를 읽을 뿐 연구·수집 API를 제공하지 않는다. 기본 바인딩은 127.0.0.1이며 외부 서비스 배포를 위한 인증 서버가 아니다.
++
++| 명령 | 목적 | 실패 조건 |
++|---|---|---|
++| `scripts/build_rust.ps1` | 금액 CLI 빌드 | 링커·SDK 부재 |
++| `python -m rentlab validate --manifest 경로` | 실제 입력 검사 | 해시·행 수·칼럼·금액 오류 |
++| `python -m rentlab run --manifest 경로 --output 새폴더` | 실측 입력 평가 | 기존 출력·빈 분할·신규계약 부재 |
++| `python -m rentlab smoke --output 새폴더` | 합성 기술 검증 | 기존 결과 덮어쓰기 거부 |
++| `python run_dashboard.py --result 결과폴더` | 결과 조회 | summary 부재·유형 오류 |
++
++금액은 만원 문자열에서 원 정수로 변환한다. 쉼표 위치·정밀도·범위를 Rust에서 검사하며 임의 실수 변환으로 대체하지 않는다. 잘못된 금액 한 행은 전체 처리를 실패시키며 부분 출력을 남기지 않는다. 기타 날짜·계약구분 이상은 감사 사유로 제외한다. 원본과 기존 결과는 보존한다. 셋업·manifest 예시·홀드아웃 명령은 [사용 안내](사용안내.md)를 참조한다. 루트 실행 스크립트는 자기 차수의 `.venv`를 우선하며 로컬 1차 환경이 있으면 명시적으로 재사용한다.
++
++</details>
++
++<details><summary>LEVEL 4 - Advanced · 분할과 모델 검토</summary>
++<a id="reading-level-4"></a>
++
++[같은 수준의 1차](history/1차/차수설명.md#user-content-reading-level-4) · [2차 전체 안내](docs/읽기안내/레벨4.md)
++
++
++
++
++
++전처리의 중앙값·범주 사전·스케일러와 지역별 중앙값은 학습 분할에서만 추정한다. 검증 MAE로 모델을 선택하며 최종 테스트를 모델 선택에 사용하지 않는다. 선택 모델을 기준으로 보정 분할의 절대 잔차를 계산한다. 지역 홀드아웃에서는 지정 지역을 앞의 세 분할에서 모두 제외하고 그 지역의 2025 계약을 평가한다.
++
++| 요소 | 현재 구현 | 검토할 한계 |
++|---|---|---|
++| 기준 모델 | 전체·지역 중앙값 | 미관측 지역은 학습 전체 중앙값 |
++| AI 모델 | Ridge·HistGradientBoosting | 고정 설정, 광범위 탐색 미수행 |
++| 특징 | 지역·면적·층·건물 연령·월 | 월세에는 관측 보증금 추가 |
++| 보정 | 절대 잔차 split conformal | 지역별 별도 보정과 분위수 모델 미구현 |
++| 지역 집계 | 지역별 MAE·포함률·표본 | 적은 표본·지역 경계 변화에 주의 |
++
++시간 분할이 신고 시차와 공개 시점의 완전한 재현을 뜻하지 않는다. 사후 공개 스냅숏의 계약일을 쓰므로 실시간 예측 성과로 확대할 수 없다. 같은 공개 행이 실제로 별도 계약일 수 있어 행을 무조건 중복 삭제하지 않는다. 파일 간 같은 지역·계약월 범위는 병합 전에 거부한다. 최종 소스의 검사와 실측 연구의 통계적 타당성은 구분해야 한다. [연구설계](docs/연구설계.md)와 [전체 차이](docs/전체차이.diff)를 함께 검토한다.
++
++</details>
++
++<details><summary>LEVEL 5 - Expert · 재현과 통계 가정</summary>
++<a id="reading-level-5"></a>
++
++[같은 수준의 1차](history/1차/차수설명.md#user-content-reading-level-5) · [2차 전체 안내](docs/읽기안내/레벨5.md)
++
++
++
++
++
++보정 표본 n과 alpha=0.1에 대해 `ceil((n+1)*(1-alpha))` 순위의 절대 잔차를 선택한다. 순위가 n을 넘으면 구간을 산출하지 않고 null로 남긴다. 유한표본 포함률 보장은 교환가능성 등의 가정에 의존하며 시간·지역 이동 환경에 무조건 적용할 수 없다. 테스트에는 MAE, RMSE, 구간 포함률, 평균 폭, interval score와 표본 수를 저장한다. 원비율은 보존하며 UI 백분율만 소수 첫째 자리로 반올림한다.
++
++| 재현 요소 | 기록·동작 | 미완료 범위 |
++|---|---|---|
++| 입력 | 원본 SHA-256·출처·시각·스냅숏 | 전국 완결성 공식 코드 대조 |
++| 금액 | i64 원 단위, Rust 바이너리 해시 | 속도 향상 전후 실측 없음 |
++| 모델 | CPU, 부스팅 random_state=42 | 불확실성 반복실험·하이퍼파라미터 탐색 |
++| 평가 | train-only 전처리·고정 시간·지역 홀드아웃 | 단지 군집 부트스트랩 |
++| 민감도 | 미측정 상태를 결과 목록에 보존 | 신고 지연·갱신·지역 conformal·분위수 비교 |
++| 출력 | 기존 폴더 보호·임시 폴더 완성 후 이름 변경 | 대규모 전국 입력의 메모리·시간 실측 |
++
++공개 자료는 임차가구 모집단 전체가 아니다. 지역명은 행정구역 코드의 역사적 동등성을 보장하지 않는다. 금액의 정확한 정수 정규화 이후 회귀·평가에는 부동소수 계산을 사용한다. 실제 데이터·모델·내부 출처·개인정보·인증자료는 이 저장소에 넣지 않는다. 나눔고딕은 [OFL](web/OFL.txt)을 동봉했다. 현재 구현 상태와 남은 연구를 함께 해석하고, 합성 검사 성능을 실측 연구 성과로 인용하지 않는다. 구현 원문은 [엔진](rentlab/engine.py), 입력·실행 계약은 [사용 안내](사용안내.md)에서 확인한다.
++
++</details>
+--- /dev/null
++++ 2차/rentlab/__init__.py
+@@ -0,0 +1 @@
++"""전국 아파트 임대료 연구 엔진."""
+--- /dev/null
++++ 2차/rentlab/__main__.py
+@@ -0,0 +1,4 @@
++from .engine import main
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- /dev/null
++++ 2차/rentlab/engine.py
+@@ -0,0 +1,395 @@
++"""스냅숏 검증, 시간 분할, 비교 모델 및 예측구간 평가."""
++from __future__ import annotations
++
++import argparse
++import hashlib
++import io
++import json
++import math
++import os
++from pathlib import Path
++import shutil
++import subprocess
++import sys
++import tempfile
++from datetime import datetime, timezone
++
++import numpy as np
++import pandas as pd
++from sklearn.compose import ColumnTransformer
++from sklearn.dummy import DummyRegressor
++from sklearn.ensemble import HistGradientBoostingRegressor
++from sklearn.impute import SimpleImputer
++from sklearn.linear_model import Ridge
++from sklearn.pipeline import Pipeline
++from sklearn.preprocessing import OneHotEncoder, StandardScaler
++
++ROOT = Path(__file__).resolve().parents[1]
++COLUMNS = ["시군구", "전용면적(㎡)", "계약년월", "계약일", "보증금(만원)", "월세금(만원)", "층", "건축년도", "계약구분"]
++NUMERIC = ["area", "floor", "age", "month"]
++CATEGORICAL = ["region"]
++
++
++def rust_binary() -> Path:
++    suffix = ".exe" if os.name == "nt" else ""
++    path = ROOT / "rust_money" / "target" / "release" / ("bc-money" + suffix)
++    if not path.is_file():
++        raise ValueError(f"Rust 금액 엔진이 없습니다. rust_money에서 cargo build --release 실행 필요: {path}")
++    return path
++
++
++def normalize_money(values: list[str]) -> list[int]:
++    # 모든 금액을 한 번의 실제 Rust 프로세스로 보내며 Python 실수로 변환하지 않는다.
++    if any("\n" in str(v) or "\r" in str(v) for v in values):
++        raise ValueError("금액 내부 개행은 허용되지 않습니다")
++    completed = subprocess.run([str(rust_binary())], input="\n".join(values) + "\n", text=True,
++                               encoding="utf-8", capture_output=True, timeout=120, check=False)
++    if completed.returncode:
++        raise ValueError(f"Rust 금액 검증 실패(exit={completed.returncode}): {completed.stderr.strip()}")
++    result = [int(v) for v in completed.stdout.splitlines()]
++    if len(result) != len(values):
++        raise ValueError("Rust 출력 행 수가 입력과 다릅니다")
++    return result
++
++
++def read_manifest(path: Path) -> tuple[pd.DataFrame, dict]:
++    path = path.resolve(strict=True)
++    manifest = json.loads(path.read_text(encoding="utf-8-sig"))
++    entries = manifest.get("files")
++    if not isinstance(entries, list) or not entries:
++        raise ValueError("전국 실측 자료가 없습니다: manifest.files에 원본 CSV가 필요합니다")
++    seen_paths, seen_hashes, frames, sources = set(), set(), [], []
++    scopes = []
++    for entry in entries:
++        required = {"path", "sha256", "rows", "source_url", "acquired_at", "snapshot_id"}
++        if not isinstance(entry, dict) or not required.issubset(entry):
++            raise ValueError(f"파일 manifest 필수 필드: {sorted(required)}")
++        source = (path.parent / entry["path"]).resolve(strict=True)
++        original_bytes = source.read_bytes()
++        digest = hashlib.sha256(original_bytes).hexdigest()
++        if source in seen_paths or digest in seen_hashes:
++            raise ValueError("중복 경로 또는 동일 원본 파일의 범위 중복입니다")
++        if digest.lower() != str(entry["sha256"]).lower():
++            raise ValueError(f"원본 SHA-256 불일치: {source.name}")
++        if not str(entry["source_url"]).startswith("https://") or not entry["snapshot_id"]:
++            raise ValueError("출처 HTTPS URL과 snapshot_id가 필요합니다")
++        datetime.fromisoformat(str(entry["acquired_at"]).replace("Z", "+00:00"))
++        # 해시를 검사한 같은 바이트에 엄격 UTF-8을 우선 적용하고 디코딩 실패일 때만 CP949를 시도한다.
++        encoding = "utf-8-sig"
++        try:
++            original_bytes.decode(encoding, errors="strict")
++        except UnicodeDecodeError:
++            encoding = "cp949"
++            try:
++                original_bytes.decode(encoding, errors="strict")
++            except UnicodeDecodeError as error:
++                raise ValueError(f"CSV 인코딩 오류: UTF-8 또는 CP949로 저장한 공식 CSV가 필요합니다: {source.name}") from error
++        frame = pd.read_csv(io.BytesIO(original_bytes), dtype=str, encoding=encoding, encoding_errors="strict", keep_default_na=False)
++        if isinstance(entry["rows"], bool) or not isinstance(entry["rows"], int) or entry["rows"] != len(frame):
++            raise ValueError(f"원본 행 수 불일치: {source.name}")
++        if frame.empty or not set(COLUMNS).issubset(frame.columns):
++            raise ValueError(f"빈 자료 또는 공식 CSV 필수 칼럼 누락: {source.name}")
++        # 내용상 같은 지역·계약월을 포함하는 파일은 신고 범위가 겹칠 수 있어 병합을 거부한다.
++        scope = set(zip(frame["시군구"].str.strip(), frame["계약년월"].str.strip()))
++        if any(scope & previous for previous in scopes):
++            raise ValueError("파일 사이 시군구·계약년월 범위 중복: 원본 범위를 분리해 제출하십시오")
++        scopes.append(scope)
++        seen_paths.add(source)
++        seen_hashes.add(digest)
++        frame["source_file"] = str(source)
++        frames.append(frame)
++        sources.append({**entry, "resolved_path": str(source), "verified_sha256": digest, "encoding": encoding})
++    return pd.concat(frames, ignore_index=True), {"manifest": str(path), "sources": sources}
++
++
++def prepare(raw: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
++    data = raw.copy()
++    money = normalize_money(data["보증금(만원)"].tolist() + data["월세금(만원)"].tolist())
++    n = len(data)
++    data["deposit"] = money[:n]
++    data["rent"] = money[n:]
++    data["region"] = data["시군구"].str.strip()
++    data["area"] = pd.to_numeric(data["전용면적(㎡)"], errors="coerce")
++    data["floor"] = pd.to_numeric(data["층"], errors="coerce")
++    built = pd.to_numeric(data["건축년도"], errors="coerce")
++    dates = pd.to_datetime(data["계약년월"].str.strip() + data["계약일"].str.strip().str.zfill(2), format="%Y%m%d", errors="coerce")
++    data["date"] = dates
++    data["month"] = dates.dt.month
++    data["age"] = dates.dt.year - built
++    reasons = pd.Series("", index=data.index, dtype=str)
++    def reject(mask, label):
++        reasons.loc[mask & reasons.eq("")] = label
++    reject(~data["계약구분"].str.strip().isin(["신규", "신규계약"]), "not_new_contract")
++    if "해제사유발생일" in data:
++        reject(data["해제사유발생일"].str.strip().ne(""), "cancelled")
++    reject(dates.isna(), "invalid_date")
++    reject(data["region"].eq(""), "missing_region")
++    reject(~np.isfinite(data["area"]) | (data["area"] <= 0), "invalid_area")
++    reject(data["floor"].notna() & ~np.isfinite(data["floor"]), "invalid_floor")
++    reject(built.isna() | (built < 1800) | (built > dates.dt.year), "invalid_build_year")
++    reject((data["deposit"] <= 0) & (data["rent"] == 0), "invalid_amount")
++    reject(~dates.dt.year.between(2022, 2025), "outside_protocol")
++    data["exclusion_reason"] = reasons
++    audit = {"input_rows": n, "included_rows": int(reasons.eq("").sum()),
++             "excluded_by_reason": {str(k): int(v) for k, v in reasons[reasons.ne("")].value_counts().items()},
++             "identical_rows_retained": int(raw.duplicated().sum()),
++             "contract_categories": {str(k): int(v) for k, v in raw["계약구분"].value_counts().items()}}
++    return data, audit
++
++
++def split_data(data: pd.DataFrame, holdout_region: str | None = None) -> dict[str, pd.DataFrame]:
++    dates = data["date"]
++    masks = {"train": dates.between("2022-01-01", "2023-12-31"),
++             "validation": dates.between("2024-01-01", "2024-06-30"),
++             "calibration": dates.between("2024-07-01", "2024-12-31"),
++             "test": dates.between("2025-01-01", "2025-12-31")}
++    if holdout_region:
++        held = data["region"].eq(holdout_region) | data["region"].str.startswith(holdout_region + " ")
++        if not held.any():
++            raise ValueError(f"홀드아웃 지역이 없습니다: {holdout_region}")
++        for name in ("train", "validation", "calibration"):
++            masks[name] &= ~held
++        masks["test"] &= held
++    result = {name: data.loc[mask].copy() for name, mask in masks.items()}
++    if any(frame.empty for frame in result.values()):
++        raise ValueError(f"프로토콜 분할에 빈 자료가 있습니다: { {k:len(v) for k,v in result.items()} }")
++    return result
++
++
++def conformal_radius(residuals, alpha=0.1):
++    values = np.asarray(residuals, dtype=float)
++    if not 0 < alpha < 1 or not np.isfinite(values).all() or (values < 0).any():
++        raise ValueError("보정 잔차와 alpha가 유효하지 않습니다")
++    rank = math.ceil((len(values) + 1) * (1 - alpha))
++    if rank > len(values) or not len(values):
++        return None
++    return float(np.partition(values, rank - 1)[rank - 1])
++
++
++def metrics(actual, predicted, radius=None, alpha=0.1):
++    y, p = np.asarray(actual, dtype=float), np.asarray(predicted, dtype=float)
++    error = y - p
++    result = {"n": len(y), "mae": float(np.abs(error).mean()), "rmse": float(np.sqrt(np.mean(error ** 2))),
++              "coverage": None, "width": None, "interval_score": None}
++    if radius is not None:
++        low, high = p - radius, p + radius
++        result.update(coverage=float(np.mean((low <= y) & (y <= high))), width=float(2 * radius),
++                      interval_score=float(np.mean(2 * radius + 2 / alpha * np.maximum(low-y, 0) + 2 / alpha * np.maximum(y-high, 0))))
++    return result
++
++
++def preprocessor(numeric):
++    return ColumnTransformer([
++        ("numeric", Pipeline([("impute", SimpleImputer(strategy="median", keep_empty_features=True)), ("scale", StandardScaler())]), numeric),
++        ("category", OneHotEncoder(handle_unknown="ignore", sparse_output=False, max_categories=64), CATEGORICAL)], sparse_threshold=0)
++
++
++def fit_target(data: pd.DataFrame, target: str, holdout: str | None):
++    frames = split_data(data, holdout)
++    numeric = NUMERIC + (["deposit"] if target == "monthly" else [])
++    features = numeric + CATEGORICAL
++    response = "rent" if target == "monthly" else "deposit"
++    train = frames["train"]
++    x, y = train[features], train[response]
++    candidates = {
++        "global_median": DummyRegressor(strategy="median"),
++        "ridge": Pipeline([("prepare", preprocessor(numeric)), ("model", Ridge(alpha=10))]),
++        "hist_gradient_boosting": Pipeline([("prepare", preprocessor(numeric)), ("model", HistGradientBoostingRegressor(max_iter=80, max_leaf_nodes=15, min_samples_leaf=10, random_state=42))])}
++    predictions, validation = {}, {}
++    for name, model in candidates.items():
++        model.fit(x if name != "global_median" else np.zeros((len(x), 1)), y)
++        predictions[name] = {key: model.predict(frame[features] if name != "global_median" else np.zeros((len(frame), 1))) for key, frame in frames.items() if key != "train"}
++        validation[name] = metrics(frames["validation"][response], predictions[name]["validation"])
++    # 지역 중앙값의 사전과 미관측 지역 대체값은 학습 분할에만 의존한다.
++    medians, fallback = train.groupby("region")[response].median(), float(y.median())
++    predictions["region_median"] = {key: frame["region"].map(medians).fillna(fallback).to_numpy() for key, frame in frames.items() if key != "train"}
++    validation["region_median"] = metrics(frames["validation"][response], predictions["region_median"]["validation"])
++    selected = min(validation, key=lambda key: (validation[key]["mae"], key))
++    residuals = np.abs(frames["calibration"][response].to_numpy() - predictions[selected]["calibration"])
++    radius = conformal_radius(residuals)
++    test = frames["test"].copy()
++    test["actual_won"] = test[response]
++    test["prediction_won"] = predictions[selected]["test"]
++    test["lower_won"] = test["prediction_won"] - radius if radius is not None else np.nan
++    test["upper_won"] = test["prediction_won"] + radius if radius is not None else np.nan
++    groups = [{"region": str(region), **metrics(group.actual_won, group.prediction_won, radius)} for region, group in test.groupby("region")]
++    return {"selected_model": selected, "validation": validation, "metrics": metrics(test.actual_won, test.prediction_won, radius),
++            "groups": groups, "conformal_radius_won": radius, "interval_status": "available" if radius is not None else "insufficient_calibration",
++            "split_counts": {key: len(frame) for key, frame in frames.items()},
++            "interpretation": "관측 보증금을 조건으로 한 월세 예측" if target == "monthly" else "전세 보증금 예측"}, test, frames
++
++
++PURPOSES = [
++    ("split_counts", "시간 분할별 표본 수"), ("audit", "제외 사유별 표본 수"),
++    ("target_counts", "전세·월세 표본 수"), ("region_counts", "지역별 표본 수"),
++    ("year_counts", "연도별 표본 수"), ("month_counts", "월별 계절 분포"),
++    ("area_distribution", "전용면적 분포"), ("age_distribution", "건물 연령 분포"),
++    ("floor_distribution", "층수 분포"), ("deposit_distribution", "보증금 분포"),
++    ("rent_distribution", "월세 분포"), ("validation_mae", "검증 모델별 MAE"),
++    ("validation_rmse", "검증 모델별 RMSE"), ("test_mae", "목표별 테스트 MAE"),
++    ("test_rmse", "목표별 테스트 RMSE"), ("coverage", "목표별 구간 포함률"),
++    ("width", "목표별 구간 폭"), ("interval_score", "목표별 구간 점수"),
++    ("regional_mae", "지역별 테스트 MAE"), ("regional_coverage", "지역별 구간 포함률"),
++    ("regional_counts", "지역별 테스트 표본 수"), ("residual_distribution", "테스트 절대오차 분포"),
++    ("prediction_distribution", "테스트 예측값 분포"), ("actual_distribution", "테스트 실제값 분포"),
++    ("monthly_test_mae", "계약월별 테스트 MAE"), ("area_test_mae", "면적 구간별 테스트 MAE"),
++    ("age_test_mae", "연령 구간별 테스트 MAE"), ("floor_test_mae", "층 구간별 테스트 MAE"),
++    ("regional_macro_mae", "지역 동일 가중 MAE"), ("price_test_mae", "가격 구간별 테스트 MAE"),
++    ("cluster_bootstrap", "단지 군집 부트스트랩"), ("regional_conformal", "지역별 별도 보정 비교"),
++    ("quantile_interval", "분위수 모델 구간 비교"), ("report_delay", "신고 지연 민감도"),
++    ("renewal_sensitivity", "갱신 계약 민감도")]
++
++
++def write_artifacts(output, summary, data, tests):
++    import matplotlib
++    matplotlib.use("Agg")
++    import matplotlib.pyplot as plt
++    from matplotlib import font_manager
++    font_path = ROOT / "web" / "NanumGothic-Bold.ttf"
++    if not font_path.is_file():
++        raise ValueError(f"그래프용 나눔고딕700 파일이 없습니다: {font_path}")
++    font_manager.fontManager.addfont(str(font_path))
++    plt.rcParams.update({"font.family": font_manager.FontProperties(fname=str(font_path)).get_name(),
++                         "font.weight": "bold", "axes.unicode_minus": False})
++    tables = {}
++    tables["split_counts"] = pd.DataFrame([{"label": f"{target}/{split}", "value": count} for target, counts in summary["split_counts"].items() for split, count in counts.items()])
++    tables["audit"] = pd.DataFrame([{"label": reason, "value": count} for reason, count in summary["audit"]["excluded_by_reason"].items()] or [{"label": "excluded", "value": 0}])
++    tables["target_counts"] = pd.DataFrame([{"label": "jeonse", "value": int(data.rent.eq(0).sum())}, {"label": "monthly", "value": int(data.rent.gt(0).sum())}])
++    for name, series in [("region_counts", data.region), ("year_counts", data.date.dt.year), ("month_counts", data.date.dt.month)]:
++        tables[name] = series.value_counts().sort_index().rename_axis("label").reset_index(name="value")
++    for name, column in [("area_distribution", "area"), ("age_distribution", "age"), ("floor_distribution", "floor"), ("deposit_distribution", "deposit"), ("rent_distribution", "rent")]:
++        counts = pd.cut(data[column], bins=10, duplicates="drop").value_counts(sort=False)
++        tables[name] = pd.DataFrame({"label": counts.index.astype(str), "value": counts.values})
++    for score in ["mae", "rmse"]:
++        tables[f"validation_{score}"] = pd.DataFrame([{"target": target, "label": model, "value": scores[score]} for target, result in summary["targets"].items() for model, scores in result["validation"].items()])
++    for score in ["mae", "rmse", "coverage", "width", "interval_score"]:
++        tables["test_" + score if score in ["mae", "rmse"] else score] = pd.DataFrame([{"target": target, "label": target, "value": result["metrics"][score]} for target, result in summary["targets"].items()])
++    all_test = pd.concat([frame.assign(target=target) for target, frame in tests.items()], ignore_index=True)
++    all_test["absolute_error"] = (all_test.actual_won-all_test.prediction_won).abs()
++    for name, column in [("residual_distribution", "absolute_error"), ("prediction_distribution", "prediction_won"), ("actual_distribution", "actual_won")]:
++        distributions = []
++        for target, group in all_test.groupby("target"):
++            counts = pd.cut(group[column], bins=10, duplicates="drop").value_counts(sort=False)
++            distributions.append(pd.DataFrame({"target": target, "label": counts.index.astype(str), "value": counts.values}))
++        tables[name] = pd.concat(distributions, ignore_index=True)
++    for name, score in [("regional_mae", "mae"), ("regional_coverage", "coverage"), ("regional_counts", "n")]:
++        tables[name] = pd.DataFrame([{"target": target, "label": group["region"], "value": group[score]} for target, result in summary["targets"].items() for group in result["groups"]])
++    tables["regional_macro_mae"] = pd.DataFrame([{"target": target, "label": target, "value": float(np.mean([g["mae"] for g in result["groups"]]))} for target, result in summary["targets"].items()])
++    for name, column in [("monthly_test_mae", "month"), ("area_test_mae", "area"), ("age_test_mae", "age"), ("floor_test_mae", "floor"), ("price_test_mae", "actual_won")]:
++        groups = all_test[column] if column == "month" else pd.cut(all_test[column], bins=5, duplicates="drop")
++        table = all_test.groupby(["target", groups], observed=True).absolute_error.mean().reset_index(name="value")
++        table["label"] = table.iloc[:, 1].astype(str)
++        tables[name] = table[["target", "label", "value"]]
++    artifacts = []
++    for name, title in PURPOSES:
++        item = {"id": name, "title": title, "status": "unmeasured", "csv": None, "png": None}
++        table = tables.get(name)
++        if table is not None and not table.empty and table["value"].notna().any():
++            table.to_csv(output / f"{name}.csv", index=False, encoding="utf-8-sig")
++            panels = list(table.groupby("target", sort=False)) if "target" in table else [(None, table)]
++            fig, axes = plt.subplots(len(panels), 1, figsize=(10, 4 * len(panels)), squeeze=False)
++            displayed = 0
++            for axis, (target, panel) in zip(axes[:, 0], panels):
++                plot = panel.dropna(subset=["value"]).head(50)
++                displayed += len(plot)
++                axis.bar(np.arange(len(plot)), plot.value, color="#4168D6")
++                axis.set_xticks(np.arange(len(plot)), plot.label.astype(str), rotation=75, fontsize=7)
++                target_title = {"jeonse": "전세 보증금", "monthly": "월세(관측 보증금 조건부)"}.get(target, "")
++                axis.set_title(title + (f" · {target_title}" if target else "") + (" [합성 검증]" if summary["mode"] == "SYNTHETIC" else ""))
++                x_unit = {"area_distribution": "전용면적 구간(㎡)", "age_distribution": "건물 연령 구간(년)",
++                          "floor_distribution": "층수 구간(층)", "deposit_distribution": "보증금 구간(원)",
++                          "rent_distribution": "월세 구간(원)", "residual_distribution": "절대오차 구간(원)",
++                          "prediction_distribution": "예측값 구간(원)", "actual_distribution": "실제값 구간(원)",
++                          "area_test_mae": "전용면적 구간(㎡)", "age_test_mae": "건물 연령 구간(년)",
++                          "floor_test_mae": "층수 구간(층)", "price_test_mae": "실제 가격 구간(원)",
++                          "monthly_test_mae": "계약월"}.get(name, "분석 구분")
++                axis.set_xlabel(x_unit)
++                if plot.empty:
++                    axis.text(0.5, 0.5, "보정 표본 부족: 미산출", ha="center", transform=axis.transAxes)
++                unit = "포함률(0–1)" if "coverage" in name else "금액(원)" if any(key in name for key in ["mae", "rmse", "width", "score"]) else "표본 수(건)"
++                axis.set_ylabel(unit)
++            fig.tight_layout()
++            fig.savefig(output / f"{name}.png", dpi=120)
++            plt.close(fig)
++            item.update(status="measured", csv=f"{name}.csv", png=f"{name}.png", displayed_rows=displayed, total_rows=len(table))
++        else:
++            item["reason"] = "필요한 입력 또는 구현이 없어 미측정"
++        artifacts.append(item)
++    return artifacts
++
++
++def synthetic_data():
++    rows = []
++    for year, months in [(2022, [1, 7]), (2023, [1, 7]), (2024, [1, 7]), (2025, [1, 7])]:
++        for month in months:
++            for i in range(36):
++                monthly = i % 2 == 0
++                rows.append(dict(zip(COLUMNS, [f"합성시 지역{i%3}", str(40+i), f"{year}{month:02}", str(1+i%27), str(1000+i*30), str(30+i if monthly else 0), str(1+i%20), str(1990+i%25), "신규"])))
++    return pd.DataFrame(rows)
++
++
++def run(output: Path, manifest: Path | None = None, holdout_region=None, synthetic=False):
++    output = output.resolve()
++    if output.exists():
++        raise ValueError(f"기존 출력은 덮어쓰지 않습니다: {output}")
++    if synthetic:
++        raw, provenance = synthetic_data(), {"manifest": None, "sources": [], "generator": "deterministic_smoke_v1"}
++    else:
++        if manifest is None:
++            raise ValueError("전국 원본 manifest가 필요합니다. 합성 검증은 smoke를 사용하십시오")
++        raw, provenance = read_manifest(manifest)
++    prepared, audit = prepare(raw)
++    data = prepared.loc[prepared.exclusion_reason.eq("")].copy()
++    if data.empty:
++        raise ValueError("주분석 신규계약이 없습니다")
++    summary = {"mode": "SYNTHETIC" if synthetic else "REAL", "status": "completed", "created_at": datetime.now(timezone.utc).isoformat(),
++               "rows": len(raw), "audit": audit, "provenance": {**provenance, "rust_binary": str(rust_binary()), "rust_sha256": hashlib.sha256(rust_binary().read_bytes()).hexdigest()},
++               "holdout_region": holdout_region, "split_counts": {}, "targets": {},
++               "limitations": ["실거래 공개 스냅숏이며 전국 임차가구 모집단이 아닙니다", "전국 지역 완전성은 별도 공식 코드 목록과 대조되지 않았습니다", "시간·지역 이동에서 90% 포함률을 보장하지 않습니다", "모델 선택은 2024 상반기 검증 MAE만 사용합니다", "월세는 관측 보증금 조건부 예측입니다", "단지 군집·지역 보정·분위수 비교·신고 지연·갱신 민감도는 미측정입니다"]}
++    tests = {}
++    for target, mask in [("jeonse", data.rent.eq(0)), ("monthly", data.rent.gt(0))]:
++        result, test, _ = fit_target(data.loc[mask], target, holdout_region)
++        summary["targets"][target] = result
++        summary["split_counts"][target] = result["split_counts"]
++        tests[target] = test
++    output.parent.mkdir(parents=True, exist_ok=True)
++    stage = Path(tempfile.mkdtemp(prefix=".rentlab-", dir=output.parent))
++    try:
++        prepared.to_csv(stage / "audit_rows.csv", index=False, encoding="utf-8-sig")
++        for target, test in tests.items():
++            test.to_csv(stage / f"{target}_predictions.csv", index=False, encoding="utf-8-sig")
++        summary["artifacts"] = write_artifacts(stage, summary, data, tests)
++        (stage / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
++        if output.exists():
++            raise ValueError("출력 경로가 실행 중 생성되어 보존합니다")
++        stage.rename(output)
++    except BaseException:
++        shutil.rmtree(stage)
++        raise
++    return summary
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description="전국 아파트 임대료 연구 CPU 엔진")
++    sub = parser.add_subparsers(dest="command", required=True)
++    validate = sub.add_parser("validate")
++    validate.add_argument("--manifest", type=Path, required=True)
++    execute = sub.add_parser("run")
++    execute.add_argument("--manifest", type=Path, required=True)
++    execute.add_argument("--output", type=Path, required=True)
++    execute.add_argument("--holdout-region")
++    smoke = sub.add_parser("smoke")
++    smoke.add_argument("--output", type=Path, required=True)
++    args = parser.parse_args(argv)
++    try:
++        if args.command == "validate":
++            raw, provenance = read_manifest(args.manifest)
++            _, audit = prepare(raw)
++            print(json.dumps({"status": "validated", "rows": len(raw), "audit": audit, "provenance": provenance}, ensure_ascii=False, allow_nan=False))
++        else:
++            result = run(args.output, getattr(args, "manifest", None), getattr(args, "holdout_region", None), args.command == "smoke")
++            print(json.dumps({"mode": result["mode"], "status": result["status"], "output": str(args.output.resolve())}, ensure_ascii=False))
++        return 0
++    except (ValueError, OSError, subprocess.SubprocessError, json.JSONDecodeError) as error:
++        print(f"연구 실행 실패: {error}", file=sys.stderr)
++        return 2
+--- /dev/null
++++ 2차/requirements.txt
+@@ -0,0 +1,4 @@
++numpy==2.2.6
++pandas==2.2.3
++scikit-learn==1.7.2
++matplotlib==3.10.1
+--- /dev/null
++++ 2차/run_dashboard.py
+@@ -0,0 +1,118 @@
++"""로컬 연구 결과를 읽기 전용으로 제공한다."""
++import argparse
++import json
++from functools import partial
++from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
++from pathlib import Path
++from urllib.parse import urlparse, unquote
++import mimetypes
++
++ROOT = Path(__file__).resolve().parent
++
++
++def contained_file(root, relative):
++    """상대 경로만 허용하고 폴더 밖 파일과 연결 파일을 거부한다."""
++    rel = Path(relative)
++    if rel.is_absolute() or ".." in rel.parts or ":" in relative or "\\" in relative:
++        raise ValueError("허용하지 않는 파일 경로입니다")
++    current = root
++    for part in rel.parts:
++        current = current / part
++        if current.is_symlink() or current.is_junction():
++            raise ValueError("파일 연결은 제공하지 않습니다")
++    candidate = current.resolve()
++    if not candidate.is_relative_to(root.resolve()) or not candidate.is_file():
++        raise ValueError("파일을 찾을 수 없습니다")
++    return candidate
++
++
++def load_summary(result):
++    if result is None:
++        return {"mode": "UNCONNECTED", "status": "실제 자료 미연결", "rows": None,
++                "targets": {}, "artifacts": [], "limitations": ["과거 클라우드 CSV는 이 컴퓨터에서 확보하지 못했습니다. 전국 본실험은 미실행입니다."]}
++    path = contained_file(result, "summary.json")
++    data = json.loads(path.read_text(encoding="utf-8"))
++    if not isinstance(data, dict) or data.get("mode") not in {"REAL", "SYNTHETIC"}:
++        raise ValueError("결과 유형을 확인할 수 없습니다")
++    # 원본 경로나 취득 URL 전체는 브라우저 API에 노출하지 않는다.
++    data.pop("provenance", None)
++    return data
++
++
++class Handler(BaseHTTPRequestHandler):
++    def __init__(self, *args, result=None, **kwargs):
++        self.result = result
++        super().__init__(*args, **kwargs)
++
++    def send_bytes(self, payload, content_type, status=200):
++        self.send_response(status)
++        self.send_header("Content-Type", content_type)
++        self.send_header("Content-Length", str(len(payload)))
++        self.send_header("Cache-Control", "no-store")
++        self.send_header("X-Content-Type-Options", "nosniff")
++        self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
++        self.end_headers()
++        self.wfile.write(payload)
++
++    def do_GET(self):
++        # DNS 재바인딩 등으로 외부 호스트가 루프백 서버를 읽는 것을 차단한다.
++        hosts = self.headers.get_all("Host", [])
++        port = self.server.server_port
++        allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
++        if port == 80:
++            allowed_hosts.update({"127.0.0.1", "localhost"})
++        if len(hosts) != 1 or hosts[0].lower() not in allowed_hosts:
++            self.send_bytes(b"Forbidden host", "text/plain", 403)
++            return
++        # 다른 웹사이트가 로컬 결과를 읽도록 CORS를 허용하지 않는다.
++        if self.headers.get("Sec-Fetch-Site") == "cross-site":
++            self.send_bytes(b"Forbidden", "text/plain", 403)
++            return
++        try:
++            path = unquote(urlparse(self.path).path)
++            if path == "/api/status":
++                payload = json.dumps(load_summary(self.result), ensure_ascii=False, allow_nan=False).encode("utf-8")
++                self.send_bytes(payload, "application/json; charset=utf-8")
++                return
++            if path.startswith("/artifact/"):
++                if self.result is None:
++                    raise ValueError("연결된 결과가 없습니다")
++                relative = path.removeprefix("/artifact/")
++                data = load_summary(self.result)
++                allowed = {str(a[k]) for a in data.get("artifacts", []) for k in ("csv", "png") if a.get(k)}
++                if relative not in allowed or Path(relative).suffix.lower() not in {".csv", ".png"}:
++                    raise ValueError("공개 대상으로 등록되지 않은 결과입니다")
++                source = contained_file(self.result, relative)
++            else:
++                relative = "index.html" if path == "/" else path.lstrip("/")
++                source = contained_file(ROOT / "web", relative)
++            mime = mimetypes.guess_type(source.name)[0] or "application/octet-stream"
++            self.send_bytes(source.read_bytes(), mime + ("; charset=utf-8" if mime.startswith("text/") else ""))
++        except (ValueError, OSError, KeyError, TypeError) as exc:
++            self.send_bytes(json.dumps({"error": str(exc)}, ensure_ascii=False).encode("utf-8"), "application/json; charset=utf-8", 404)
++
++    def log_message(self, fmt, *args):
++        # 파일 경로나 입력 내용을 운영 로그에 복제하지 않는다.
++        return
++
++
++def main():
++    parser = argparse.ArgumentParser(description="Balance Compass 읽기 전용 화면")
++    parser.add_argument("--result", type=Path, help="summary.json이 있는 결과 폴더")
++    parser.add_argument("--port", type=int, default=8776)
++    args = parser.parse_args()
++    result = args.result.resolve() if args.result else None
++    if result:
++        load_summary(result)
++    server = ThreadingHTTPServer(("127.0.0.1", args.port), partial(Handler, result=result))
++    print(f"Balance Compass: http://127.0.0.1:{server.server_port} (읽기 전용)", flush=True)
++    try:
++        server.serve_forever()
++    except KeyboardInterrupt:
++        pass
++    finally:
++        server.server_close()
++
++
++if __name__ == "__main__":
++    main()
+--- 1차/scripts/build_rust.ps1
++++ 2차/scripts/build_rust.ps1
+@@ -1,5 +1,23 @@
+ $ErrorActionPreference = 'Stop'
++# 설치된 Visual Studio 환경을 현재 빌드 프로세스에만 적용한다.
++$vswhere = 'C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe'
++if (-not (Get-Command link.exe -ErrorAction SilentlyContinue)) {
++    if (-not (Test-Path -LiteralPath $vswhere)) { throw 'Visual Studio C++ Build Tools가 필요합니다.' }
++    $installPath = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
++    if (-not $installPath) { throw '설치된 Visual Studio C++ 빌드 도구를 찾지 못했습니다.' }
++    $devCmd = Join-Path $installPath 'Common7/Tools/VsDevCmd.bat'
++    $buildEnvironment = & $env:ComSpec /d /c "`"$devCmd`" -arch=x64 -host_arch=x64 >nul && set"
++    if ($LASTEXITCODE -ne 0) { throw 'Visual Studio 빌드 환경 로딩 실패' }
++    foreach ($line in $buildEnvironment) {
++        if ($line -match '^([^=]+)=(.*)$') { [Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process') }
++    }
++}
+ $env:CARGO_HOME = 'E:/2026/개발 도구 및 캐시/Rust Astryx/cargo'
+ $env:RUSTUP_HOME = 'E:/2026/개발 도구 및 캐시/Rust Astryx/rustup'
++# E에 보존된 SDK 라이브러리의 실제 경로를 사용한다. 전역 설정은 바꾸지 않는다.
++$sdkLibraries = 'E:/2026/개발 도구 및 캐시/Rust Astryx/windows-sdk/x64/c'
++if (Test-Path -LiteralPath "$sdkLibraries/um/x64/kernel32.Lib") {
++    $env:LIB = "$sdkLibraries/um/x64;$sdkLibraries/ucrt/x64;$env:LIB"
++}
+ & "$env:CARGO_HOME/bin/cargo.exe" build --release --manifest-path "$PSScriptRoot/../rust_money/Cargo.toml"
+ if ($LASTEXITCODE -ne 0) { throw 'Rust 빌드 실패. 기존 실행 파일로 대체하지 않습니다.' }
+--- /dev/null
++++ 2차/tests/test_engine.py
+@@ -0,0 +1,207 @@
++"""금액·자료 보존·분할 누수·유한표본 구간의 경계 검증."""
++import hashlib
++import json
++from pathlib import Path
++import tempfile
++import unittest
++from unittest.mock import patch
++
++import numpy as np
++import pandas as pd
++
++from rentlab.engine import (COLUMNS, PURPOSES, conformal_radius, fit_target, main, metrics,
++                            normalize_money, prepare, preprocessor, read_manifest, run, split_data, synthetic_data)
++
++
++class EngineTests(unittest.TestCase):
++    def setUp(self):
++        self.temp = tempfile.TemporaryDirectory()
++        self.folder = Path(self.temp.name)
++
++    def tearDown(self):
++        self.temp.cleanup()
++
++    def manifest(self, frame=None):
++        source = self.folder / "source.csv"
++        (synthetic_data() if frame is None else frame).to_csv(source, index=False, encoding="utf-8-sig")
++        document = {"files": [{"path": source.name, "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
++                               "rows": len(synthetic_data() if frame is None else frame), "source_url": "https://rt.molit.go.kr/pt/xls/xls.do",
++                               "acquired_at": "2026-11-26T10:00:00+09:00", "snapshot_id": "test-snapshot"}]}
++        path = self.folder / "manifest.json"
++        path.write_text(json.dumps(document), encoding="utf-8")
++        return path, document, source
++
++    def test_rust_exact_won(self):
++        self.assertEqual(normalize_money(["12,345.6789", "0", "001.5"]), [123456789, 0, 15000])
++
++    def test_rust_rejects_malformed(self):
++        with self.assertRaisesRegex(ValueError, "Rust 금액 검증 실패"):
++            normalize_money(["1,23"])
++
++    def test_rust_rejects_embedded_newline(self):
++        with self.assertRaises(ValueError):
++            normalize_money(["1\n2"])
++
++    def test_manifest_source_unchanged(self):
++        path, _, source = self.manifest()
++        before = source.read_bytes()
++        raw, provenance = read_manifest(path)
++        self.assertEqual(len(raw), 288)
++        self.assertEqual(source.read_bytes(), before)
++        self.assertEqual(len(provenance["sources"]), 1)
++
++    def test_manifest_utf8_strict_priority(self):
++        path, _, _ = self.manifest()
++        _, provenance = read_manifest(path)
++        self.assertEqual(provenance["sources"][0]["encoding"], "utf-8-sig")
++
++    def test_manifest_cp949_preserves_original_bytes(self):
++        path, document, source = self.manifest()
++        original = synthetic_data().to_csv(index=False).encode("cp949", errors="strict")
++        source.write_bytes(original)
++        document["files"][0]["sha256"] = hashlib.sha256(original).hexdigest()
++        path.write_text(json.dumps(document), encoding="utf-8")
++        frame, provenance = read_manifest(path)
++        self.assertEqual(frame.iloc[0]["시군구"], "합성시 지역0")
++        self.assertEqual(provenance["sources"][0]["encoding"], "cp949")
++        self.assertEqual(provenance["sources"][0]["verified_sha256"], hashlib.sha256(original).hexdigest())
++        self.assertEqual(source.read_bytes(), original)
++
++    def test_manifest_invalid_encoding_cli_exit2(self):
++        path, document, source = self.manifest()
++        source.write_bytes(b"\xff\xff")
++        document["files"][0]["sha256"] = hashlib.sha256(source.read_bytes()).hexdigest()
++        path.write_text(json.dumps(document), encoding="utf-8")
++        with self.assertRaisesRegex(ValueError, "UTF-8 또는 CP949"):
++            read_manifest(path)
++        self.assertEqual(main(["validate", "--manifest", str(path)]), 2)
++
++    def test_manifest_hash_failure(self):
++        path, document, _ = self.manifest()
++        document["files"][0]["sha256"] = "0" * 64
++        path.write_text(json.dumps(document), encoding="utf-8")
++        with self.assertRaisesRegex(ValueError, "SHA-256"):
++            read_manifest(path)
++
++    def test_duplicate_source_rejected(self):
++        path, document, _ = self.manifest()
++        document["files"].append(dict(document["files"][0]))
++        path.write_text(json.dumps(document), encoding="utf-8")
++        with self.assertRaisesRegex(ValueError, "중복"):
++            read_manifest(path)
++
++    def test_overlapping_scope_rejected(self):
++        path, document, _ = self.manifest()
++        other = synthetic_data().iloc[:1].copy()
++        other["층"] = "99"
++        file = self.folder / "other.csv"
++        other.to_csv(file, index=False, encoding="utf-8-sig")
++        document["files"].append({**document["files"][0], "path": file.name, "rows": 1,
++                                   "sha256": hashlib.sha256(file.read_bytes()).hexdigest()})
++        path.write_text(json.dumps(document), encoding="utf-8")
++        with self.assertRaisesRegex(ValueError, "범위 중복"):
++            read_manifest(path)
++
++    def test_empty_manifest_is_not_real_success(self):
++        path = self.folder / "empty.json"
++        path.write_text('{"files": []}', encoding="utf-8")
++        with self.assertRaisesRegex(ValueError, "실측 자료가 없습니다"):
++            read_manifest(path)
++
++    def test_contract_audit(self):
++        raw = synthetic_data().iloc[:4].copy()
++        raw.loc[0, "계약구분"] = "갱신"
++        raw.loc[1, "전용면적(㎡)"] = "-1"
++        raw.loc[2, "계약일"] = "99"
++        data, audit = prepare(raw)
++        self.assertEqual(audit["included_rows"], 1)
++        self.assertEqual(set(audit["excluded_by_reason"]), {"not_new_contract", "invalid_area", "invalid_date"})
++        self.assertEqual(data.deposit.dtype.kind, "i")
++
++    def test_fixed_time_boundaries(self):
++        data, _ = prepare(synthetic_data())
++        splits = split_data(data)
++        self.assertTrue(splits["train"].date.dt.year.isin([2022, 2023]).all())
++        self.assertTrue(splits["validation"].date.dt.month.le(6).all())
++        self.assertTrue(splits["calibration"].date.dt.month.ge(7).all())
++        self.assertTrue(splits["test"].date.dt.year.eq(2025).all())
++        self.assertEqual(sum(len(v) for v in splits.values()), len(data))
++
++    def test_region_holdout_all_prior_splits(self):
++        data, _ = prepare(synthetic_data())
++        splits = split_data(data, "합성시 지역1")
++        for name in ["train", "validation", "calibration"]:
++            self.assertFalse(splits[name].region.eq("합성시 지역1").any())
++        self.assertTrue(splits["test"].region.eq("합성시 지역1").all())
++
++    def test_unknown_holdout_rejected(self):
++        data, _ = prepare(synthetic_data())
++        with self.assertRaises(ValueError):
++            split_data(data, "없는지역")
++
++    def test_empty_split_rejected(self):
++        data, _ = prepare(synthetic_data().iloc[:36])
++        with self.assertRaisesRegex(ValueError, "빈 자료"):
++            split_data(data)
++
++    def test_finite_sample_rank(self):
++        self.assertEqual(conformal_radius(np.arange(1, 10)), 9)
++        self.assertEqual(conformal_radius(np.arange(1, 20)), 18)
++
++    def test_insufficient_calibration_is_json_null(self):
++        self.assertIsNone(conformal_radius([1, 2]))
++        self.assertEqual(json.dumps({"radius": conformal_radius([])}, allow_nan=False), '{"radius": null}')
++
++    def test_invalid_residual_rejected(self):
++        for residual in [[float("nan")], [-1], [float("inf")]]:
++            with self.assertRaises(ValueError):
++                conformal_radius(residual)
++
++    def test_interval_score(self):
++        result = metrics([0, 4], [1, 1], radius=1)
++        self.assertEqual(result["coverage"], 0.5)
++        self.assertEqual(result["width"], 2)
++        self.assertEqual(result["interval_score"], 22)
++
++    def test_existing_output_preserved(self):
++        output = self.folder / "existing"
++        output.mkdir()
++        marker = output / "keep.txt"
++        marker.write_text("보존", encoding="utf-8")
++        with self.assertRaisesRegex(ValueError, "덮어쓰지"):
++            run(output, synthetic=True)
++        self.assertEqual(marker.read_text(encoding="utf-8"), "보존")
++
++    def test_output_failure_atomic(self):
++        output = self.folder / "failed"
++        with patch("rentlab.engine.fit_target", return_value=({"split_counts": {}}, pd.DataFrame(), {})), patch("rentlab.engine.write_artifacts", side_effect=ValueError("의도한 출력 실패")):
++            with self.assertRaisesRegex(ValueError, "의도한 출력 실패"):
++                run(output, synthetic=True)
++        self.assertFalse(output.exists())
++        self.assertEqual(list(self.folder.iterdir()), [])
++
++    def test_registry_distinct_purposes(self):
++        self.assertGreaterEqual(len(PURPOSES), 30)
++        self.assertEqual(len(PURPOSES), len({name for name, _ in PURPOSES}))
++
++    def test_model_selection_never_test(self):
++        data, _ = prepare(synthetic_data())
++        jeonse = data.loc[data.rent.eq(0)].copy()
++        first, _, _ = fit_target(jeonse, "jeonse", None)
++        jeonse.loc[jeonse.date.dt.year.eq(2025), "deposit"] = 999999999
++        second, _, _ = fit_target(jeonse, "jeonse", None)
++        self.assertEqual(first["selected_model"], second["selected_model"])
++        self.assertEqual(first["validation"], second["validation"])
++        self.assertEqual(first["conformal_radius_won"], second["conformal_radius_won"])
++
++    def test_preprocessing_train_only_and_unknown_region(self):
++        processor = preprocessor(["area"])
++        processor.fit(pd.DataFrame({"area": [10.0, 20.0, np.nan], "region": ["훈련지역"] * 3}))
++        self.assertEqual(processor.named_transformers_["numeric"].named_steps["impute"].statistics_[0], 15)
++        result = processor.transform(pd.DataFrame({"area": [np.nan], "region": ["새지역"]}))
++        self.assertTrue(np.isfinite(result).all())
++        self.assertEqual(processor.named_transformers_["category"].categories_[0].tolist(), ["훈련지역"])
++
++
++if __name__ == "__main__":
++    unittest.main()
+--- /dev/null
++++ 2차/web/app.js
+@@ -0,0 +1,23 @@
++'use strict';
++const $ = (id) => document.getElementById(id);
++const titles = {overview:['연구 현황','자료 확보부터 모델 평가까지, 현재 상태를 확인합니다.'],data:['데이터 점검','원본 검사와 시간 분할에 사용된 표본을 확인합니다.'],evaluation:['AI 평가','검증에서 선택한 모델의 최종 오차와 예측구간을 봅니다.'],artifacts:['표와 그림','실제 생성된 산출물과 아직 측정하지 않은 분석을 구분합니다.'],guide:['실행 안내','원본을 보존하며 새 실행을 준비하는 방법입니다.']};
++const models = {global_median:'전체 중앙값',region_median:'지역 중앙값',ridge:'Ridge 회귀',hist_gradient_boosting:'트리 부스팅'};
++const metricNames = {n:'평가 표본',mae:'MAE · 평균 절대오차',rmse:'RMSE',coverage:'구간 포함률',width:'평균 구간 폭',interval_score:'구간 점수'};
++let summary = null, current = 'overview';
++function node(tag, text, cls) {const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;}
++function number(value, percent=false) {if(value===null||value===undefined||!Number.isFinite(Number(value)))return '미산출';return percent ? `${(value*100).toFixed(1)}%` : Number(value).toLocaleString('ko-KR',{maximumFractionDigits:1});}
++function empty(container, text='연결된 평가 결과가 없습니다.') {container.replaceChildren(node('p',text,'empty'));}
++function table(container, headings, rows) {if(!rows.length){empty(container);return;}const t=node('table'),head=node('thead'),tr=node('tr');for(const h of headings)tr.append(node('th',h));head.append(tr);t.append(head);const b=node('tbody');for(const row of rows){const r=node('tr');for(const cell of row){const d=node('td');if(cell instanceof Node)d.append(cell);else d.textContent=String(cell??'—');r.append(d);}b.append(r);}t.append(b);container.replaceChildren(t);}
++function hideTip(){$('tooltip').hidden=true;}
++function tip(anchor, heading, value, detail){const el=$('tooltip');el.replaceChildren(node('span',heading),node('strong',value),node('div',detail));el.hidden=false;const r=anchor.getBoundingClientRect(),t=el.getBoundingClientRect();el.style.left=`${Math.max(10,Math.min(innerWidth-t.width-10,r.left))}px`;el.style.top=`${Math.max(10,Math.min(innerHeight-t.height-10,r.bottom+8))}px`;}
++function metricButton(value,key,label=metricNames[key]) {const percent=key==='coverage',formatted=number(value,percent)+(percent||key==='n'||value===null?'':' 원');const b=node('button',formatted,'metric-info');const show=()=>tip(b,label,formatted,`저장 원값: ${value===null?'미산출':String(value)}${percent?' · 표시는 소수 첫째 자리 반올림입니다.':''}`);b.addEventListener('pointerenter',show);b.addEventListener('focus',show);b.addEventListener('click',show);b.addEventListener('pointerleave',hideTip);b.addEventListener('blur',hideTip);return b;}
++function activate(page){current=page;hideTip();for(const [id, copy] of Object.entries(titles)){$(id).hidden=id!==page;const b=document.querySelector(`[data-page="${id}"]`);if(id===page)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');} $('heading').textContent=titles[page][0];$('subtitle').textContent=titles[page][1];$('section-number').textContent=`RESEARCH / ${String(Object.keys(titles).indexOf(page)+1).padStart(2,'0')}`;}
++function setTheme(theme){document.documentElement.dataset.theme=theme;const text=theme==='dark'?'라이트 모드':'다크 모드';$('theme').textContent=text;$('theme').setAttribute('aria-label',`${text}로 전환`);try{localStorage.setItem('balance-compass-theme',theme);}catch{}}
++function render(){const d=summary,connected=d.mode!=='UNCONNECTED',synthetic=d.mode==='SYNTHETIC';$('mode').textContent=synthetic?'합성 기능 검증':connected?'실제 자료 연결':'자료 미연결';$('notice').textContent=synthetic?'합성 자료로 처리 기능을 확인한 결과입니다. 전국 실측 연구결과나 실제 예측 성능이 아닙니다.':connected?'실제 입력 자료의 결과를 표시합니다. 전국 수집 범위는 별도 확인이 필요하며, 전국 본실험 완료로 표시하지 않습니다.':'실제 자료가 아직 연결되지 않았습니다. 과거 클라우드 CSV와 결과는 로컬 실물을 확보하지 못했습니다. 전국 본실험은 미실행입니다.';$('rows').textContent=d.rows===null?'—':number(d.rows);$('target-count').textContent=connected?String(Object.keys(d.targets||{}).length):'—';$('artifact-count').textContent=d.artifacts?.length?`${d.artifacts.length}종`:'미산출';for(const id of ['step-data','step-model','step-test'])$(id).textContent=connected?(synthetic?'합성 검증':'결과 연결'):'대기';$('updated').textContent=d.created_at?`결과 저장 ${new Date(d.created_at).toLocaleString('ko-KR')}`:'결과 미연결';
++const splitRows=[];for(const [target,counts] of Object.entries(d.split_counts||{}))for(const [name,count]of Object.entries(counts))splitRows.push([target==='jeonse'?'전세':'월세',({train:'학습',validation:'모델 선택',calibration:'구간 보정',test:'최종 테스트'})[name]||name,number(count)]);table($('splits'),['유형','분할','행 수'],splitRows);
++const auditRows=[];for(const [key,value] of Object.entries(d.audit||{})){if(value&&typeof value==='object'){for(const [reason,count]of Object.entries(value))auditRows.push([reason,number(count)]);}else auditRows.push([({input_rows:'원본 행',included_rows:'분석 포함',excluded_rows:'분석 제외',retained_rows:'분석 포함'})[key]||key,number(value)]);}table($('audit'),['검사 항목','행 수'],auditRows);$('limitations').replaceChildren(...(d.limitations||[]).map(x=>node('li',x)));renderEvaluation();renderArtifacts();}
++function renderEvaluation(){hideTip();const t=summary?.targets?.[$('target').value];if(!t){for(const id of ['model-chart','validation','metrics','groups'])empty($(id));$('selection').textContent='평가 결과를 연결하면 선택 모델과 지표가 표시됩니다.';return;}$('selection').textContent=`선택 모델: ${models[t.selected_model]||t.selected_model} · ${t.interpretation||''}`;const entries=Object.entries(t.validation||{});table($('validation'),['모델','검증 MAE','검증 RMSE'],entries.map(([name,s])=>[models[name]||name,metricButton(s.mae,'mae'),metricButton(s.rmse,'rmse')]));const max=Math.max(1,...entries.map(([,s])=>s.mae));$('model-chart').replaceChildren(...entries.map(([name,s])=>{const row=node('div',undefined,'bar-row'),b=node('button',models[name]||name),track=node('div',undefined,'bar-track'),fill=node('div',undefined,'bar-fill');fill.style.width=`${Math.max(0,Math.min(100,s.mae/max*100))}%`;track.append(fill);b.addEventListener('focus',()=>tip(b,'검증 MAE',`${number(s.mae)} 원`,`${models[name]||name} · 저장 원값 ${s.mae}`));b.addEventListener('pointerenter',()=>b.focus({preventScroll:true}));b.addEventListener('click',()=>tip(b,'검증 MAE',`${number(s.mae)} 원`,`저장 원값 ${s.mae}`));b.addEventListener('pointerleave',hideTip);b.addEventListener('blur',hideTip);row.append(b,track,node('span',`${number(s.mae)} 원`));return row;}));table($('metrics'),['지표','실제 저장값'],Object.entries(t.metrics||{}).map(([key,value])=>[metricNames[key]||key,metricButton(value,key,key==='n'?'평가 표본 수':undefined)]));table($('groups'),['지역','표본 수','MAE','구간 포함률'],(t.groups||[]).map(g=>[g.region,number(g.n),metricButton(g.mae,'mae'),metricButton(g.coverage,'coverage')]));}
++function artifactLink(path,label){const a=node('a',label);a.href=`/artifact/${path.split('/').map(encodeURIComponent).join('/')}`;if(path.endsWith('.csv'))a.download='';return a;}
++function renderArtifacts(){const term=$('search').value.trim().toLocaleLowerCase(),state=$('artifact-state').value;const items=(summary?.artifacts||[]).filter(a=>`${a.id} ${a.title}`.toLocaleLowerCase().includes(term)&&(state==='all'||state==='ready'&&a.csv||state==='missing'&&!a.csv));const rows=items.map(a=>{const links=node('div');if(a.csv)links.append(artifactLink(a.csv,'CSV'));if(a.png){const b=node('button','그림 보기');b.addEventListener('click',()=>{$('preview-title').textContent=a.title;$('preview-image').src=artifactLink(a.png,'').href;$('preview-image').alt=a.title;$('preview').showModal();});links.append(b);}return [a.title,a.csv?'생성됨':`미산출${a.reason?` · ${a.reason}`:''}`,links];});table($('artifact-list'),['분석 목적','상태','파일'],rows);if(!rows.length)empty($('artifact-list'),summary?.artifacts?.length?'검색 조건에 맞는 분석이 없습니다.':'연결된 분석 산출물이 없습니다.');}
++async function refresh(){const b=$('refresh');b.disabled=true;try{const response=await fetch('/api/status',{cache:'no-store'});if(!response.ok)throw new Error('저장 결과를 읽을 수 없습니다. 실행 폴더와 summary.json을 확인해 주세요.');summary=await response.json();render();}catch(error){$('notice').textContent=error.message;$('mode').textContent='결과 읽기 실패';}finally{b.disabled=false;}}
++for(const button of document.querySelectorAll('[data-page]'))button.addEventListener('click',()=>activate(button.dataset.page));$('refresh').addEventListener('click',()=>{hideTip();refresh();});$('target').addEventListener('change',renderEvaluation);$('search').addEventListener('input',renderArtifacts);$('artifact-state').addEventListener('change',renderArtifacts);$('theme').addEventListener('click',()=>{hideTip();setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');});$('close-preview').addEventListener('click',()=>$('preview').close());document.addEventListener('keydown',e=>{if(e.key==='Escape')hideTip();});addEventListener('scroll',hideTip,true);addEventListener('resize',hideTip);let theme='light';try{theme=localStorage.getItem('balance-compass-theme')==='dark'?'dark':'light';}catch{}setTheme(theme);refresh();setInterval(()=>{if(!document.hidden)refresh();},15000);
+--- /dev/null
++++ 2차/web/index.html
+@@ -0,0 +1,13 @@
++<!doctype html>
++<html lang="ko" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Balance Compass · 임대료 연구</title><link rel="stylesheet" href="style.css"><script src="app.js" defer></script></head>
++<body><header><div class="brand"><span class="mark" aria-hidden="true">↗</span><div>Balance Compass<small>전국 아파트 임대료 연구 · 새 연구 2차</small></div></div><div class="toolbar"><span id="updated">결과 연결 확인 중</span><button id="refresh">새로고침</button><button id="theme" aria-label="다크 모드로 전환">다크 모드</button></div></header>
++<div class="layout"><aside><p class="eyebrow">연구 작업공간</p><nav aria-label="연구 화면"><button data-page="overview" aria-current="page"><span>01</span>연구 현황</button><button data-page="data"><span>02</span>데이터 점검</button><button data-page="evaluation"><span>03</span>AI 평가</button><button data-page="artifacts"><span>04</span>표와 그림</button><button data-page="guide"><span>05</span>실행 안내</button></nav><div class="aside-note">원본은 그대로.<br>결과는 근거와 함께.<p>실측 자료와 합성 검증을 구분해 표시합니다.</p></div></aside>
++<main><div class="page-heading"><div><p class="eyebrow" id="section-number">RESEARCH / 01</p><h1 id="heading">연구 현황</h1><p id="subtitle">자료 확보부터 모델 평가까지, 현재 상태를 확인합니다.</p></div><span class="badge" id="mode">확인 중</span></div>
++<div id="notice" class="notice" role="status">결과를 읽고 있습니다.</div>
++<section id="overview" class="page"><div class="stats"><div><span>연결된 입력 행</span><strong id="rows">—</strong><small>파일 검사에 근거한 행 수</small></div><div><span>평가한 계약 유형</span><strong id="target-count">—</strong><small>전세와 월세를 각각 평가</small></div><div><span>분석 목적</span><strong id="artifact-count">—</strong><small>동일 표·그림은 한 종류로 집계</small></div></div>
++<div class="columns"><article class="panel"><div class="panel-heading"><h2>연구 진행</h2><span>입력 → 처리 → 평가</span></div><ol class="steps"><li><b>01</b><div><h3>원본 자료와 출처 확인</h3><p>파일 해시·취득 시각·범위를 확인하고 원본을 보존합니다.</p></div><span id="step-data">대기</span></li><li><b>02</b><div><h3>시간을 나눈 AI 비교</h3><p>과거 자료로 학습하고 검증 기간에서 모델을 선택합니다.</p></div><span id="step-model">대기</span></li><li><b>03</b><div><h3>예측구간과 지역별 오차</h3><p>보정 기간과 최종 테스트를 나누어 결과를 확인합니다.</p></div><span id="step-test">대기</span></li></ol></article><article class="panel research-question"><p class="eyebrow">이번 연구의 질문</p><h2>예측한 임대료,<br>어디까지 믿을 수 있을까요?</h2><p>평균 오차와 함께 예측구간의 실제 포함률을 봅니다. 지역이 바뀌거나 시간이 흘렀을 때 신뢰성이 유지되는지 확인합니다.</p><div class="rule"></div><span>전국 본실험</span><strong>아직 미완료</strong><p>실제 자료 연결만으로 전국 수집 완료가 입증되지는 않습니다.</p></article></div><article class="panel"><h2>고정 평가 일정</h2><div class="timeline"><div><b>2022–2023</b><span>학습</span></div><div><b>2024 상반기</b><span>모델 선택</span></div><div><b>2024 하반기</b><span>구간 보정</span></div><div><b>2025</b><span>최종 테스트</span></div></div></article></section>
++<section id="data" class="page" hidden><article class="panel"><h2>분할별 표본 수</h2><div id="splits" class="table-wrap"></div></article><article class="panel"><h2>입력 검사 기록</h2><div id="audit" class="table-wrap"></div><p class="muted">정확히 같은 공개 행도 서로 다른 실제 계약일 수 있어 자동으로 삭제하지 않습니다.</p></article><article class="panel"><h2>해석할 때 확인할 점</h2><ul id="limitations"></ul></article></section>
++<section id="evaluation" class="page" hidden><div class="filters"><label>계약 유형<select id="target"><option value="jeonse">전세 · 보증금 예측</option><option value="monthly">월세 · 월임대료 예측</option></select></label></div><article class="panel"><div class="panel-heading"><h2>검증 기간 모델 비교</h2><span>낮은 평균 절대오차가 우선입니다</span></div><div id="model-chart" class="chart" aria-label="모델별 검증 오차"></div><div id="validation" class="table-wrap"></div></article><article class="panel"><h2>최종 테스트</h2><p id="selection" class="muted"></p><div id="metrics" class="table-wrap"></div><p class="muted">90%는 명목수준입니다. 시간·지역 이동에서도 90%를 보장한다는 뜻은 아닙니다.</p></article><article class="panel"><h2>지역별 결과</h2><div id="groups" class="table-wrap"></div></article></section>
++<section id="artifacts" class="page" hidden><div class="filters"><label>분석 목적 검색<input type="search" id="search" placeholder="제목이나 분석 번호로 찾기"></label><label>생성 상태<select id="artifact-state"><option value="all">전체</option><option value="ready">파일 있음</option><option value="missing">미산출</option></select></label></div><article class="panel"><h2>분석 산출물</h2><p class="muted">측정되지 않은 항목은 빈 상태로 남깁니다. CSV와 그림은 같은 분석의 두 형식입니다.</p><div id="artifact-list" class="table-wrap"></div></article></section>
++<section id="guide" class="page" hidden><article class="panel"><h2>자료를 연결하는 순서</h2><ol class="guide-list"><li>공식 원본 CSV와 취득 조건을 보존합니다.</li><li>manifest에 경로·SHA-256·출처·취득 시각·스냅숏을 기록합니다.</li><li>입력 검사를 통과한 자료로 연구 CLI를 실행합니다.</li><li>새 결과 폴더를 선택해 이 읽기 전용 화면을 시작합니다.</li></ol><p>화면에서 수집·학습을 실행하지 않습니다. 실행 명령과 입력 양식은 차수 폴더의 사용 안내에 있습니다.</p></article><article class="panel"><h2>지표를 읽는 방법</h2><div class="table-wrap"><table><thead><tr><th>지표</th><th>뜻</th><th>읽는 방법</th></tr></thead><tbody><tr><td>MAE</td><td>평균 절대오차</td><td>예측과 실제 금액 차이의 평균, 원 단위</td></tr><tr><td>RMSE</td><td>제곱평균제곱근오차</td><td>큰 오차에 더 민감한 금액 지표</td></tr><tr><td>포함률</td><td>실제값이 구간 안에 든 비율</td><td>소수 첫째 자리 반올림, 원비율은 설명 카드에서 확인</td></tr><tr><td>구간 폭</td><td>상한과 하한의 평균 차이</td><td>포함률과 함께 비교</td></tr></tbody></table></div></article></section>
++<footer>Balance Compass · 새 연구 2차 <span>실제 저장된 결과만 표시합니다.</span></footer></main></div><div id="tooltip" role="tooltip" hidden></div><dialog id="preview"><div class="dialog-heading"><h2 id="preview-title">그림 보기</h2><button id="close-preview">닫기</button></div><img id="preview-image" alt="선택한 분석 그림"><p>현재 연결한 실행에서 생성된 그림입니다.</p></dialog></body></html>
+Binary web/NanumGothic-Bold.ttf: 2073868 bytes SHA256 f96298f9fb18e364d2370f4c3ce948ac67a2b61af992d7234bc15c42b033c674
+--- /dev/null
++++ 2차/web/OFL.txt
+@@ -0,0 +1,96 @@
++Copyright (c) 2010, NHN Corporation (http://www.nhncorp.com),
++with Reserved Font Name Nanum, Naver Nanum, NanumGothic, Naver 
++NanumGothic, NanumMyeongjo, Naver NanumMyeongjo, NanumBrush, Naver
++NanumBrush, NanumPen, Naver NanumPen.
++
++This Font Software is licensed under the SIL Open Font License, Version 1.1.
++This license is copied below, and is also available with a FAQ at:
++http://scripts.sil.org/OFL
++
++
++-----------------------------------------------------------
++SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
++-----------------------------------------------------------
++
++PREAMBLE
++The goals of the Open Font License (OFL) are to stimulate worldwide
++development of collaborative font projects, to support the font creation
++efforts of academic and linguistic communities, and to provide a free and
++open framework in which fonts may be shared and improved in partnership
++with others.
++
++The OFL allows the licensed fonts to be used, studied, modified and
++redistributed freely as long as they are not sold by themselves. The
++fonts, including any derivative works, can be bundled, embedded, 
++redistributed and/or sold with any software provided that any reserved
++names are not used by derivative works. The fonts and derivatives,
++however, cannot be released under any other type of license. The
++requirement for fonts to remain under this license does not apply
++to any document created using the fonts or their derivatives.
++
++DEFINITIONS
++"Font Software" refers to the set of files released by the Copyright
++Holder(s) under this license and clearly marked as such. This may
++include source files, build scripts and documentation.
++
++"Reserved Font Name" refers to any names specified as such after the
++copyright statement(s).
++
++"Original Version" refers to the collection of Font Software components as
++distributed by the Copyright Holder(s).
++
++"Modified Version" refers to any derivative made by adding to, deleting,
++or substituting -- in part or in whole -- any of the components of the
++Original Version, by changing formats or by porting the Font Software to a
++new environment.
++
++"Author" refers to any designer, engineer, programmer, technical
++writer or other person who contributed to the Font Software.
++
++PERMISSION & CONDITIONS
++Permission is hereby granted, free of charge, to any person obtaining
++a copy of the Font Software, to use, study, copy, merge, embed, modify,
++redistribute, and sell modified and unmodified copies of the Font
++Software, subject to the following conditions:
++
++1) Neither the Font Software nor any of its individual components,
++in Original or Modified Versions, may be sold by itself.
++
++2) Original or Modified Versions of the Font Software may be bundled,
++redistributed and/or sold with any software, provided that each copy
++contains the above copyright notice and this license. These can be
++included either as stand-alone text files, human-readable headers or
++in the appropriate machine-readable metadata fields within text or
++binary files as long as those fields can be easily viewed by the user.
++
++3) No Modified Version of the Font Software may use the Reserved Font
++Name(s) unless explicit written permission is granted by the corresponding
++Copyright Holder. This restriction only applies to the primary font name as
++presented to the users.
++
++4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
++Software shall not be used to promote, endorse or advertise any
++Modified Version, except to acknowledge the contribution(s) of the
++Copyright Holder(s) and the Author(s) or with their explicit written
++permission.
++
++5) The Font Software, modified or unmodified, in part or in whole,
++must be distributed entirely under this license, and must not be
++distributed under any other license. The requirement for fonts to
++remain under this license does not apply to any document created
++using the Font Software.
++
++TERMINATION
++This license becomes null and void if any of the above conditions are
++not met.
++
++DISCLAIMER
++THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
++MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
++OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
++COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
++DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
++OTHER DEALINGS IN THE FONT SOFTWARE.
+--- /dev/null
++++ 2차/web/style.css
+@@ -0,0 +1,8 @@
++@font-face{font-family:Nanum;src:url('NanumGothic-Bold.ttf') format('truetype');font-weight:700;font-display:swap}
++:root{font-family:Nanum,'Malgun Gothic',sans-serif;font-weight:700;color:#173047;background:#f2f5fa;--panel:#fff;--text:#173047;--muted:#62758a;--line:#dce5ef;--blue:#4168d6;--purple:#8556bc;--select:#edf1fe;--warn:#916015;--wash:#faf6ec;--border:#c7d4e5;color-scheme:light}
++:root[data-theme=dark]{color-scheme:dark;--panel:#1b2735;--text:#e1eaf4;--muted:#b2c2d3;--line:#3c4e63;--blue:#93b3ff;--purple:#d0a6ff;--select:#293b61;--warn:#efc16e;--wash:#302d28;--border:#4a5e78;background:#111923;color:var(--text)}
++*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button,a,input,select{touch-action:manipulation}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #93b3ff;outline-offset:3px}button:disabled{opacity:.55;cursor:default}button,a{transition:background .15s,border-color .15s}header{background:linear-gradient(115deg,#142e46,#174454);color:#fff;padding:23px max(24px,calc((100vw - 1632px)/2));display:flex;justify-content:space-between;gap:24px;align-items:center}html[data-theme=dark] header{background:linear-gradient(115deg,#18283e,#242c49)}.brand{display:flex;align-items:center;gap:13px;font-size:22px;letter-spacing:-.5px}.brand small{display:block;font-size:12px;color:#c0cfdd;margin-top:6px;letter-spacing:0}.mark{border:1px solid #8194ad;border-radius:10px;width:42px;height:42px;display:grid;place-items:center;font-size:26px}.toolbar{display:flex;align-items:center;gap:10px}.toolbar span{font-size:12px;color:#d0dce7;margin-right:8px}button{border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);padding:10px 15px;min-height:44px}header button{background:transparent;color:#fff;border-color:#6f879a}button:hover{border-color:var(--blue);background:var(--select)}header button:hover{background:#ffffff14;border-color:#b3c9ff}.layout{max-width:1680px;margin:0 auto;padding:30px 24px;display:grid;grid-template-columns:218px minmax(0,1fr);gap:26px}aside{align-self:start;position:sticky;top:20px;padding-top:9px}.eyebrow{color:var(--muted);font-size:11px;letter-spacing:1.2px;margin:0 0 14px}aside>.eyebrow{padding-left:14px}nav{display:grid;gap:6px}nav button{border:1px solid transparent;background:transparent;text-align:left;display:flex;gap:14px;align-items:center;min-height:49px;font-size:14px}nav span{font-size:11px;color:var(--muted)}nav button[aria-current=page]{background:var(--select);border-color:var(--line);color:var(--blue)}.aside-note{font-size:14px;line-height:1.9;padding:25px 14px;margin-top:30px;border-top:1px solid var(--line)}.aside-note p{font-size:12px;color:var(--muted);line-height:1.8}main{min-width:0}.page-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:8px 0 24px}.page-heading .eyebrow{margin-bottom:9px;color:var(--blue)}h1{font-size:25px;letter-spacing:-.8px;margin:0 0 9px}p{line-height:1.8}.page-heading p:last-child{font-size:13px;color:var(--muted);margin:0}.badge{border:1px solid var(--line);border-radius:7px;padding:8px 11px;font-size:12px;white-space:nowrap;background:var(--panel)}.notice{border-left:3px solid var(--warn);background:var(--wash);color:var(--warn);padding:15px 18px;border-radius:0 10px 10px 0;font-size:13px;line-height:1.8;margin-bottom:23px}.stats{display:grid;grid-template-columns:repeat(3,1fr);padding:5px 0 27px;margin-bottom:10px}.stats>div{border-right:1px solid var(--line);padding:8px 26px}.stats>div:first-child{padding-left:4px}.stats>div:last-child{border:0}.stats span,.stats small{display:block;color:var(--muted);font-size:12px}.stats strong{font-size:36px;display:block;letter-spacing:-1.5px;margin:9px 0}.stats small{font-size:11px}.columns{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px;min-width:0;box-shadow:0 5px 22px #1c3e5608}html[data-theme=dark] .panel{box-shadow:none}h2{font-size:16px;margin:0 0 19px}h3{font-size:14px;margin:0 0 6px}.panel-heading{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.panel-heading span{font-size:11px;color:var(--muted)}.steps{list-style:none;padding:0;margin:0}.steps li{display:flex;align-items:start;gap:13px;padding:20px 0;border-top:1px solid var(--line)}.steps li:first-child{border-top:0;padding-top:10px}.steps li>b{background:var(--select);color:var(--blue);border-radius:50%;min-width:31px;height:31px;display:grid;place-items:center;font-size:11px}.steps p{font-size:12px;margin:0;color:var(--muted)}.steps li>span{font-size:11px;color:var(--muted);white-space:nowrap;margin-left:auto;padding-top:6px}.research-question{padding:26px;background:var(--panel)}.research-question h2{font-size:22px;line-height:1.6;letter-spacing:-.7px}.research-question p{font-size:12px;color:var(--muted)}.research-question>span{display:block;font-size:11px;color:var(--muted)}.research-question strong{display:block;color:var(--purple);font-size:19px;margin:8px 0}.rule{height:1px;background:var(--line);margin:20px 0}.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.timeline div{border-top:3px solid var(--blue);padding:13px 8px 3px}.timeline div:nth-child(3){border-color:var(--purple)}.timeline div:nth-child(4){border-color:var(--text)}.timeline b{display:block;font-size:13px}.timeline span{display:block;color:var(--muted);font-size:12px;margin-top:9px}.filters{display:flex;gap:16px;margin-bottom:22px;flex-wrap:wrap}label{display:grid;gap:7px;font-size:12px;min-width:240px}input,select{min-height:44px;border:1px solid var(--border);border-radius:10px;background:var(--panel);color:var(--text);padding:10px 13px}select{padding-right:40px}input:hover,select:hover{border-color:var(--blue)}.table-wrap{overflow:auto;max-width:100%}table{border-collapse:collapse;width:100%;font-size:12px;text-align:left}th{color:var(--muted);background:var(--select);white-space:nowrap}td,th{padding:14px 12px;border-bottom:1px solid var(--line);line-height:1.7;vertical-align:top}td a{color:var(--blue);text-underline-offset:4px;margin-right:12px}.empty{padding:34px 12px;text-align:center;color:var(--muted);font-size:13px;line-height:1.9}.muted{font-size:12px;color:var(--muted)}li{line-height:1.9}ul{font-size:13px;padding-left:21px}.guide-list{font-size:13px;padding-left:23px}.chart{display:grid;gap:13px;margin:22px 0}.bar-row{display:grid;grid-template-columns:130px 1fr 110px;gap:16px;align-items:center;font-size:12px}.bar-track{height:9px;background:var(--select);border-radius:5px;overflow:hidden}.bar-fill{height:100%;background:var(--blue);border-radius:5px}.bar-row:nth-child(even) .bar-fill{background:var(--purple)}.bar-row button{background:transparent;border-color:transparent;text-align:left;padding:5px;min-height:32px}.metric-info{border:0;border-bottom:1px dashed var(--blue);border-radius:0;padding:0;min-height:24px;color:var(--blue);background:transparent}#tooltip{position:fixed;z-index:20;width:min(330px,calc(100vw - 20px));max-height:calc(100vh - 20px);overflow:auto;background:var(--panel);color:var(--text);border:1px solid var(--line);border-top:3px solid var(--blue);border-radius:15px;padding:17px;box-shadow:0 12px 50px #0002;font-size:12px;line-height:1.8}#tooltip strong{display:block;font-size:30px;color:var(--blue);margin:7px 0}dialog{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:16px;width:min(1000px,calc(100vw - 24px));max-height:calc(100vh - 24px);padding:20px}dialog::backdrop{background:#08192ec9}dialog img{display:block;width:100%;max-height:70vh;object-fit:contain}dialog p{font-size:12px;color:var(--muted)}.dialog-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:16px}.dialog-heading h2{margin:0}footer{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin:30px 0 10px;gap:20px}[hidden]{display:none!important}
++@media(max-width:1200px){.layout{grid-template-columns:190px minmax(0,1fr);gap:18px}.columns{grid-template-columns:1fr}.research-question h2 br{display:none}.toolbar span{display:none}}
++@media(max-width:900px){.layout{display:block;padding-top:20px}aside{position:static;padding:0}aside>.eyebrow,.aside-note{display:none}nav{display:flex;overflow:auto;padding:3px 2px 12px;margin-bottom:20px}nav button{white-space:nowrap;min-height:44px;gap:8px;padding:10px 12px}.page-heading{margin-top:4px}.brand{font-size:19px}header{padding:20px 24px}.stats strong{font-size:30px}}
++@media(max-width:650px){header{align-items:start;flex-direction:column;gap:17px}.toolbar{align-self:stretch;justify-content:flex-end}.brand small{font-size:11px}.layout{padding:16px}.page-heading{align-items:start}h1{font-size:24px}.page-heading p:last-child{font-size:12px}.panel{padding:18px}.panel-heading{display:block}.panel-heading span{display:block;margin-bottom:12px}.stats>div{padding:8px 12px}.stats span{font-size:11px}.stats small{font-size:10px}.stats strong{font-size:27px}.timeline{grid-template-columns:repeat(2,1fr);gap:19px 10px}.filters label{min-width:0;flex:1 1 180px}.bar-row{grid-template-columns:95px 1fr 85px;gap:6px;font-size:11px}footer{display:block}footer span{display:block;margin-top:8px}.steps p{font-size:11px}}
++@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+--- /dev/null
++++ 2차/대시보드_시작.ps1
+@@ -0,0 +1,7 @@
++$ErrorActionPreference = 'Stop'
++Set-Location -LiteralPath $PSScriptRoot
++$pythonPath = Join-Path $PSScriptRoot '.venv/Scripts/python.exe'
++if (-not (Test-Path -LiteralPath $pythonPath)) { $pythonPath = Join-Path $PSScriptRoot '../1차/.venv/Scripts/python.exe' }
++if (-not (Test-Path -LiteralPath $pythonPath)) { throw '사용 안내에 따라 Python 환경을 먼저 준비해 주세요.' }
++& $pythonPath -B -X utf8 "$PSScriptRoot/run_dashboard.py" @args
++if ($LASTEXITCODE -ne 0) { throw '대시보드 실행에 실패했습니다. 입력 경로와 오류를 확인해 주세요.' }
+--- /dev/null
++++ 2차/변경기록.md
+@@ -0,0 +1,14 @@
++# 새 연구 2차 변경 기록
++
++2026-11-26. 로컬 최신 설계와 Rust 금액 코드를 이어서 연구 엔진·결과 조회 화면을 신규 구현했다.
++
++| 변경 | 파일 | 이유 |
++|---|---|---|
++| 연구 처리 추가 | rentlab/engine.py, rentlab/__main__.py | 원본 검사부터 예측 평가까지 실제 처리 경로 연결 |
++| 금액 처리 연결 | rust_money/src/main.rs, scripts/build_rust.ps1 | 원 단위 정수 정규화와 Windows 빌드 환경 연결 |
++| 화면 추가 | run_dashboard.py, web/index.html, web/style.css, web/app.js | 실제 결과·합성 검증·미연결 상태를 읽기 전용으로 확인 |
++| 실행·안내 | 연구_실행.ps1, 대시보드_시작.ps1, 사용안내.md | 새 채팅과 별개로 로컬 실행 |
++| 검사 | tests/test_engine.py | 입력 보존·분할·보정·모델 선택 오류 확인 |
++| 글꼴 | web/NanumGothic-Bold.ttf, web/OFL.txt | 나눔고딕700과 원본 OFL 동봉 |
++
++검증된 최종 상태와 미완료 항목은 [사용 안내](사용안내.md), 연구 방법은 [연구설계](docs/연구설계.md), 직전 비교는 [차수 비교](docs/차수비교.md)를 따른다. 이 변경 기록은 실제 전국 학습 완료·논문 게재·과거 클라우드 첨부 복원을 주장하지 않는다.
+--- /dev/null
++++ 2차/사용안내.md
+@@ -0,0 +1,84 @@
++# Balance Compass 새 연구 2차 사용 안내
++
++이번 차수는 Windows 로컬에서 다시 만든 연구 도구입니다. **과거 클라우드 ZIP을 복원한 원본이 아닙니다.** 전국 아파트 전세 보증금과 월임대료를 별도 예측하며, 실제 자료를 확보하기 전에는 합성 검증만 수행합니다.
++
++| 시작할 작업 | 실행 파일 | 결과 |
++|---|---|---|
++| 화면 열기 | `대시보드_시작.ps1` | 기본 주소 `http://127.0.0.1:8776`, 읽기 전용 |
++| 실제 자료 검사 | `연구_실행.ps1 validate` | 파일 해시·행 수·금액·제외 사유 확인 |
++| 실제 자료 평가 | `연구_실행.ps1 run` | 새 결과 폴더에 표·그림·요약 저장 |
++| 합성 처리 확인 | `연구_실행.ps1 smoke` | SYNTHETIC으로 명시한 기술 검증 |
++
++모든 명령은 이 차수 폴더에서 PowerShell로 실행합니다. 기존 1차의 `.venv`가 있으면 실행 파일이 재사용합니다. 새 설치에서는 Python 3.12로 `.venv`를 만든 뒤 `requirements.txt`를 설치합니다. 대시보드는 Python 표준 라이브러리만 사용합니다. 연구 엔진에는 별도 의존성이 필요합니다.
++
++```powershell
++py -3.12 -m venv .venv
++.\.venv\Scripts\python.exe -m pip install -r requirements.txt
++.\scripts\build_rust.ps1
++.\대시보드_시작.ps1
++```
++
++Rust 빌드에는 MSVC C++ 도구와 Windows SDK가 필요합니다. 이 컴퓨터의 스크립트는 설치된 Visual Studio와 E에 보존된 SDK를 사용하며 환경변수는 해당 프로세스에서만 적용합니다. 다른 컴퓨터는 해당 경로를 실제 환경에 맞춰 조정하거나 MSVC 개발자 PowerShell에서 `cargo build --release --manifest-path rust_money/Cargo.toml`을 사용합니다. Python 연구 실행은 `rust_money/target/release/bc-money.exe`를 실제 호출합니다. 실행 파일이 없으면 실패하며 Python 계산으로 몰래 대체하지 않습니다.
++
++## 실제 자료 manifest
++
++CSV와 같은 폴더에 manifest JSON을 저장합니다. 아래 값은 **입력 형식 예시**이며 실제 파일·해시·행 수로 교체해야 합니다. 미확인 값을 실측 출처로 입력하지 않습니다. API 키·계좌·개인정보는 넣지 않습니다.
++
++```json
++{
++  "files": [
++    {
++      "path": "확보한_원본.csv",
++      "sha256": "실제_SHA256_64자리",
++      "rows": 100,
++      "source_url": "https://rt.molit.go.kr/",
++      "acquired_at": "2026-11-26T19:00:00+09:00",
++      "snapshot_id": "확보한_스냅숏_식별자",
++      "region": "실제 파일 범위",
++      "start_month": "202201",
++      "end_month": "202512"
++    }
++  ]
++}
++```
++
++| CSV 칼럼 | 단위·뜻 | 처리 |
++|---|---|---|
++| 시군구 | 원본 지역명 | 지역 feature 및 결과 집계 |
++| 전용면적(㎡) | ㎡ | 유효한 양수 |
++| 계약년월·계약일 | YYYYMM·일 | 실제 달력 날짜 확인 |
++| 보증금(만원)·월세금(만원) | 만원 문자열 | Rust가 정확한 원 정수로 변환 |
++| 층·건축년도 | 층·연도 | 이상값 감사 후 제외 |
++| 계약구분 | 신규 / 갱신 / 미상 | 주분석은 신규, 나머지 사유 기록 |
++
++공식 내려받기 파일에 제목·설명 행이 있거나 칼럼 이름이 다르면 그대로 읽을 수 없습니다. 현재 로더는 위 머리글을 가진 UTF-8 또는 CP949 CSV를 받습니다. 원본을 덮어쓰지 않고 별도 정규화 파일을 만들며 취득 원본과의 관계를 보존해야 합니다. 원본 해시 검사는 파일 내용의 정확성을 보장하지 않습니다.
++
++```powershell
++.\연구_실행.ps1 validate --manifest "실제 자료 폴더/manifest.json"
++.\연구_실행.ps1 run --manifest "실제 자료 폴더/manifest.json" --output "results/실측_첫실행"
++.\대시보드_시작.ps1 --result "results/실측_첫실행" --port 8777
++```
++
++지역 이동 평가는 별도 출력 경로로 실행합니다. `--holdout-region`은 해당 지역을 학습·검증·보정에서 모두 제외하며 최종 테스트에서만 평가합니다. 시간 평가와 다른 실험이므로 출력과 해석을 분리합니다.
++
++```powershell
++.\연구_실행.ps1 run --manifest "실제 자료 폴더/manifest.json" --output "results/지역이동_첫실행" --holdout-region "서울특별시"
++.\연구_실행.ps1 smoke --output "results/합성_처리확인"
++```
++
++## 결과와 한계
++
++| 결과 | 의미 | 주의 |
++|---|---|---|
++| summary.json | 원값 지표·분할 표본·출처·감사·산출물 목록 | 내부 출처 경로는 공개 저장소에 넣지 않음 |
++| 분석 CSV·PNG | 동일 분석의 원자료와 시각화 | 두 파일을 두 종류로 세지 않음 |
++| 예측 CSV | 실제값·예측값·예측구간 | 개인 자료·실측 행은 비공개 |
++| audit_rows.csv | 행별 제외 사유 포함 | 원본은 수정하지 않음 |
++| REAL | 사용자가 제공한 CSV 처리 | 전국 완결성 인증이 아님 |
++| SYNTHETIC | 결정론적으로 만든 기술 검증 자료 | 실제 예측 성능이 아님 |
++
++금액 형식 오류는 Rust 전체 검증을 실패시키며 부분 결과를 출력하지 않습니다. 기존 출력 폴더가 있으면 덮어쓰지 않습니다. 신규계약 부재·빈 시간 분할·자료 누락도 실패합니다. 오류를 0점이나 완료 상태로 바꾸지 않습니다.
++
++전국 원본 수집, 공식 지역 코드에 따른 완결성 대조, 지역별 conformal·분위수 구간 비교·단지 부트스트랩·신고 지연·갱신 민감도와 논문은 미완료입니다. 현재 구현으로 전국 연구와 논문이 완성됐다고 해석하면 안 됩니다.
++
++데이터 출처: [국토교통부 아파트 전월세 실거래가 자료](https://www.data.go.kr/data/15126474/openapi.do). 지역코드와 계약월을 사용하는 공식 자료입니다. 이번 차수에서 API 인증을 만들거나 자료를 새로 수집하지 않았습니다.
+--- /dev/null
++++ 2차/연구_실행.ps1
+@@ -0,0 +1,9 @@
++$ErrorActionPreference = 'Stop'
++Set-Location -LiteralPath $PSScriptRoot
++$env:OMP_NUM_THREADS = '2'
++$env:OPENBLAS_NUM_THREADS = '2'
++$pythonPath = Join-Path $PSScriptRoot '.venv/Scripts/python.exe'
++if (-not (Test-Path -LiteralPath $pythonPath)) { $pythonPath = Join-Path $PSScriptRoot '../1차/.venv/Scripts/python.exe' }
++if (-not (Test-Path -LiteralPath $pythonPath)) { throw '사용 안내에 따라 Python 환경을 먼저 준비해 주세요.' }
++& $pythonPath -B -X utf8 -m rentlab @args
++if ($LASTEXITCODE -ne 0) { throw '연구 처리가 실패했습니다. 원본과 기존 결과는 보존합니다.' }
