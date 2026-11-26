@@ -1,6 +1,6 @@
 # LEVEL 4 - Advanced
 
-This English guide covers revisions 1–4. [Revision 5 is currently documented in Korean](../../../5차/docs/차수설명.md#user-content-reading-level-4); its English translation is not yet available.
+**Latest: Round 5.** [Read the current round at this level](../round5.md#user-content-reading-level-4). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨4.md)
 
@@ -20,10 +20,18 @@ Round 4 separates raw-input preservation, public-source acquisition, feature val
 
 The information-group comparison measures predictive contribution under this protocol. It does not identify a causal treatment effect. The same input, target, contracts and algorithm are necessary to interpret differences; changing them would confound the comparison.
 
-[Round 4 at this level](../round4.md#user-content-reading-level-4) · [Current source](../../../4차/)
+[Round 4 at this level](../round4.md#user-content-reading-level-4) · [Round 4 source](../../../4차/)
 
 | Earlier round · Korean | Same-level detail |
 |---|---|
 | 1 | [Round 1](../../../2차/history/1차/차수설명.md#user-content-reading-level-4) |
 | 2 | [Round 2](../../../2차/docs/차수설명.md#user-content-reading-level-4) |
 | 3 | [Round 3](../../../3차/docs/차수설명.md#user-content-reading-level-4) |
+
+## Latest · Round 5
+
+| Focus | Current behavior | Boundary |
+|---|---|---|
+| Module boundaries | Exact-name/time lookup, address disagreement and coordinate quarantine | Do not fabricate publication timestamps or representative points |
+
+[Round 5 at this level](../round5.md#user-content-reading-level-4) · [Current source](../../../5차/)
