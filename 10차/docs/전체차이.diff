@@ -1,0 +1,1072 @@
+--- 9차/README.md
++++ 10차/README.md
+@@ -1,14 +1,12 @@
+-# Balance Compass · 새 연구 9차
+-
+-전국 아파트 임대료 예측과 예측구간 신뢰성 연구의 저장 결과 대조를 보강한다. 실제 학습은 중지 상태이며 실측 성능은 없다.
+-
+-| 검증 경로 | 9차 처리 | 한계 |
+-|---|---|---|
+-| 양쪽 저장 summary | 반환값과 저장 JSON을 분석 폴더 생성 전에 대조 | 원자료의 과거 사실성을 인증하지 않음 |
+-| 홀드아웃 보정 계약 | 일반 보정 자료에서 서울 제외 후 원행 집합·관측값 일치 확인 | 예측값은 모델별 차이를 허용 |
+-| 회귀 검사 | 기존 168개에 3개 검사 추가, 총 171개 통과 | 제어 입력 검사이며 실제 학습 아님 |
+-| 연구 상태 | 8가설·15개 평가·분할·수식·문턱 유지 | 실제 학습 중지·성능 미측정 |
+-
+-[차수 상세](docs/차수설명.md) · [직전 비교](docs/차수비교.md) · [전체 차수](docs/차수목록.md) · [실행 안내](사용안내.md) · [수식·인용](docs/논문_가설과_수식.md)
+-
+-[English · Round 9](../en/docs/round9.md)
++# Balance Compass · 새 연구 10차
++
++외부 특징과 위치 연산의 입력 경계를 보강한다. 실제 학습은 중지 상태이며 실측 성능은 없다.
++
++| 검증 경로 | 10차 수정 | 검증 범위 |
++|---|---|---|
++| 위치 계산 | 중복 인덱스를 내부 행 위치와 분리 | 원 인덱스·순서·단지별 값 보존 |
++| 식별키 | 숫자/문자 혼합을 임의 변환하지 않고 거부 | 문자열 01과1은 구분, 미상 키는 결측 유지 |
++| 특징 열 | 값/출처/결측 표시 열 모두 충돌 검사 | 기존 계약 열 덮어쓰기 거부 |
++| 회귀·산술 | 178개 검사 및 독립 직선거리 산술 대조 | 실제 위치 정답·역사적 시설 운영 인증 아님 |
++
++[차수 상세](docs/차수설명.md) · [직전 비교](docs/차수비교.md) · [전체 차수](docs/차수목록.md) · [사용 안내](사용안내.md) · [English](../en/docs/round10.md)
+--- 9차/docs/10차_특징경계검증.md
++++ 10차/docs/10차_특징경계검증.md
+@@ -0,0 +1,34 @@
++# 10차 외부 특징·위치 연산 경계 검증
++
++기준은 한영 안내가 보완된 공개9차 1c2d797이다. 실제 취득·학습은 실행하지 않고 제어 입력으로 누락된 경계를 재현했다. 8가설·15개 평가·기존 수식·시간 분할·과학 문턱은 유지한다.
++
++## 재현과 수리
++
++| 검증 경로 | 10차 수정 | 검증 범위 |
++|---|---|---|
++| 위치 계산 | 중복 인덱스를 내부 행 위치와 분리 | 원 인덱스·순서·단지별 값 보존 |
++| 식별키 | 숫자/문자 혼합을 임의 변환하지 않고 거부 | 문자열 01과1은 구분, 미상 키는 결측 유지 |
++| 특징 열 | 값/출처/결측 표시 열 모두 충돌 검사 | 기존 계약 열 덮어쓰기 거부 |
++| 회귀·산술 | 178개 검사 및 독립 직선거리 산술 대조 | 실제 위치 정답·역사적 시설 운영 인증 아님 |
++
++station_features에서 서로 다른 서울·부산 단지에 같은 행 인덱스7을 붙이면 기존 loc[7] 대입이 양쪽 행을 함께 갱신했다. 1km 내 물리역/노선 수의 정답[1,2]가[2,2]로 덮어써졌다. 내부 연산에 순차 위치 인덱스를 사용하고 반환 전에 원 인덱스를 복원했다. cluster_id와 원행 순서는 유지하고 원본 DataFrame을 변경하지 않는다. 좌표가 모두 결측인 조기 반환 경로도 원 인덱스를 보존한다. 조기 반환에서도 직선거리 설명·지구 반지름·역사적 가용성 미입증 메타데이터를 반환한다. 추가 검사에서 기존 누락을 KeyError1개로 재현한 뒤 설정 위치를 앞당겨 수리했다.
++
++외부 관측 entity_key/source_id/record_id와 계약 source_row_id/결합키, 공간 입력 cluster_id/facility_id/line은 문자열 식별자여야 한다. 기존에는 관측의 숫자1과 문자열1이 by_key의 str 변환에서 같은 키가 되어 관측이 덮어써질 수 있었다. 노선 수 집계도 원형/문자열 변환의 차이로 환승 판정과 일치하지 않을 수 있었다. 이제 숫자·불리언 등 비문자 식별자를 ValueError로 거부한다. 공란/누락의 기존 규칙은 유지한다. 계약의 미상 결합키는 결측 특징으로 남길 수 있고, 원행ID·원천ID·시설/노선ID의 누락은 계속 거부한다. 숫자를 임의로 문자열화하거나 앞자리0을 복원하지 않는다. 표준 특징 CSV는 문자열을 보존해 읽으므로 정상 입력 방식은 유지된다.
++
++join_features는 특징명 자체만 충돌 검사하고 특징명__record와 특징명__missing을 덮어쓸 수 있었다. 현재 관측에서 실제 생성하는 세 종류 열의 집합을 먼저 계산해 계약 표와 하나라도 겹치면 쓰기 전에 거부한다. 기존 값을 지우거나 이름을 자동 변경하지 않는다.
++
++## 검증 근거와 수치
++
++| 검사 | 수정 전 | 수정 후 |
++|---|---|---|
++| 새7개 회귀 method | 11개 하위 조건 실패 | 7개 통과 |
++| 전체 통합 | 9차171개 | 10차178개, 조기 반환 수리 후 전체 재실행 |
++| 직접 haversine 대조 | 별도 제어 산술 | 40개 단지·25개 물리역·30개 노선기록 |
++| 최근접 거리 최대 절대차 | 기준: 직접 atan2 산술 | 1.924×10⁻⁹m 미만 |
++| 거리/개수/환승 | 중복 원행 인덱스 포함 | 500m/1000m 역수·노선수·환승거리 모두 일치 |
++
++산술 차이는 코드의 수치 일치 정도이며 실제 좌표 측량 오차나 위치 정확도가 아니다. 제어 좌표는 고정 시드20261127로 생성했다. 실제 위치·시설표를 정정하거나 실제 계약을 다시 학습한 결과가 아니다. 모든 검사는 원본 보존과 실제 stopped_by_user 기록 SHA 불변을 확인했다.
++
++## 남아 있는 연구 한계
++
++단지 식별자 미상31행, 독립 위치 정답, 시설·인구·임대차 자료의 계약 당시 공개 판본, 실제 대규모 자원·예측 성능은 여전히 미입증이다. 직선거리 계산은 보행거리나 전국 시설 완전성을 증명하지 않는다. 과거4,845,086행 전수 감사는8차 기록으로 보존하며10차에서 재실행했다고 주장하지 않는다. 원문/모델/운영 근거는 공개하지 않는다. [9차 기록](9차_결과대조.md), [가설·수식·인용](논문_가설과_수식.md), [전체 차이](전체차이.diff).
+--- 9차/docs/읽기안내/레벨1.md
++++ 10차/docs/읽기안내/레벨1.md
+@@ -1,13 +1,11 @@
+-# LEVEL 1 - Beginner
+-
+-실험 결과 상자의 이름표와 상자 안의 기록이 같은지 양쪽 모두 확인한다. 서로 다른 계약의 보정 자료가 섞이면 계산 전에 멈춘다. 검사 통과가 실제 예측 성능을 뜻하지는 않는다.
+-
+-| 쉬운 상황 | 확인하는 것 | 결과 |
+-|---|---|---|
+-| 상자의 이름표와 내용이 다름 | 결과 요약과 저장 기록 | 계산 전에 중단 |
+-| 다른 계약이 섞임 | 같은 계약 번호인지 | 잘못된 비교 거부 |
+-| 새 모델의 예측이 달라짐 | 관측 계약은 그대로인지 | 정상 비교 허용 |
+-
+-[차수 상세](../차수설명.md#user-content-reading-level-1) · [직전 비교](../차수비교.md) · [전체 차수](../차수목록.md)
+-
+-[English at this level](../../../en/docs/round9.md#user-content-reading-level-1)
++# LEVEL 1 - Beginner
++
++표의 왼쪽 행 번호가 같아도 같은 단지는 아니다. 서로 다른 두 단지의 주변 역 수가 마지막 값으로 덮어써지는 문제를 고쳤다. 기존 정보가 있는 칸은 새 특징으로 덮어쓰지 않는다.
++
++| 상황 | 판단 | 동작 |
++|---|---|---|
++| 행 번호는 같고 단지가 다름 | 각각 다른 관측 | 단지별 값을 따로 계산 |
++| 기존 정보가 있는 열 | 보존할 원본 | 새 결합을 거부 |
++| 모르는 단지 키 | 근거 부족 | 가짜 번호 없이 결측 유지 |
++
++[상세](../차수설명.md#user-content-reading-level-1) · [공통 근거](../10차_특징경계검증.md) · [English](../../../en/docs/round10.md#user-content-reading-level-1)
+--- 9차/docs/읽기안내/레벨2.md
++++ 10차/docs/읽기안내/레벨2.md
+@@ -1,13 +1,11 @@
+-# LEVEL 2 - Explorer
+-
+-일반 보정 계약에서 서울 계약만 제외한 집합이 홀드아웃 보정 계약과 같아야 한다. 계약 번호·정답·날짜·지역·단지는 같아야 하고 별도 모델의 예측값은 달라도 된다.
+-
+-| 자료 흐름 | 남겨야 할 것 | 달라도 되는 것 |
+-|---|---|---|
+-| 일반 보정 → 서울 제외 | 나머지 계약 번호 전체 | 행의 나열 순서 |
+-| 일반 ↔ 홀드아웃 관측 | 실제 금액·계약일·지역·단지 | 별도 모델의 예측 |
+-| 요약 → 분석 복사본 | 값과 JSON 자료형·검사한 바이트 | 분석 결과용 파일 이름 |
+-
+-[차수 상세](../차수설명.md#user-content-reading-level-2) · [직전 비교](../차수비교.md) · [전체 차수](../차수목록.md)
+-
+-[English at this level](../../../en/docs/round9.md#user-content-reading-level-2)
++# LEVEL 2 - Explorer
++
++원행ID는 계약을, 단지ID는 위치를 가리키며 표 인덱스는 행 표식이다. 01과1처럼 다른 문자열 식별자를 구분한다. 숫자1을 문자열1로 자동 바꿔 연결하지 않는다.
++
++| 자료 | 확인 항목 | 결과 |
++|---|---|---|
++| 계약→관측 | 문자열 결합키 | 정확한 키만 연결 |
++| 단지→공간연산 | 고유 cluster_id와 좌표 | 인덱스 중복과 분리 |
++| 특징→출력 | 값·출처·결측 열 | 기존 열과 충돌하면 중단 |
++
++[상세](../차수설명.md#user-content-reading-level-2) · [공통 근거](../10차_특징경계검증.md) · [English](../../../en/docs/round10.md#user-content-reading-level-2)
+--- 9차/docs/읽기안내/레벨3.md
++++ 10차/docs/읽기안내/레벨3.md
+@@ -1,14 +1,11 @@
+-# LEVEL 3 - Practitioner
+-
+-Python 3.12와 고정 의존성 및 Rust 파서 환경에서 python -B -X utf8 -m unittest discover -s tests -v로 제어 검사를 실행한다. 171개 통과를 관측했다. summary 불일치와 보정 집합/관측값 불일치는 ValueError로 중단한다. 실제 학습 명령은 실행하지 않았다.
+-
+-| 실행 단계 | 확인 위치 | 오류 처리 |
+-|---|---|---|
+-| 제어 검사 | unittest discover, 총171개 | 실패하면 완료 처리하지 않음 |
+-| 통합 전 | 양쪽 summary.json | 누락·값/자료형 불일치 거부 |
+-| 보정 대조 | calibration_predictions.csv | 집합·관측 불일치 ValueError |
+-| 결과 추적 | 입력검증.json, 일반원본_summary.json | 원본 결과와 별도 보관 |
+-
+-[차수 상세](../차수설명.md#user-content-reading-level-3) · [직전 비교](../차수비교.md) · [전체 차수](../차수목록.md)
+-
+-[English at this level](../../../en/docs/round9.md#user-content-reading-level-3)
++# LEVEL 3 - Practitioner
++
++Python3.12·고정 의존성·Rust 파서 환경에서 python -B -X utf8 -m unittest discover -s tests -v를 실행해178개 통과를 관측했다. 식별자 문자열 오류나 기존 열 충돌은 입력을 자동 고치지 않고 ValueError로 알린다. 실제 학습은 중지 상태다.
++
++| 검사 | 입력/위치 | 예상 동작 |
++|---|---|---|
++| 회귀7개 | test_feature_boundaries_v10.py | 중복 인덱스·키 자료형·생성 열 검증 |
++| 정상 경계 | 01/1, 미상 결합키 | 구분/결측을 보존 |
++| 직접 산술 | 40단지/25역 제어 좌표 | 거리·역수·노선수·환승 대조 |
++
++[상세](../차수설명.md#user-content-reading-level-3) · [공통 근거](../10차_특징경계검증.md) · [English](../../../en/docs/round10.md#user-content-reading-level-3)
+--- 9차/docs/읽기안내/레벨4.md
++++ 10차/docs/읽기안내/레벨4.md
+@@ -1,14 +1,11 @@
+-# LEVEL 4 - Advanced
+-
+-combine_results는 두 summary를 분석 디렉터리 생성 전에 대조하고 읽은 동일 바이트를 복사한다. 보정 집합은 source_row_id 인덱스로 정렬해 비교하므로 순서를 강제하지 않는다. 원본 일반 summary와 분석 summary를 다른 이름으로 보관한다.
+-
+-| 모듈 계약 | 비교 방법 | 보존 파일 |
+-|---|---|---|
+-| combine_results | JSON 자료형을 구분하는 정렬 직렬화 비교 | 일반원본_summary.json, 홀드아웃/summary.json |
+-| write_research_results | source_row_id 집합 비교 후 ID 정렬 | 각 보정 CSV의 실제 읽은 바이트 해시 |
+-| 관측 열 | 문자열3개·정답 수치의 동일성 | date·region·cluster_id·actual_won |
+-| 학습 산출 열 | 동일값 강제 안 함 | prediction_won의 별도 추정 허용 |
+-
+-[차수 상세](../차수설명.md#user-content-reading-level-4) · [직전 비교](../차수비교.md) · [전체 차수](../차수목록.md)
+-
+-[English at this level](../../../en/docs/round9.md#user-content-reading-level-4)
++# LEVEL 4 - Advanced
++
++station_features는 내부 reset_index 후 원 인덱스를 복원한다. validate_observations와 join_features는 식별자 타입을 검사한다. join_features는 현재 관측의 생성 열 집합을 계산한 뒤 충돌을 차단한다. 원본 표와 ID를 제자리 수정하지 않는다.
++
++| 모듈 | 경계 처리 | 보존 조건 |
++|---|---|---|
++| station_features | 위치 인덱스로 대입 | 원 인덱스·순서 복원 |
++| feature_store | 문자열 ID 검증 | 강제 변환·키 병합 없음 |
++| join_features | feature/+__record/+__missing | 충돌 시 대입 전 실패 |
++
++[상세](../차수설명.md#user-content-reading-level-4) · [공통 근거](../10차_특징경계검증.md) · [English](../../../en/docs/round10.md#user-content-reading-level-4)
+--- 9차/docs/읽기안내/레벨5.md
++++ 10차/docs/읽기안내/레벨5.md
+@@ -1,14 +1,11 @@
+-# LEVEL 5 - Expert
+-
+-같은 원천 manifest·설정이라는 선언만으로 결과 보정 행의 동일성을 대신하지 않는다. 이 수리는 H5 비교 입력의 추적성을 강화하지만 단지 간 독립성·시간 교환가능성·인과 일반화를 증명하지 않는다. 기존 8가설·15개 평가 및 다중평가 구간 조건은 유지하며 미입증 역사판과 군집 결손은 그대로 보고한다.
+-
+-| 연구 조건 | 9차가 확인하는 범위 | 입증하지 않는 범위 |
+-|---|---|---|
+-| H5 비교 입력 | 서울 제외 보정 모집합과 관측 키 동일성 | 지역 이동의 인과적 효과 |
+-| 분석 추적성 | 반환 요약·저장 JSON·복사 해시 연결 | 역사판과 원천 자료의 사실성 |
+-| 불확실성 | 기존 단지 bootstrap·15평가 규칙 유지 | 시간/군집 독립성과 포함률 보장 |
+-| 실측 주장 | 제어 검사만171개 통과 | 실제 성능·가설 지지·논문 완료 |
+-
+-[차수 상세](../차수설명.md#user-content-reading-level-5) · [직전 비교](../차수비교.md) · [전체 차수](../차수목록.md)
+-
+-[English at this level](../../../en/docs/round9.md#user-content-reading-level-5)
++# LEVEL 5 - Expert
++
++BallTree 결과를 별도의 haversine atan2 산술과 대조했다. 이는 같은 좌표로 계산한 수치 일관성을 확인하며 실제 좌표 정확도·시설 운영 이력·모집단 완전성을 증명하지 않는다. 결측 식별자와 역사판 제한은 통계 추론에서 그대로 유지한다.
++
++| 증거 | 확인한 범위 | 확인하지 못한 범위 |
++|---|---|---|
++| 직접 거리 산술 | 최대차<1.924×10⁻⁹m | 현장 측량 정확도 |
++| 개수/환승 대조 | 제어 물리역25개/노선30행 | 전국 시설 완전성·보행거리 |
++| 178개 회귀 | 기술 조건·이전 동작 보존 | 실측 성능·가설 지지·오류부재 절대보장 |
++
++[상세](../차수설명.md#user-content-reading-level-5) · [공통 근거](../10차_특징경계검증.md) · [English](../../../en/docs/round10.md#user-content-reading-level-5)
+--- 9차/docs/차수목록.md
++++ 10차/docs/차수목록.md
+@@ -1,15 +1,16 @@
+-# 새 연구 전체 차수
+-
+-| 차수 | 자료 폴더 | 상세 | 직전 비교 |
+-|---|---|---|---|
+-| 새 연구 1차 | [보존](../../2차/history/1차/) | [상세](../../2차/history/1차/차수설명.md) | [초기](../../2차/history/1차/차수설명.md) |
+-| 새 연구 2차 | [소스](../../2차/) | [상세](../../2차/docs/차수설명.md) | [1→2](../../2차/docs/차수비교.md) |
+-| 새 연구 3차 | [소스](../../3차/) | [상세](../../3차/docs/차수설명.md) | [2→3](../../3차/docs/차수비교.md) |
+-| 새 연구 4차 | [소스](../../4차/) | [상세](../../4차/docs/차수설명.md) | [3→4](../../4차/docs/차수비교.md) |
+-| 새 연구 5차 | [소스](../../5차/) | [상세](../../5차/docs/차수설명.md) | [4→5](../../5차/docs/차수비교.md) |
+-| 새 연구 6차 | [소스](../../6차/) | [상세](../../6차/docs/차수설명.md) | [5→6](../../6차/docs/차수비교.md) |
+-| 새 연구 7차 | [소스](../../7차/) | [상세](../../7차/docs/차수설명.md) | [6→7](../../7차/docs/차수비교.md) |
+-| 새 연구 8차 | [소스](../../8차/) | [상세](../../8차/docs/차수설명.md) | [7→8](../../8차/docs/차수비교.md) |
+-| 새 연구 9차 | [소스](../../9차/) | [상세](../../9차/docs/차수설명.md) | [8→9](../../9차/docs/차수비교.md) |
+-
+-9차는 저장 결과 대조 보강이며 실제 학습은 중지 상태다.
++# 새 연구 전체 차수
++
++| 차수 | 자료 폴더 | 상세 | 직전 비교 |
++|---|---|---|---|
++| 새 연구 1차 | [보존](../../2차/history/1차/) | [상세](../../2차/history/1차/차수설명.md) | [초기](../../2차/history/1차/차수설명.md) |
++| 새 연구 2차 | [소스](../../2차/) | [상세](../../2차/docs/차수설명.md) | [1→2](../../2차/docs/차수비교.md) |
++| 새 연구 3차 | [소스](../../3차/) | [상세](../../3차/docs/차수설명.md) | [2→3](../../3차/docs/차수비교.md) |
++| 새 연구 4차 | [소스](../../4차/) | [상세](../../4차/docs/차수설명.md) | [3→4](../../4차/docs/차수비교.md) |
++| 새 연구 5차 | [소스](../../5차/) | [상세](../../5차/docs/차수설명.md) | [4→5](../../5차/docs/차수비교.md) |
++| 새 연구 6차 | [소스](../../6차/) | [상세](../../6차/docs/차수설명.md) | [5→6](../../6차/docs/차수비교.md) |
++| 새 연구 7차 | [소스](../../7차/) | [상세](../../7차/docs/차수설명.md) | [6→7](../../7차/docs/차수비교.md) |
++| 새 연구 8차 | [소스](../../8차/) | [상세](../../8차/docs/차수설명.md) | [7→8](../../8차/docs/차수비교.md) |
++| 새 연구 9차 | [소스](../../9차/) | [상세](../../9차/docs/차수설명.md) | [8→9](../../9차/docs/차수비교.md) |
++| 새 연구 10차 | [소스](../../10차/) | [상세](../../10차/docs/차수설명.md) | [9→10](../../10차/docs/차수비교.md) |
++
++10차는 외부 특징·위치 연산 경계 수리이며 실제 학습은 중지 상태다.
+--- 9차/docs/차수비교.md
++++ 10차/docs/차수비교.md
+@@ -1,12 +1,11 @@
+-# 새 연구 8차 → 9차
+-
+-| 구분 | 8차 | 9차 |
+-|---|---|---|
+-| 저장 summary | 일반 반환값과 저장 파일 대조 없음, 홀드아웃은 복사 후 대조 | 양쪽 분석 전 대조·검사한 동일 바이트 보관 |
+-| 홀드아웃 보정 | 제외 지역/형식/건수 검사 | 같은 원천의 서울 제외 원행 집합·관측값 대조 추가 |
+-| 검사 | 168개(완료 가드2개 포함) | 171개 |
+-| 가설·수식·학습 | 8가설15평가·학습 중지 | 유지 |
+-
+-추가: docs/9차_결과대조.md, tests/test_result_binding_v9.py. 수정: experiment_runner.py, research_metrics.py 및9차 설명·탐색. 삭제: 공개 파일 삭제 없음. 일반원본_summary.json은 실행 시 생성하는 별도 분석 근거이며 실제 결과를 지금 생성하지 않았다.
+-
+-[전체 차이](전체차이.diff) · [검증 상세](9차_결과대조.md)
++# 새 연구 9차 → 10차
++
++| 항목 | 9차 | 10차 |
++|---|---|---|
++| 중복 원행 인덱스 | 단지별 역/노선 수 덮어쓰기 가능 | 위치 계산 후 원 인덱스 복원 |
++| 혼합 식별자 | str 변환으로 키 충돌 가능 | 관측/계약/공간의 비문자 식별자 거부 |
++| 생성 열 충돌 | 특징명만 검사 | 값/출처/결측 표시 열 모두 검사 |
++| 검사 | 171개 | 178개 + 직접 공간 산술 대조 |
++| 연구 조건 | 8가설15평가·실제 중지 | 유지 |
++
++추가2파일·수정2모듈 및 차수 설명/탐색/버전 표기. 이전9차 원본·한영 설명과 결과는 보존한다. [전체 차이](전체차이.diff) · [검증 상세](10차_특징경계검증.md)
+--- 9차/docs/차수설명.md
++++ 10차/docs/차수설명.md
+@@ -1,86 +1,83 @@
+-# 새 연구 9차 상세
+-
+-[결과 대조 검증](9차_결과대조.md) · [직전 비교](차수비교.md) · [수식·인용](논문_가설과_수식.md)
+-
+-<a id="reading-level-1"></a>
+-
+-## LEVEL 1 - Beginner
+-
+-### 저장 결과의 이름표 확인
+-
+-실험 결과 상자의 이름표와 상자 안의 기록이 같은지 양쪽 모두 확인한다. 서로 다른 계약의 보정 자료가 섞이면 계산 전에 멈춘다. 검사 통과가 실제 예측 성능을 뜻하지는 않는다.
+-
+-| 쉬운 상황 | 확인하는 것 | 결과 |
+-|---|---|---|
+-| 상자의 이름표와 내용이 다름 | 결과 요약과 저장 기록 | 계산 전에 중단 |
+-| 다른 계약이 섞임 | 같은 계약 번호인지 | 잘못된 비교 거부 |
+-| 새 모델의 예측이 달라짐 | 관측 계약은 그대로인지 | 정상 비교 허용 |
+-
+-[English at this level](../../en/docs/round9.md#user-content-reading-level-1) · [프로젝트 같은 수준](../../docs/읽기안내/레벨1.md) · [이전8차 같은 수준](../../8차/docs/차수설명.md#user-content-reading-level-1) · [검증 상세](9차_결과대조.md)
+-
+-<a id="reading-level-2"></a>
+-
+-## LEVEL 2 - Explorer
+-
+-### 같은 계약을 따라 대조
+-
+-일반 보정 계약에서 서울 계약만 제외한 집합이 홀드아웃 보정 계약과 같아야 한다. 계약 번호·정답·날짜·지역·단지는 같아야 하고 별도 모델의 예측값은 달라도 된다.
+-
+-| 자료 흐름 | 남겨야 할 것 | 달라도 되는 것 |
+-|---|---|---|
+-| 일반 보정 → 서울 제외 | 나머지 계약 번호 전체 | 행의 나열 순서 |
+-| 일반 ↔ 홀드아웃 관측 | 실제 금액·계약일·지역·단지 | 별도 모델의 예측 |
+-| 요약 → 분석 복사본 | 값과 JSON 자료형·검사한 바이트 | 분석 결과용 파일 이름 |
+-
+-[English at this level](../../en/docs/round9.md#user-content-reading-level-2) · [프로젝트 같은 수준](../../docs/읽기안내/레벨2.md) · [이전8차 같은 수준](../../8차/docs/차수설명.md#user-content-reading-level-2) · [검증 상세](9차_결과대조.md)
+-
+-<a id="reading-level-3"></a>
+-
+-## LEVEL 3 - Practitioner
+-
+-### 실행과 오류 확인
+-
+-Python 3.12와 고정 의존성 및 Rust 파서 환경에서 python -B -X utf8 -m unittest discover -s tests -v로 제어 검사를 실행한다. 171개 통과를 관측했다. summary 불일치와 보정 집합/관측값 불일치는 ValueError로 중단한다. 실제 학습 명령은 실행하지 않았다.
+-
+-| 실행 단계 | 확인 위치 | 오류 처리 |
+-|---|---|---|
+-| 제어 검사 | unittest discover, 총171개 | 실패하면 완료 처리하지 않음 |
+-| 통합 전 | 양쪽 summary.json | 누락·값/자료형 불일치 거부 |
+-| 보정 대조 | calibration_predictions.csv | 집합·관측 불일치 ValueError |
+-| 결과 추적 | 입력검증.json, 일반원본_summary.json | 원본 결과와 별도 보관 |
+-
+-[English at this level](../../en/docs/round9.md#user-content-reading-level-3) · [프로젝트 같은 수준](../../docs/읽기안내/레벨3.md) · [이전8차 같은 수준](../../8차/docs/차수설명.md#user-content-reading-level-3) · [검증 상세](9차_결과대조.md)
+-
+-<a id="reading-level-4"></a>
+-
+-## LEVEL 4 - Advanced
+-
+-### 저장 바이트와 관측 키 연결
+-
+-combine_results는 두 summary를 분석 디렉터리 생성 전에 대조하고 읽은 동일 바이트를 복사한다. 보정 집합은 source_row_id 인덱스로 정렬해 비교하므로 순서를 강제하지 않는다. 원본 일반 summary와 분석 summary를 다른 이름으로 보관한다.
+-
+-| 모듈 계약 | 비교 방법 | 보존 파일 |
+-|---|---|---|
+-| combine_results | JSON 자료형을 구분하는 정렬 직렬화 비교 | 일반원본_summary.json, 홀드아웃/summary.json |
+-| write_research_results | source_row_id 집합 비교 후 ID 정렬 | 각 보정 CSV의 실제 읽은 바이트 해시 |
+-| 관측 열 | 문자열3개·정답 수치의 동일성 | date·region·cluster_id·actual_won |
+-| 학습 산출 열 | 동일값 강제 안 함 | prediction_won의 별도 추정 허용 |
+-
+-[English at this level](../../en/docs/round9.md#user-content-reading-level-4) · [프로젝트 같은 수준](../../docs/읽기안내/레벨4.md) · [이전8차 같은 수준](../../8차/docs/차수설명.md#user-content-reading-level-4) · [검증 상세](9차_결과대조.md)
+-
+-<a id="reading-level-5"></a>
+-
+-## LEVEL 5 - Expert
+-
+-### 추론 조건과 구현 검증 구분
+-
+-같은 원천 manifest·설정이라는 선언만으로 결과 보정 행의 동일성을 대신하지 않는다. 이 수리는 H5 비교 입력의 추적성을 강화하지만 단지 간 독립성·시간 교환가능성·인과 일반화를 증명하지 않는다. 기존 8가설·15개 평가 및 다중평가 구간 조건은 유지하며 미입증 역사판과 군집 결손은 그대로 보고한다.
+-
+-| 연구 조건 | 9차가 확인하는 범위 | 입증하지 않는 범위 |
+-|---|---|---|
+-| H5 비교 입력 | 서울 제외 보정 모집합과 관측 키 동일성 | 지역 이동의 인과적 효과 |
+-| 분석 추적성 | 반환 요약·저장 JSON·복사 해시 연결 | 역사판과 원천 자료의 사실성 |
+-| 불확실성 | 기존 단지 bootstrap·15평가 규칙 유지 | 시간/군집 독립성과 포함률 보장 |
+-| 실측 주장 | 제어 검사만171개 통과 | 실제 성능·가설 지지·논문 완료 |
+-
+-[English at this level](../../en/docs/round9.md#user-content-reading-level-5) · [프로젝트 같은 수준](../../docs/읽기안내/레벨5.md) · [이전8차 같은 수준](../../8차/docs/차수설명.md#user-content-reading-level-5) · [검증 상세](9차_결과대조.md)
++# 새 연구 10차 상세
++
++[전체 경계 검증](10차_특징경계검증.md) · [직전 비교](차수비교.md) · [수식·출처](논문_가설과_수식.md)
++
++<a id="reading-level-1"></a>
++
++## LEVEL 1 - Beginner
++
++### 서로 다른 단지의 값을 지키기
++
++표의 왼쪽 행 번호가 같아도 같은 단지는 아니다. 서로 다른 두 단지의 주변 역 수가 마지막 값으로 덮어써지는 문제를 고쳤다. 기존 정보가 있는 칸은 새 특징으로 덮어쓰지 않는다.
++
++| 상황 | 판단 | 동작 |
++|---|---|---|
++| 행 번호는 같고 단지가 다름 | 각각 다른 관측 | 단지별 값을 따로 계산 |
++| 기존 정보가 있는 열 | 보존할 원본 | 새 결합을 거부 |
++| 모르는 단지 키 | 근거 부족 | 가짜 번호 없이 결측 유지 |
++
++[공통 원수치·제약](10차_특징경계검증.md) · [프로젝트 같은 수준](../../docs/읽기안내/레벨1.md) · [English](../../en/docs/round10.md#user-content-reading-level-1) · [이전9차](../../9차/docs/차수설명.md#user-content-reading-level-1)
++
++<a id="reading-level-2"></a>
++
++## LEVEL 2 - Explorer
++
++### 원행·단지 키·특징을 구분하기
++
++원행ID는 계약을, 단지ID는 위치를 가리키며 표 인덱스는 행 표식이다. 01과1처럼 다른 문자열 식별자를 구분한다. 숫자1을 문자열1로 자동 바꿔 연결하지 않는다.
++
++| 자료 | 확인 항목 | 결과 |
++|---|---|---|
++| 계약→관측 | 문자열 결합키 | 정확한 키만 연결 |
++| 단지→공간연산 | 고유 cluster_id와 좌표 | 인덱스 중복과 분리 |
++| 특징→출력 | 값·출처·결측 열 | 기존 열과 충돌하면 중단 |
++
++[공통 원수치·제약](10차_특징경계검증.md) · [프로젝트 같은 수준](../../docs/읽기안내/레벨2.md) · [English](../../en/docs/round10.md#user-content-reading-level-2) · [이전9차](../../9차/docs/차수설명.md#user-content-reading-level-2)
++
++<a id="reading-level-3"></a>
++
++## LEVEL 3 - Practitioner
++
++### 검사를 실행하고 실패를 읽기
++
++Python3.12·고정 의존성·Rust 파서 환경에서 python -B -X utf8 -m unittest discover -s tests -v를 실행해178개 통과를 관측했다. 식별자 문자열 오류나 기존 열 충돌은 입력을 자동 고치지 않고 ValueError로 알린다. 실제 학습은 중지 상태다.
++
++| 검사 | 입력/위치 | 예상 동작 |
++|---|---|---|
++| 회귀7개 | test_feature_boundaries_v10.py | 중복 인덱스·키 자료형·생성 열 검증 |
++| 정상 경계 | 01/1, 미상 결합키 | 구분/결측을 보존 |
++| 직접 산술 | 40단지/25역 제어 좌표 | 거리·역수·노선수·환승 대조 |
++
++[공통 원수치·제약](10차_특징경계검증.md) · [프로젝트 같은 수준](../../docs/읽기안내/레벨3.md) · [English](../../en/docs/round10.md#user-content-reading-level-3) · [이전9차](../../9차/docs/차수설명.md#user-content-reading-level-3)
++
++<a id="reading-level-4"></a>
++
++## LEVEL 4 - Advanced
++
++### 모듈의 행 위치와 출력 계약
++
++station_features는 내부 reset_index 후 원 인덱스를 복원한다. validate_observations와 join_features는 식별자 타입을 검사한다. join_features는 현재 관측의 생성 열 집합을 계산한 뒤 충돌을 차단한다. 원본 표와 ID를 제자리 수정하지 않는다.
++
++| 모듈 | 경계 처리 | 보존 조건 |
++|---|---|---|
++| station_features | 위치 인덱스로 대입 | 원 인덱스·순서 복원 |
++| feature_store | 문자열 ID 검증 | 강제 변환·키 병합 없음 |
++| join_features | feature/+__record/+__missing | 충돌 시 대입 전 실패 |
++
++[공통 원수치·제약](10차_특징경계검증.md) · [프로젝트 같은 수준](../../docs/읽기안내/레벨4.md) · [English](../../en/docs/round10.md#user-content-reading-level-4) · [이전9차](../../9차/docs/차수설명.md#user-content-reading-level-4)
++
++<a id="reading-level-5"></a>
++
++## LEVEL 5 - Expert
++
++### 수치 검증과 위치 정답의 차이
++
++BallTree 결과를 별도의 haversine atan2 산술과 대조했다. 이는 같은 좌표로 계산한 수치 일관성을 확인하며 실제 좌표 정확도·시설 운영 이력·모집단 완전성을 증명하지 않는다. 결측 식별자와 역사판 제한은 통계 추론에서 그대로 유지한다.
++
++| 증거 | 확인한 범위 | 확인하지 못한 범위 |
++|---|---|---|
++| 직접 거리 산술 | 최대차<1.924×10⁻⁹m | 현장 측량 정확도 |
++| 개수/환승 대조 | 제어 물리역25개/노선30행 | 전국 시설 완전성·보행거리 |
++| 178개 회귀 | 기술 조건·이전 동작 보존 | 실측 성능·가설 지지·오류부재 절대보장 |
++
++[공통 원수치·제약](10차_특징경계검증.md) · [프로젝트 같은 수준](../../docs/읽기안내/레벨5.md) · [English](../../en/docs/round10.md#user-content-reading-level-5) · [이전9차](../../9차/docs/차수설명.md#user-content-reading-level-5)
+--- 9차/rentlab/feature_store.py
++++ 10차/rentlab/feature_store.py
+@@ -1,171 +1,176 @@
+-"""등록된 외부 수치 특징의 날짜·공표시점 결합. 계약 원행을 복제하지 않는다."""
+-from __future__ import annotations
+-from datetime import datetime
+-import hashlib
+-import csv
+-import json
+-from pathlib import Path
+-import numpy as np
+-import pandas as pd
+-
+-# 원자료의 정답이나 임의 칼럼을 특징 이름으로 주입할 수 없다.
+-FEATURES={
+- 'building':['households','buildings','max_floor','relative_floor','parking_per_household',
+-             'elevators_per_household','coverage_ratio','floor_area_ratio'],
+- 'access':['station_distance_m','stations_500m','stations_1000m','lines_1000m','transfer_distance_m',
+-           'primary_distance_m','middle_distance_m','high_distance_m','primary_count_1000m',
+-           'park_distance_m','park_area_1000m','hospital_distance_m','hospital_count_1000m'],
+- 'supply_demand':['population','resident_households','population_yoy','households_yoy',
+-                  'persons_per_household','unsold','completed_unsold'],
+- 'market':['base_rate','lending_rate','cpi','jeonse_index','monthly_index','jeonse_index_yoy','monthly_index_yoy'],
+- 'lagged_prices':['rent_count_90d','rent_count_180d','jeonse_median_per_m2','monthly_median_per_m2',
+-                  'sale_count_180d','sale_median_per_m2','days_from_published_contract']}
+-ALLOWED={x for group in FEATURES.values() for x in group}
+-MODES={'strict_asof','retrospective_snapshot'}
+-
+-
+-def validate_feature_manifest(descriptor, root):
+-    """해시·행수·등록 특징·원천 파일 근거 확인. 날짜의 역사적 사실성 자체를 인증하지 않는다."""
+-    root=Path(root).resolve()
+-    required={'path','sha256','rows','features','sources','status','key_column'}
+-    if not isinstance(descriptor,dict) or not required.issubset(descriptor) or descriptor['status']!='verified_feature_snapshot':
+-        raise ValueError('특징 스냅숏 명세 누락/미검증')
+-    if not isinstance(descriptor['features'],list) or any(not isinstance(x,str) for x in descriptor['features']) or not descriptor['features'] or len(descriptor['features'])!=len(set(descriptor['features'])) or not set(descriptor['features']).issubset(ALLOWED):
+-        raise ValueError('특징 목록 오류')
+-    if descriptor['key_column'] not in {'cluster_id','region'}:raise ValueError('허용하지 않는 결합키')
+-    def checked(record):
+-        if (not isinstance(record,dict) or not isinstance(record.get('path'),str) or not record['path']
+-                or not isinstance(record.get('sha256'),str)):
+-            raise ValueError('특징/원천 파일 명세 형식 오류')
+-        p=(root/record['path']).resolve(strict=True)
+-        if not p.is_relative_to(root):raise ValueError('특징/원천 파일 범위 이탈')
+-        digest=hashlib.sha256()
+-        with p.open('rb') as stream:
+-            for chunk in iter(lambda:stream.read(1024*1024),b''):digest.update(chunk)
+-        if digest.hexdigest()!=record['sha256']:raise ValueError('특징/원천 해시 불일치')
+-        return p
+-    sources=descriptor['sources']
+-    if not isinstance(sources,list) or not sources:raise ValueError('원천 증거 없음')
+-    identifiers=set()
+-    for source in sources:
+-        if not isinstance(source,dict) or not {'path','sha256','source_id','source_url','acquired_at','status','rows'}.issubset(source):raise ValueError('원천 명세 누락')
+-        if not isinstance(source['source_id'],str) or not source['source_id'].strip() or source['source_id'] in identifiers:
+-            raise ValueError('원천 source_id 누락/중복')
+-        if source['status']!='acquired_current_snapshot' or not isinstance(source['source_url'],str) or not source['source_url'].startswith('https://'):
+-            raise ValueError('격리/미취득 원천 또는 출처 오류')
+-        try:acquired=datetime.fromisoformat(str(source['acquired_at']).replace('Z','+00:00'))
+-        except ValueError as e:raise ValueError('원천 취득 시각 오류') from e
+-        if acquired.tzinfo is None:raise ValueError('원천 취득 시각 시간대 누락')
+-        p=checked(source)
+-        if p.suffix.lower()!='.csv':raise ValueError('원천 표준 CSV만 지원: 원 JSON도 별도 보존 필요')
+-        try:
+-            with p.open(encoding=source.get('encoding','utf-8-sig'),newline='') as stream:
+-                reader=csv.reader(stream,strict=True);header=next(reader,None);count=0
+-                if not header or len(set(header))!=len(header) or any(not name.strip() or '\x00' in name for name in header):
+-                    raise ValueError('원천 머리글 오류')
+-                for row in reader:
+-                    if len(row)!=len(header) or any('\x00' in value for value in row):raise ValueError('원천 칼럼 수/NUL 오류')
+-                    count+=1
+-        except (csv.Error,UnicodeError,LookupError) as error:
+-            raise ValueError('원천 CSV 인코딩/인용 구조 오류') from error
+-        if isinstance(source['rows'],bool) or not isinstance(source['rows'],int) or source['rows']!=count:
+-            raise ValueError('원천 행 수 불일치')
+-        identifiers.add(source['source_id'])
+-    path=checked(descriptor)
+-    from .input_contracts import strict_csv
+-    raw=path.read_bytes()
+-    if hashlib.sha256(raw).hexdigest()!=descriptor['sha256']:raise ValueError('특징 입력 읽기 중 해시 변경')
+-    obs=strict_csv(raw)
+-    if not isinstance(descriptor['rows'],int) or isinstance(descriptor['rows'],bool) or len(obs)!=descriptor['rows']:
+-        raise ValueError('특징 행 수 불일치')
+-    if not {'feature','source_id'}.issubset(obs) or set(obs.feature)!=set(descriptor['features']) or not set(obs.source_id).issubset(identifiers):
+-        raise ValueError('특징/원천 목록 불일치')
+-    validate_observations(obs)
+-    from .facility_quality import validate_quality_reports
+-    validate_quality_reports(descriptor,obs,root,sources,checked,set(FEATURES['building']+FEATURES['access']))
+-    return obs
+-
+-
+-def validate_observations(observations):
+-    """원 관측의 구조·유효시점·정의역을 검사하며 역사적 사실성은 인증하지 않는다."""
+-    required_obs={'entity_key','feature','value','valid_from','valid_to','published_at','source_id','record_id'}
+-    if not required_obs.issubset(observations):raise ValueError('외부 관측 명세 누락')
+-    obs=observations.copy()
+-    for col in ('entity_key','feature','source_id','record_id'):
+-        if obs[col].isna().any() or obs[col].astype(str).str.strip().eq('').any():raise ValueError(f'{col} 누락')
+-    if not set(obs.feature).issubset(ALLOWED):raise ValueError('등록되지 않은 특징 또는 정답 파생 입력')
+-    obs['value']=pd.to_numeric(obs.value,errors='coerce')
+-    if not np.isfinite(obs.value).all():raise ValueError('비수치/무한대 특징')
+-    counts={'households','buildings','max_floor','stations_500m','stations_1000m','lines_1000m',
+-            'primary_count_1000m','hospital_count_1000m','population','resident_households','unsold',
+-            'completed_unsold','rent_count_90d','rent_count_180d','sale_count_180d','days_from_published_contract'}
+-    positive={'households','buildings','max_floor','cpi','jeonse_index','monthly_index',
+-              'jeonse_median_per_m2','monthly_median_per_m2','sale_median_per_m2'}
+-    nonnegative=counts|positive|{'parking_per_household','elevators_per_household','coverage_ratio',
+-                                'floor_area_ratio','persons_per_household','park_area_1000m'}|{x for x in ALLOWED if x.endswith('_distance_m')}
+-    if (obs.loc[obs.feature.isin(nonnegative),'value']<0).any():raise ValueError('특징 정의역: 음수 개수/거리/면적/지수')
+-    if (obs.loc[obs.feature.isin(positive),'value']<=0).any():raise ValueError('특징 정의역: 양수 분모/지수/가격 필요')
+-    values=obs.loc[obs.feature.isin(counts),'value']
+-    if (values%1!=0).any():raise ValueError('특징 정의역: 시설·인구·세대·거래 개수는 정수 필요')
+-    if (obs.loc[obs.feature.eq('coverage_ratio'),'value']>100).any():raise ValueError('건폐율 백분율 범위 오류')
+-    if (obs.loc[obs.feature.eq('relative_floor'),'value']>1).any():raise ValueError('상대층 비율 상한 오류')
+-    for col in ('valid_from','valid_to'):
+-        original=obs[col].fillna('').astype(str)
+-        obs[col]=pd.to_datetime(original,format='%Y-%m-%d',errors='coerce')
+-        if (original.ne('')&obs[col].isna()).any():raise ValueError(f'{col} 날짜 오류')
+-        if (original.ne('')&original.ne(obs[col].dt.strftime('%Y-%m-%d'))).any():raise ValueError(f'{col} ISO 날짜 형식 오류')
+-    if obs.valid_from.isna().any() or (obs.valid_to.notna()&(obs.valid_to<=obs.valid_from)).any():
+-        raise ValueError('유효기간 누락/역전')
+-    for value in obs.published_at:
+-        try:parsed=datetime.fromisoformat(str(value).replace('Z','+00:00'))
+-        except ValueError as e:raise ValueError('공표시점 형식 오류') from e
+-        if parsed.tzinfo is None:raise ValueError('공표시점에 시간대 필요')
+-    obs['published_at']=pd.to_datetime(obs.published_at,utc=True,errors='coerce',format='mixed')
+-    if obs.published_at.isna().any():raise ValueError('공표시점 누락/오류')
+-    if obs.duplicated(['entity_key','feature','valid_from','published_at']).any():raise ValueError('동일 시점 관측 중복/모호')
+-    if obs.duplicated(['source_id','record_id']).any():raise ValueError('원 관측 ID 중복')
+-    return obs
+-
+-
+-def join_features(contracts, observations, mode='strict_asof', key_column='cluster_id'):
+-    if mode not in MODES:raise ValueError('평가 모드 오류')
+-    if key_column not in {'cluster_id','region'}:raise ValueError('허용하지 않는 결합키')
+-    required={'source_row_id','date',key_column}
+-    if not required.issubset(contracts):raise ValueError('계약 식별/날짜/결합키 누락')
+-    if contracts.source_row_id.isna().any() or contracts.source_row_id.astype(str).str.strip().eq('').any() or contracts.source_row_id.duplicated().any():
+-        raise ValueError('계약 원행 ID 중복/누락')
+-    obs=validate_observations(observations)
+-    if set(obs.feature)&set(contracts.columns):raise ValueError('기존 계약 칼럼 충돌')
+-    dates=pd.to_datetime(contracts.date,errors='coerce')
+-    if dates.isna().any():raise ValueError('계약일 누락/오류')
+-    if dates.dt.tz is not None:raise ValueError('계약일은 현지 달력 날짜여야 합니다')
+-    dates=dates.dt.normalize()
+-    cutoffs=dates.dt.tz_localize('Asia/Seoul').dt.tz_convert('UTC')
+-    frame=contracts.copy();audit={'mode':mode,'input_rows':len(frame),'output_rows':len(frame),
+-      'historical_availability_proven':False,'features':{},
+-      'availability_note':'관측의 공표/유효시점 조건만 검사. 원천 이력 증거 및 학습 정답 시점은 별도 검증 필요.'}
+-    # 같은 키·계약일을 묶어 계산량을 줄인다. 모호한 일대다를 펼치지 않고 정확히 한 값을 선택한다.
+-    queries=pd.DataFrame({'key':frame[key_column].fillna('').astype(str),'date':dates,'cutoff':cutoffs})
+-    for feature,part in obs.groupby('feature',sort=True):
+-        values={};lineage={}
+-        by_key={str(k):v for k,v in part.groupby('entity_key')}
+-        for key,day,cutoff in queries.drop_duplicates().itertuples(index=False,name=None):
+-            group=by_key.get(key)
+-            if group is None:continue
+-            eligible=group[(group.valid_from<=day)&(group.valid_to.isna()|(day<group.valid_to))]
+-            if mode=='strict_asof':eligible=eligible[eligible.published_at<cutoff]
+-            if eligible.empty:continue
+-            # 서로 다른 유효기간이 겹치고 최신 공표시점도 같다면 임의 선택하지 않는다.
+-            latest=eligible[eligible.published_at.eq(eligible.published_at.max())]
+-            if len(latest)!=1:raise ValueError('유효기간과 최신 공표시점이 겹치는 후보가 모호합니다')
+-            row=latest.iloc[0];values[(key,day)]=float(row.value)
+-            lineage[(key,day)]=str(row.source_id)+':'+str(row.record_id)
+-        pairs=list(zip(queries.key,queries.date))
+-        frame[feature]=[values.get(pair,np.nan) for pair in pairs]
+-        frame[feature+'__record']=[lineage.get(pair,'') for pair in pairs]
+-        frame[feature+'__missing']=frame[feature].isna().astype(int)
+-        audit['features'][feature]={'matched_rows':int(frame[feature].notna().sum()),
+-                                  'unmatched_rows':int(frame[feature].isna().sum()),'source_ids':sorted(set(part.source_id))}
+-    if len(frame)!=len(contracts) or frame.source_row_id.tolist()!=contracts.source_row_id.tolist():
+-        raise ValueError('결합 후 계약 원행 변경')
+-    return frame,audit
++"""등록된 외부 수치 특징의 날짜·공표시점 결합. 계약 원행을 복제하지 않는다."""
++from __future__ import annotations
++from datetime import datetime
++import hashlib
++import csv
++import json
++from pathlib import Path
++import numpy as np
++import pandas as pd
++
++# 원자료의 정답이나 임의 칼럼을 특징 이름으로 주입할 수 없다.
++FEATURES={
++ 'building':['households','buildings','max_floor','relative_floor','parking_per_household',
++             'elevators_per_household','coverage_ratio','floor_area_ratio'],
++ 'access':['station_distance_m','stations_500m','stations_1000m','lines_1000m','transfer_distance_m',
++           'primary_distance_m','middle_distance_m','high_distance_m','primary_count_1000m',
++           'park_distance_m','park_area_1000m','hospital_distance_m','hospital_count_1000m'],
++ 'supply_demand':['population','resident_households','population_yoy','households_yoy',
++                  'persons_per_household','unsold','completed_unsold'],
++ 'market':['base_rate','lending_rate','cpi','jeonse_index','monthly_index','jeonse_index_yoy','monthly_index_yoy'],
++ 'lagged_prices':['rent_count_90d','rent_count_180d','jeonse_median_per_m2','monthly_median_per_m2',
++                  'sale_count_180d','sale_median_per_m2','days_from_published_contract']}
++ALLOWED={x for group in FEATURES.values() for x in group}
++MODES={'strict_asof','retrospective_snapshot'}
++
++
++def validate_feature_manifest(descriptor, root):
++    """해시·행수·등록 특징·원천 파일 근거 확인. 날짜의 역사적 사실성 자체를 인증하지 않는다."""
++    root=Path(root).resolve()
++    required={'path','sha256','rows','features','sources','status','key_column'}
++    if not isinstance(descriptor,dict) or not required.issubset(descriptor) or descriptor['status']!='verified_feature_snapshot':
++        raise ValueError('특징 스냅숏 명세 누락/미검증')
++    if not isinstance(descriptor['features'],list) or any(not isinstance(x,str) for x in descriptor['features']) or not descriptor['features'] or len(descriptor['features'])!=len(set(descriptor['features'])) or not set(descriptor['features']).issubset(ALLOWED):
++        raise ValueError('특징 목록 오류')
++    if descriptor['key_column'] not in {'cluster_id','region'}:raise ValueError('허용하지 않는 결합키')
++    def checked(record):
++        if (not isinstance(record,dict) or not isinstance(record.get('path'),str) or not record['path']
++                or not isinstance(record.get('sha256'),str)):
++            raise ValueError('특징/원천 파일 명세 형식 오류')
++        p=(root/record['path']).resolve(strict=True)
++        if not p.is_relative_to(root):raise ValueError('특징/원천 파일 범위 이탈')
++        digest=hashlib.sha256()
++        with p.open('rb') as stream:
++            for chunk in iter(lambda:stream.read(1024*1024),b''):digest.update(chunk)
++        if digest.hexdigest()!=record['sha256']:raise ValueError('특징/원천 해시 불일치')
++        return p
++    sources=descriptor['sources']
++    if not isinstance(sources,list) or not sources:raise ValueError('원천 증거 없음')
++    identifiers=set()
++    for source in sources:
++        if not isinstance(source,dict) or not {'path','sha256','source_id','source_url','acquired_at','status','rows'}.issubset(source):raise ValueError('원천 명세 누락')
++        if not isinstance(source['source_id'],str) or not source['source_id'].strip() or source['source_id'] in identifiers:
++            raise ValueError('원천 source_id 누락/중복')
++        if source['status']!='acquired_current_snapshot' or not isinstance(source['source_url'],str) or not source['source_url'].startswith('https://'):
++            raise ValueError('격리/미취득 원천 또는 출처 오류')
++        try:acquired=datetime.fromisoformat(str(source['acquired_at']).replace('Z','+00:00'))
++        except ValueError as e:raise ValueError('원천 취득 시각 오류') from e
++        if acquired.tzinfo is None:raise ValueError('원천 취득 시각 시간대 누락')
++        p=checked(source)
++        if p.suffix.lower()!='.csv':raise ValueError('원천 표준 CSV만 지원: 원 JSON도 별도 보존 필요')
++        try:
++            with p.open(encoding=source.get('encoding','utf-8-sig'),newline='') as stream:
++                reader=csv.reader(stream,strict=True);header=next(reader,None);count=0
++                if not header or len(set(header))!=len(header) or any(not name.strip() or '\x00' in name for name in header):
++                    raise ValueError('원천 머리글 오류')
++                for row in reader:
++                    if len(row)!=len(header) or any('\x00' in value for value in row):raise ValueError('원천 칼럼 수/NUL 오류')
++                    count+=1
++        except (csv.Error,UnicodeError,LookupError) as error:
++            raise ValueError('원천 CSV 인코딩/인용 구조 오류') from error
++        if isinstance(source['rows'],bool) or not isinstance(source['rows'],int) or source['rows']!=count:
++            raise ValueError('원천 행 수 불일치')
++        identifiers.add(source['source_id'])
++    path=checked(descriptor)
++    from .input_contracts import strict_csv
++    raw=path.read_bytes()
++    if hashlib.sha256(raw).hexdigest()!=descriptor['sha256']:raise ValueError('특징 입력 읽기 중 해시 변경')
++    obs=strict_csv(raw)
++    if not isinstance(descriptor['rows'],int) or isinstance(descriptor['rows'],bool) or len(obs)!=descriptor['rows']:
++        raise ValueError('특징 행 수 불일치')
++    if not {'feature','source_id'}.issubset(obs) or set(obs.feature)!=set(descriptor['features']) or not set(obs.source_id).issubset(identifiers):
++        raise ValueError('특징/원천 목록 불일치')
++    validate_observations(obs)
++    from .facility_quality import validate_quality_reports
++    validate_quality_reports(descriptor,obs,root,sources,checked,set(FEATURES['building']+FEATURES['access']))
++    return obs
++
++
++def validate_observations(observations):
++    """원 관측의 구조·유효시점·정의역을 검사하며 역사적 사실성은 인증하지 않는다."""
++    required_obs={'entity_key','feature','value','valid_from','valid_to','published_at','source_id','record_id'}
++    if not required_obs.issubset(observations):raise ValueError('외부 관측 명세 누락')
++    obs=observations.copy()
++    for col in ('entity_key','feature','source_id','record_id'):
++        if obs[col].isna().any() or obs[col].astype(str).str.strip().eq('').any():raise ValueError(f'{col} 누락')
++        if not obs[col].map(lambda value:isinstance(value,str)).all():raise ValueError(f'{col} 식별자는 문자열이어야 합니다')
++    if not set(obs.feature).issubset(ALLOWED):raise ValueError('등록되지 않은 특징 또는 정답 파생 입력')
++    obs['value']=pd.to_numeric(obs.value,errors='coerce')
++    if not np.isfinite(obs.value).all():raise ValueError('비수치/무한대 특징')
++    counts={'households','buildings','max_floor','stations_500m','stations_1000m','lines_1000m',
++            'primary_count_1000m','hospital_count_1000m','population','resident_households','unsold',
++            'completed_unsold','rent_count_90d','rent_count_180d','sale_count_180d','days_from_published_contract'}
++    positive={'households','buildings','max_floor','cpi','jeonse_index','monthly_index',
++              'jeonse_median_per_m2','monthly_median_per_m2','sale_median_per_m2'}
++    nonnegative=counts|positive|{'parking_per_household','elevators_per_household','coverage_ratio',
++                                'floor_area_ratio','persons_per_household','park_area_1000m'}|{x for x in ALLOWED if x.endswith('_distance_m')}
++    if (obs.loc[obs.feature.isin(nonnegative),'value']<0).any():raise ValueError('특징 정의역: 음수 개수/거리/면적/지수')
++    if (obs.loc[obs.feature.isin(positive),'value']<=0).any():raise ValueError('특징 정의역: 양수 분모/지수/가격 필요')
++    values=obs.loc[obs.feature.isin(counts),'value']
++    if (values%1!=0).any():raise ValueError('특징 정의역: 시설·인구·세대·거래 개수는 정수 필요')
++    if (obs.loc[obs.feature.eq('coverage_ratio'),'value']>100).any():raise ValueError('건폐율 백분율 범위 오류')
++    if (obs.loc[obs.feature.eq('relative_floor'),'value']>1).any():raise ValueError('상대층 비율 상한 오류')
++    for col in ('valid_from','valid_to'):
++        original=obs[col].fillna('').astype(str)
++        obs[col]=pd.to_datetime(original,format='%Y-%m-%d',errors='coerce')
++        if (original.ne('')&obs[col].isna()).any():raise ValueError(f'{col} 날짜 오류')
++        if (original.ne('')&original.ne(obs[col].dt.strftime('%Y-%m-%d'))).any():raise ValueError(f'{col} ISO 날짜 형식 오류')
++    if obs.valid_from.isna().any() or (obs.valid_to.notna()&(obs.valid_to<=obs.valid_from)).any():
++        raise ValueError('유효기간 누락/역전')
++    for value in obs.published_at:
++        try:parsed=datetime.fromisoformat(str(value).replace('Z','+00:00'))
++        except ValueError as e:raise ValueError('공표시점 형식 오류') from e
++        if parsed.tzinfo is None:raise ValueError('공표시점에 시간대 필요')
++    obs['published_at']=pd.to_datetime(obs.published_at,utc=True,errors='coerce',format='mixed')
++    if obs.published_at.isna().any():raise ValueError('공표시점 누락/오류')
++    if obs.duplicated(['entity_key','feature','valid_from','published_at']).any():raise ValueError('동일 시점 관측 중복/모호')
++    if obs.duplicated(['source_id','record_id']).any():raise ValueError('원 관측 ID 중복')
++    return obs
++
++
++def join_features(contracts, observations, mode='strict_asof', key_column='cluster_id'):
++    if mode not in MODES:raise ValueError('평가 모드 오류')
++    if key_column not in {'cluster_id','region'}:raise ValueError('허용하지 않는 결합키')
++    required={'source_row_id','date',key_column}
++    if not required.issubset(contracts):raise ValueError('계약 식별/날짜/결합키 누락')
++    if contracts.source_row_id.isna().any() or contracts.source_row_id.astype(str).str.strip().eq('').any() or contracts.source_row_id.duplicated().any():
++        raise ValueError('계약 원행 ID 중복/누락')
++    for column in ('source_row_id',key_column):
++        if not contracts[column].dropna().map(lambda value:isinstance(value,str)).all():
++            raise ValueError(f'{column} 식별자는 문자열이어야 합니다')
++    obs=validate_observations(observations)
++    generated={name+suffix for name in set(obs.feature) for suffix in ('','__record','__missing')}
++    if generated & set(contracts.columns):raise ValueError('기존 계약 칼럼 충돌')
++    dates=pd.to_datetime(contracts.date,errors='coerce')
++    if dates.isna().any():raise ValueError('계약일 누락/오류')
++    if dates.dt.tz is not None:raise ValueError('계약일은 현지 달력 날짜여야 합니다')
++    dates=dates.dt.normalize()
++    cutoffs=dates.dt.tz_localize('Asia/Seoul').dt.tz_convert('UTC')
++    frame=contracts.copy();audit={'mode':mode,'input_rows':len(frame),'output_rows':len(frame),
++      'historical_availability_proven':False,'features':{},
++      'availability_note':'관측의 공표/유효시점 조건만 검사. 원천 이력 증거 및 학습 정답 시점은 별도 검증 필요.'}
++    # 같은 키·계약일을 묶어 계산량을 줄인다. 모호한 일대다를 펼치지 않고 정확히 한 값을 선택한다.
++    queries=pd.DataFrame({'key':frame[key_column].fillna('').astype(str),'date':dates,'cutoff':cutoffs})
++    for feature,part in obs.groupby('feature',sort=True):
++        values={};lineage={}
++        by_key={str(k):v for k,v in part.groupby('entity_key')}
++        for key,day,cutoff in queries.drop_duplicates().itertuples(index=False,name=None):
++            group=by_key.get(key)
++            if group is None:continue
++            eligible=group[(group.valid_from<=day)&(group.valid_to.isna()|(day<group.valid_to))]
++            if mode=='strict_asof':eligible=eligible[eligible.published_at<cutoff]
++            if eligible.empty:continue
++            # 서로 다른 유효기간이 겹치고 최신 공표시점도 같다면 임의 선택하지 않는다.
++            latest=eligible[eligible.published_at.eq(eligible.published_at.max())]
++            if len(latest)!=1:raise ValueError('유효기간과 최신 공표시점이 겹치는 후보가 모호합니다')
++            row=latest.iloc[0];values[(key,day)]=float(row.value)
++            lineage[(key,day)]=str(row.source_id)+':'+str(row.record_id)
++        pairs=list(zip(queries.key,queries.date))
++        frame[feature]=[values.get(pair,np.nan) for pair in pairs]
++        frame[feature+'__record']=[lineage.get(pair,'') for pair in pairs]
++        frame[feature+'__missing']=frame[feature].isna().astype(int)
++        audit['features'][feature]={'matched_rows':int(frame[feature].notna().sum()),
++                                  'unmatched_rows':int(frame[feature].isna().sum()),'source_ids':sorted(set(part.source_id))}
++    if len(frame)!=len(contracts) or frame.source_row_id.tolist()!=contracts.source_row_id.tolist():
++        raise ValueError('결합 후 계약 원행 변경')
++    return frame,audit
+--- 9차/rentlab/spatial_features.py
++++ 10차/rentlab/spatial_features.py
+@@ -1,56 +1,65 @@
+-"""신뢰된 물리역 ID의 직선거리 산술만 수행한다.
+-
+-원문 철도 CSV의 노선별 역번호를 facility_id로 자동 변환하지 않는다.
+-이 저수준 함수는 자료를 승인하지 않으며, 실험의 외부 특징 입력은
+-feature_store.validate_feature_manifest의 원천 자격 검사를 별도로 통과해야 한다.
+-과거 시설 운영/전국 역망 완전성/보행거리를 입증하지 않는다.
+-"""
+-import numpy as np
+-import pandas as pd
+-from sklearn.neighbors import BallTree
+-
+-EARTH_RADIUS_M=6371008.8
+-
+-
+-def station_features(origins, facilities):
+-    required={'latitude','longitude'}
+-    if not required.union({'cluster_id'}).issubset(origins) or not required.union({'facility_id','line'}).issubset(facilities):
+-        raise ValueError('좌표/식별자/노선 칼럼 누락')
+-    if origins.cluster_id.isna().any() or origins.cluster_id.astype(str).str.strip().eq('').any() or origins.cluster_id.duplicated().any():
+-        raise ValueError('단지 좌표 키 중복/누락')
+-    fac=facilities.copy()
+-    if fac.facility_id.isna().any() or fac.facility_id.astype(str).str.strip().eq('').any():raise ValueError('시설 ID 누락')
+-    if fac.line.isna().any() or fac.line.astype(str).str.strip().eq('').any():raise ValueError('노선 미상은 노선 수0으로 처리하지 않음')
+-    def coordinates(frame):
+-        xy=frame[['latitude','longitude']].apply(pd.to_numeric,errors='coerce')
+-        # 연구 대상의 넉넉한 대한민국 범위. 국경 판정·행정 경계 검사가 아니다.
+-        valid=xy.latitude.between(32,39.5)&xy.longitude.between(124,132)
+-        return xy,valid
+-    xy,valid=coordinates(origins);fxy,fvalid=coordinates(fac)
+-    if not fvalid.all() or not len(fac):raise ValueError('시설 좌표 오류/빈 목록: 시설을 조용히 제외하지 않음')
+-    fac[['latitude','longitude']]=fxy
+-    if (fac.groupby('facility_id')[['latitude','longitude']].nunique()>1).any().any():
+-        raise ValueError('같은 시설 ID의 좌표 충돌')
+-    unique=fac.drop_duplicates('facility_id').reset_index(drop=True)
+-    tree=BallTree(np.radians(unique[['latitude','longitude']].to_numpy()),metric='haversine')
+-    out=origins[['cluster_id']].copy()
+-    for name in ['station_distance_m','stations_500m','stations_1000m','lines_1000m','transfer_distance_m']:out[name]=np.nan
+-    out['coordinate_status']=np.where(valid,'available',np.where(xy.isna().any(axis=1),'missing','invalid'))
+-    if not valid.any():return out
+-    points=np.radians(xy.loc[valid].to_numpy());d,_=tree.query(points,k=1)
+-    out.loc[valid,'station_distance_m']=d[:,0]*EARTH_RADIUS_M
+-    nearby=tree.query_radius(points,r=1000/EARTH_RADIUS_M)
+-    for i,ids in zip(out.index[valid],nearby):
+-        station_ids=set(unique.iloc[ids].facility_id)
+-        lines=fac[fac.facility_id.isin(station_ids)].line.dropna().astype(str)
+-        if lines.str.strip().eq('').any():raise ValueError('노선 미상은 노선 수0으로 처리하지 않음')
+-        out.loc[i,'stations_1000m']=len(station_ids);out.loc[i,'lines_1000m']=lines.nunique()
+-    out.loc[valid,'stations_500m']=tree.query_radius(points,r=500/EARTH_RADIUS_M,count_only=True)
+-    line_counts=fac.groupby('facility_id').line.nunique()
+-    transfers=unique[unique.facility_id.isin(line_counts[line_counts>=2].index)]
+-    if len(transfers):
+-        transfer_tree=BallTree(np.radians(transfers[['latitude','longitude']].to_numpy()),metric='haversine')
+-        out.loc[valid,'transfer_distance_m']=transfer_tree.query(points,k=1)[0][:,0]*EARTH_RADIUS_M
+-    out.attrs.update({'distance':'haversine straight-line metres; not walking distance',
+-                      'historical_availability_proven':False,'earth_radius_m':EARTH_RADIUS_M})
+-    return out
++"""신뢰된 물리역 ID의 직선거리 산술만 수행한다.
++
++원문 철도 CSV의 노선별 역번호를 facility_id로 자동 변환하지 않는다.
++이 저수준 함수는 자료를 승인하지 않으며, 실험의 외부 특징 입력은
++feature_store.validate_feature_manifest의 원천 자격 검사를 별도로 통과해야 한다.
++과거 시설 운영/전국 역망 완전성/보행거리를 입증하지 않는다.
++"""
++import numpy as np
++import pandas as pd
++from sklearn.neighbors import BallTree
++
++EARTH_RADIUS_M=6371008.8
++
++
++def station_features(origins, facilities):
++    required={'latitude','longitude'}
++    if not required.union({'cluster_id'}).issubset(origins) or not required.union({'facility_id','line'}).issubset(facilities):
++        raise ValueError('좌표/식별자/노선 칼럼 누락')
++    for frame, column in ((origins,'cluster_id'),(facilities,'facility_id'),(facilities,'line')):
++        if not frame[column].dropna().map(lambda value:isinstance(value,str)).all():
++            raise ValueError(f'{column} 식별자는 문자열이어야 합니다')
++    # 인덱스는 외부 행 표식일 뿐 단지 키가 아니다. 중복 표식을 위치 계산에 쓰지 않는다.
++    original_index=origins.index.copy()
++    origins=origins.reset_index(drop=True)
++    if origins.cluster_id.isna().any() or origins.cluster_id.astype(str).str.strip().eq('').any() or origins.cluster_id.duplicated().any():
++        raise ValueError('단지 좌표 키 중복/누락')
++    fac=facilities.copy()
++    if fac.facility_id.isna().any() or fac.facility_id.astype(str).str.strip().eq('').any():raise ValueError('시설 ID 누락')
++    if fac.line.isna().any() or fac.line.astype(str).str.strip().eq('').any():raise ValueError('노선 미상은 노선 수0으로 처리하지 않음')
++    def coordinates(frame):
++        xy=frame[['latitude','longitude']].apply(pd.to_numeric,errors='coerce')
++        # 연구 대상의 넉넉한 대한민국 범위. 국경 판정·행정 경계 검사가 아니다.
++        valid=xy.latitude.between(32,39.5)&xy.longitude.between(124,132)
++        return xy,valid
++    xy,valid=coordinates(origins);fxy,fvalid=coordinates(fac)
++    if not fvalid.all() or not len(fac):raise ValueError('시설 좌표 오류/빈 목록: 시설을 조용히 제외하지 않음')
++    fac[['latitude','longitude']]=fxy
++    if (fac.groupby('facility_id')[['latitude','longitude']].nunique()>1).any().any():
++        raise ValueError('같은 시설 ID의 좌표 충돌')
++    unique=fac.drop_duplicates('facility_id').reset_index(drop=True)
++    tree=BallTree(np.radians(unique[['latitude','longitude']].to_numpy()),metric='haversine')
++    out=origins[['cluster_id']].copy()
++    for name in ['station_distance_m','stations_500m','stations_1000m','lines_1000m','transfer_distance_m']:out[name]=np.nan
++    out['coordinate_status']=np.where(valid,'available',np.where(xy.isna().any(axis=1),'missing','invalid'))
++    out.attrs.update({'distance':'haversine straight-line metres; not walking distance',
++                      'historical_availability_proven':False,'earth_radius_m':EARTH_RADIUS_M})
++    if not valid.any():
++        out.index=original_index
++        return out
++    points=np.radians(xy.loc[valid].to_numpy());d,_=tree.query(points,k=1)
++    out.loc[valid,'station_distance_m']=d[:,0]*EARTH_RADIUS_M
++    nearby=tree.query_radius(points,r=1000/EARTH_RADIUS_M)
++    for i,ids in zip(out.index[valid],nearby):
++        station_ids=set(unique.iloc[ids].facility_id)
++        lines=fac[fac.facility_id.isin(station_ids)].line.dropna().astype(str)
++        if lines.str.strip().eq('').any():raise ValueError('노선 미상은 노선 수0으로 처리하지 않음')
++        out.loc[i,'stations_1000m']=len(station_ids);out.loc[i,'lines_1000m']=lines.nunique()
++    out.loc[valid,'stations_500m']=tree.query_radius(points,r=500/EARTH_RADIUS_M,count_only=True)
++    line_counts=fac.groupby('facility_id').line.nunique()
++    transfers=unique[unique.facility_id.isin(line_counts[line_counts>=2].index)]
++    if len(transfers):
++        transfer_tree=BallTree(np.radians(transfers[['latitude','longitude']].to_numpy()),metric='haversine')
++        out.loc[valid,'transfer_distance_m']=transfer_tree.query(points,k=1)[0][:,0]*EARTH_RADIUS_M
++    out.index=original_index
++    return out
+--- 9차/tests/test_feature_boundaries_v10.py
++++ 10차/tests/test_feature_boundaries_v10.py
+@@ -0,0 +1,71 @@
++"""실제 취득/학습 없이 식별키·원행 인덱스·생성 열 경계를 검사한다."""
++import unittest
++import pandas as pd
++import numpy as np
++from pandas.testing import assert_frame_equal
++from rentlab.feature_store import join_features, validate_observations
++from rentlab.spatial_features import station_features
++
++
++class FeatureBoundaryTests(unittest.TestCase):
++    def origins(self):
++        return pd.DataFrame(dict(cluster_id=['seoul','busan'],latitude=[37.5,35.18],longitude=[127.,129.07]))
++    def facilities(self):
++        return pd.DataFrame(dict(facility_id=['s','b1','b2'],latitude=[37.5,35.18,35.18001],longitude=[127.,129.07,129.07001],line=['L1','L2','L3']))
++    def contracts(self):
++        return pd.DataFrame(dict(source_row_id=['a','b','c'],cluster_id=['01','1','missing'],date=['2025-01-02']*3))
++    def observations(self):
++        return pd.DataFrame([dict(entity_key=key,feature='households',value=value,valid_from='2020-01-01',valid_to='',published_at='2024-01-01T00:00:00+09:00',source_id='fixture',record_id=str(i)) for i,(key,value) in enumerate([('01',120),('1',240)])])
++    def test_duplicate_origin_index_preserves_distinct_values_and_index(self):
++        origins=self.origins();fac=self.facilities();expected=station_features(origins,fac)
++        origins.index=pd.Index([7,7],name='original_row');before=origins.copy(deep=True)
++        actual=station_features(origins,fac)
++        self.assertEqual(actual.stations_1000m.tolist(),[1,2])
++        self.assertEqual(actual.lines_1000m.tolist(),[1,2])
++        self.assertTrue(actual.index.equals(origins.index))
++        assert_frame_equal(actual.reset_index(drop=True),expected.reset_index(drop=True))
++        assert_frame_equal(origins,before)
++    def test_invalid_coordinates_with_duplicate_index_remain_missing(self):
++        origins=self.origins();origins.index=[8,8];origins['latitude']=np.nan
++        actual=station_features(origins,self.facilities())
++        self.assertEqual(actual.coordinate_status.tolist(),['missing','missing'])
++        self.assertFalse(actual.attrs['historical_availability_proven'])
++        self.assertIn('not walking',actual.attrs['distance'])
++        self.assertTrue(actual.station_distance_m.isna().all())
++        self.assertTrue(actual.index.equals(origins.index))
++    def test_observation_identifiers_must_be_strings(self):
++        for field in ('entity_key','source_id','record_id'):
++            with self.subTest(field=field):
++                obs=self.observations();obs.loc[0,field]=1
++                with self.assertRaisesRegex(ValueError,'문자열'):
++                    validate_observations(obs)
++    def test_contract_identifiers_must_not_be_coerced(self):
++        for field in ('source_row_id','cluster_id'):
++            with self.subTest(field=field):
++                contracts=self.contracts();contracts.loc[0,field]=1
++                with self.assertRaisesRegex(ValueError,'문자열'):
++                    join_features(contracts,self.observations())
++    def test_every_generated_column_collision_is_rejected_without_mutation(self):
++        for field in ('households','households__record','households__missing'):
++            with self.subTest(field=field):
++                contracts=self.contracts();contracts[field]='preserve';before=contracts.copy(deep=True)
++                with self.assertRaisesRegex(ValueError,'충돌'):
++                    join_features(contracts,self.observations())
++                assert_frame_equal(contracts,before)
++    def test_spatial_identifiers_cannot_mix_numeric_and_string_labels(self):
++        for field in ('cluster_id','facility_id','line'):
++            with self.subTest(field=field):
++                origins=self.origins();fac=self.facilities()
++                (origins if field=='cluster_id' else fac).loc[0,field]=1
++                with self.assertRaisesRegex(ValueError,'문자열'):
++                    station_features(origins,fac)
++    def test_distinct_string_keys_and_unknown_key_preserve_contracts(self):
++        contracts=self.contracts();contracts.index=[4,4,6];contracts.loc[contracts.cluster_id.eq('missing'),'cluster_id']=None
++        frame,audit=join_features(contracts,self.observations())
++        self.assertEqual(frame.households.iloc[:2].tolist(),[120.,240.])
++        self.assertTrue(pd.isna(frame.households.iloc[2]))
++        self.assertEqual(frame.source_row_id.tolist(),contracts.source_row_id.tolist())
++        self.assertTrue(frame.index.equals(contracts.index))
++        self.assertEqual(audit['features']['households']['unmatched_rows'],1)
++
++if __name__=='__main__':unittest.main()
+--- 9차/web/index.html
++++ 10차/web/index.html
+@@ -1,13 +1,13 @@
+-<!doctype html>
+-<html lang="ko" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Balance Compass · 임대료 연구</title><link rel="stylesheet" href="style.css"><script src="app.js" defer></script></head>
+-<body><header><div class="brand"><span class="mark" aria-hidden="true">↗</span><div>Balance Compass<small>전국 아파트 임대료 연구 · 새 연구 9차</small></div></div><div class="toolbar"><span id="updated">결과 연결 확인 중</span><button id="refresh">새로고침</button><button id="theme" aria-label="다크 모드로 전환">다크 모드</button></div></header>
+-<div class="layout"><aside><p class="eyebrow">연구 작업공간</p><nav aria-label="연구 화면"><button data-page="overview" aria-current="page"><span>01</span>연구 현황</button><button data-page="data"><span>02</span>데이터 점검</button><button data-page="evaluation"><span>03</span>AI 평가</button><button data-page="artifacts"><span>04</span>표와 그림</button><button data-page="guide"><span>05</span>실행 안내</button></nav><div class="aside-note">원본은 그대로.<br>결과는 근거와 함께.<p>실측 자료와 합성 검증을 구분해 표시합니다.</p></div></aside>
+-<main><div class="page-heading"><div><p class="eyebrow" id="section-number">연구 / 01</p><h1 id="heading">연구 현황</h1><p id="subtitle">자료 확보부터 모델 평가까지, 현재 상태를 확인합니다.</p></div><span class="badge" id="mode">확인 중</span></div>
+-<p id="freshness" class="notice" hidden role="status"></p><div id="notice" class="notice" role="status">결과를 읽고 있습니다.</div>
+-<section id="overview" class="page"><div class="stats"><div><span>연결된 입력 행</span><strong id="rows">—</strong><small>파일 검사에 근거한 행 수</small></div><div><span>평가한 계약 유형</span><strong id="target-count">—</strong><small>전세와 월세를 각각 평가</small></div><div><span>분석 목적</span><strong id="artifact-count">—</strong><small>동일 표·그림은 한 종류로 집계</small></div></div>
+-<article class="panel"><h2>수집·실행 상태</h2><p id="collection-status">수집 기록 미연결</p><p id="execution-status">학습 기록 미연결</p><p id="evaluation-scope">완료 결과 미연결</p></article><div class="columns"><article class="panel"><div class="panel-heading"><h2>연구 진행</h2><span>입력 → 처리 → 평가</span></div><ol class="steps"><li><b>01</b><div><h3>원본 자료와 출처 확인</h3><p>파일 해시·취득 시각·범위를 확인하고 원본을 보존합니다.</p></div><span id="step-data">대기</span></li><li><b>02</b><div><h3>시간을 나눈 AI 비교</h3><p>과거 자료로 학습하고 검증 기간에서 모델을 선택합니다.</p></div><span id="step-model">대기</span></li><li><b>03</b><div><h3>예측구간과 지역별 오차</h3><p>보정 기간과 최종 테스트를 나누어 결과를 확인합니다.</p></div><span id="step-test">대기</span></li></ol></article><article class="panel research-question"><p class="eyebrow">이번 연구의 질문</p><h2>예측한 임대료,<br>어디까지 믿을 수 있을까요?</h2><p>평균 오차와 함께 예측구간의 실제 포함률을 봅니다. 지역이 바뀌거나 시간이 흘렀을 때 신뢰성이 유지되는지 확인합니다.</p><div class="rule"></div><span>전국 본실험</span><strong>아직 미완료</strong><p>실제 자료 연결만으로 전국 수집 완료가 입증되지는 않습니다.</p></article></div><article class="panel"><h2>고정 평가 일정</h2><div class="timeline"><div><b>2022–2023</b><span>학습</span></div><div><b>2024 상반기</b><span>모델 선택</span></div><div><b>2024 하반기</b><span>구간 보정</span></div><div><b>2025</b><span>최종 테스트</span></div></div></article></section>
+-<section id="data" class="page" hidden><article class="panel"><h2>분할별 표본 수</h2><div id="splits" class="table-wrap"></div></article><article class="panel"><h2>입력 검사 기록</h2><div id="audit" class="table-wrap"></div><p class="muted">정확히 같은 공개 행도 서로 다른 실제 계약일 수 있어 자동으로 삭제하지 않습니다.</p></article><article class="panel"><h2>해석할 때 확인할 점</h2><ul id="limitations"></ul></article></section>
+-<section id="evaluation" class="page" hidden><p id="evaluation-condition" class="notice"></p><div class="filters"><label>계약 유형<select id="target"><option value="jeonse">전세 · 보증금 예측</option><option value="monthly">월세 · 월임대료 예측</option></select></label></div><article class="panel"><div class="panel-heading"><h2>검증 기간 모델 비교</h2><span>낮은 평균 절대오차가 우선입니다</span></div><div id="model-chart" class="chart" aria-label="모델별 검증 오차"></div><div id="validation" class="table-wrap"></div></article><article class="panel"><h2>최종 테스트</h2><p id="selection" class="muted"></p><div id="metrics" class="table-wrap"></div><p class="muted">90%는 명목수준입니다. 시간·지역 이동에서도 90%를 보장한다는 뜻은 아닙니다.</p></article><article class="panel"><h2>지역별 결과</h2><div id="groups" class="table-wrap"></div></article></section>
+-<section id="hypotheses" hidden class="panel"><h2>고정 연구 가설 8개 · 목표별 평가 15개</h2><p class="muted">자동 산출된 효과와 불확실성을 확인합니다. 입력이 없으면 미산출입니다. <a href="/formulas.html">가설·수식·출처 읽기</a></p><div id="hypothesis-list"></div></section><section id="artifacts" class="page" hidden><div class="filters"><label>분석 목적 검색<input type="search" id="search" placeholder="제목이나 분석 번호로 찾기"></label><label>생성 상태<select id="artifact-state"><option value="all">전체</option><option value="ready">파일 있음</option><option value="missing">미산출</option></select></label></div><article class="panel"><h2>분석 산출물</h2><p class="muted">측정되지 않은 항목은 빈 상태로 남깁니다. CSV와 그림은 같은 분석의 두 형식입니다.</p><div id="artifact-list" class="table-wrap"></div></article></section>
+-<section id="guide" class="page" hidden><article class="panel"><h2>자료를 연결하는 순서</h2><ol class="guide-list"><li>공식 원본 CSV와 취득 조건을 보존합니다.</li><li>manifest에 경로·SHA-256·출처·취득 시각·스냅숏을 기록합니다.</li><li>입력 검사를 통과한 자료로 연구 CLI를 실행합니다.</li><li>새 결과 폴더를 선택해 이 읽기 전용 화면을 시작합니다.</li></ol><p>화면에서 수집·학습을 실행하지 않습니다. 실행 명령과 입력 양식은 차수 폴더의 사용 안내에 있습니다.</p></article><article class="panel"><h2>지표를 읽는 방법</h2><div class="table-wrap"><table><thead><tr><th>지표</th><th>뜻</th><th>읽는 방법</th></tr></thead><tbody><tr><td>MAE</td><td>평균 절대오차</td><td>예측과 실제 금액 차이의 평균, 원 단위</td></tr><tr><td>RMSE</td><td>제곱평균제곱근오차</td><td>큰 오차에 더 민감한 금액 지표</td></tr><tr><td>포함률</td><td>실제값이 구간 안에 든 비율</td><td>소수 첫째 자리 반올림, 원비율은 설명 카드에서 확인</td></tr><tr><td>구간 폭</td><td>상한과 하한의 평균 차이</td><td>포함률과 함께 비교</td></tr></tbody></table></div></article></section>
+-<footer>Balance Compass · 새 연구 9차 <span>실제 저장된 결과만 표시합니다.</span></footer></main></div><div id="tooltip" role="tooltip" hidden></div><dialog id="preview" aria-labelledby="preview-title"><div class="dialog-heading"><h2 id="preview-title">그림 보기</h2><button id="close-preview">닫기</button></div><img id="preview-image" alt="선택한 분석 그림"><p id="preview-status" role="status"></p><p id="preview-meta"></p><div id="preview-csv"></div></dialog></body></html>
++<!doctype html>
++<html lang="ko" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Balance Compass · 임대료 연구</title><link rel="stylesheet" href="style.css"><script src="app.js" defer></script></head>
++<body><header><div class="brand"><span class="mark" aria-hidden="true">↗</span><div>Balance Compass<small>전국 아파트 임대료 연구 · 새 연구 10차</small></div></div><div class="toolbar"><span id="updated">결과 연결 확인 중</span><button id="refresh">새로고침</button><button id="theme" aria-label="다크 모드로 전환">다크 모드</button></div></header>
++<div class="layout"><aside><p class="eyebrow">연구 작업공간</p><nav aria-label="연구 화면"><button data-page="overview" aria-current="page"><span>01</span>연구 현황</button><button data-page="data"><span>02</span>데이터 점검</button><button data-page="evaluation"><span>03</span>AI 평가</button><button data-page="artifacts"><span>04</span>표와 그림</button><button data-page="guide"><span>05</span>실행 안내</button></nav><div class="aside-note">원본은 그대로.<br>결과는 근거와 함께.<p>실측 자료와 합성 검증을 구분해 표시합니다.</p></div></aside>
++<main><div class="page-heading"><div><p class="eyebrow" id="section-number">연구 / 01</p><h1 id="heading">연구 현황</h1><p id="subtitle">자료 확보부터 모델 평가까지, 현재 상태를 확인합니다.</p></div><span class="badge" id="mode">확인 중</span></div>
++<p id="freshness" class="notice" hidden role="status"></p><div id="notice" class="notice" role="status">결과를 읽고 있습니다.</div>
++<section id="overview" class="page"><div class="stats"><div><span>연결된 입력 행</span><strong id="rows">—</strong><small>파일 검사에 근거한 행 수</small></div><div><span>평가한 계약 유형</span><strong id="target-count">—</strong><small>전세와 월세를 각각 평가</small></div><div><span>분석 목적</span><strong id="artifact-count">—</strong><small>동일 표·그림은 한 종류로 집계</small></div></div>
++<article class="panel"><h2>수집·실행 상태</h2><p id="collection-status">수집 기록 미연결</p><p id="execution-status">학습 기록 미연결</p><p id="evaluation-scope">완료 결과 미연결</p></article><div class="columns"><article class="panel"><div class="panel-heading"><h2>연구 진행</h2><span>입력 → 처리 → 평가</span></div><ol class="steps"><li><b>01</b><div><h3>원본 자료와 출처 확인</h3><p>파일 해시·취득 시각·범위를 확인하고 원본을 보존합니다.</p></div><span id="step-data">대기</span></li><li><b>02</b><div><h3>시간을 나눈 AI 비교</h3><p>과거 자료로 학습하고 검증 기간에서 모델을 선택합니다.</p></div><span id="step-model">대기</span></li><li><b>03</b><div><h3>예측구간과 지역별 오차</h3><p>보정 기간과 최종 테스트를 나누어 결과를 확인합니다.</p></div><span id="step-test">대기</span></li></ol></article><article class="panel research-question"><p class="eyebrow">이번 연구의 질문</p><h2>예측한 임대료,<br>어디까지 믿을 수 있을까요?</h2><p>평균 오차와 함께 예측구간의 실제 포함률을 봅니다. 지역이 바뀌거나 시간이 흘렀을 때 신뢰성이 유지되는지 확인합니다.</p><div class="rule"></div><span>전국 본실험</span><strong>아직 미완료</strong><p>실제 자료 연결만으로 전국 수집 완료가 입증되지는 않습니다.</p></article></div><article class="panel"><h2>고정 평가 일정</h2><div class="timeline"><div><b>2022–2023</b><span>학습</span></div><div><b>2024 상반기</b><span>모델 선택</span></div><div><b>2024 하반기</b><span>구간 보정</span></div><div><b>2025</b><span>최종 테스트</span></div></div></article></section>
++<section id="data" class="page" hidden><article class="panel"><h2>분할별 표본 수</h2><div id="splits" class="table-wrap"></div></article><article class="panel"><h2>입력 검사 기록</h2><div id="audit" class="table-wrap"></div><p class="muted">정확히 같은 공개 행도 서로 다른 실제 계약일 수 있어 자동으로 삭제하지 않습니다.</p></article><article class="panel"><h2>해석할 때 확인할 점</h2><ul id="limitations"></ul></article></section>
++<section id="evaluation" class="page" hidden><p id="evaluation-condition" class="notice"></p><div class="filters"><label>계약 유형<select id="target"><option value="jeonse">전세 · 보증금 예측</option><option value="monthly">월세 · 월임대료 예측</option></select></label></div><article class="panel"><div class="panel-heading"><h2>검증 기간 모델 비교</h2><span>낮은 평균 절대오차가 우선입니다</span></div><div id="model-chart" class="chart" aria-label="모델별 검증 오차"></div><div id="validation" class="table-wrap"></div></article><article class="panel"><h2>최종 테스트</h2><p id="selection" class="muted"></p><div id="metrics" class="table-wrap"></div><p class="muted">90%는 명목수준입니다. 시간·지역 이동에서도 90%를 보장한다는 뜻은 아닙니다.</p></article><article class="panel"><h2>지역별 결과</h2><div id="groups" class="table-wrap"></div></article></section>
++<section id="hypotheses" hidden class="panel"><h2>고정 연구 가설 8개 · 목표별 평가 15개</h2><p class="muted">자동 산출된 효과와 불확실성을 확인합니다. 입력이 없으면 미산출입니다. <a href="/formulas.html">가설·수식·출처 읽기</a></p><div id="hypothesis-list"></div></section><section id="artifacts" class="page" hidden><div class="filters"><label>분석 목적 검색<input type="search" id="search" placeholder="제목이나 분석 번호로 찾기"></label><label>생성 상태<select id="artifact-state"><option value="all">전체</option><option value="ready">파일 있음</option><option value="missing">미산출</option></select></label></div><article class="panel"><h2>분석 산출물</h2><p class="muted">측정되지 않은 항목은 빈 상태로 남깁니다. CSV와 그림은 같은 분석의 두 형식입니다.</p><div id="artifact-list" class="table-wrap"></div></article></section>
++<section id="guide" class="page" hidden><article class="panel"><h2>자료를 연결하는 순서</h2><ol class="guide-list"><li>공식 원본 CSV와 취득 조건을 보존합니다.</li><li>manifest에 경로·SHA-256·출처·취득 시각·스냅숏을 기록합니다.</li><li>입력 검사를 통과한 자료로 연구 CLI를 실행합니다.</li><li>새 결과 폴더를 선택해 이 읽기 전용 화면을 시작합니다.</li></ol><p>화면에서 수집·학습을 실행하지 않습니다. 실행 명령과 입력 양식은 차수 폴더의 사용 안내에 있습니다.</p></article><article class="panel"><h2>지표를 읽는 방법</h2><div class="table-wrap"><table><thead><tr><th>지표</th><th>뜻</th><th>읽는 방법</th></tr></thead><tbody><tr><td>MAE</td><td>평균 절대오차</td><td>예측과 실제 금액 차이의 평균, 원 단위</td></tr><tr><td>RMSE</td><td>제곱평균제곱근오차</td><td>큰 오차에 더 민감한 금액 지표</td></tr><tr><td>포함률</td><td>실제값이 구간 안에 든 비율</td><td>소수 첫째 자리 반올림, 원비율은 설명 카드에서 확인</td></tr><tr><td>구간 폭</td><td>상한과 하한의 평균 차이</td><td>포함률과 함께 비교</td></tr></tbody></table></div></article></section>
++<footer>Balance Compass · 새 연구 10차 <span>실제 저장된 결과만 표시합니다.</span></footer></main></div><div id="tooltip" role="tooltip" hidden></div><dialog id="preview" aria-labelledby="preview-title"><div class="dialog-heading"><h2 id="preview-title">그림 보기</h2><button id="close-preview">닫기</button></div><img id="preview-image" alt="선택한 분석 그림"><p id="preview-status" role="status"></p><p id="preview-meta"></p><div id="preview-csv"></div></dialog></body></html>
+--- 9차/변경기록.md
++++ 10차/변경기록.md
+@@ -1,12 +1,12 @@
+-# 새 연구 9차 변경 기록
+-
+-양쪽 저장 summary 사전 대조 및 동일 바이트 보관, 홀드아웃 보정 원행 집합/관측값 대조를 추가했다. 새 회귀 검사3개와 전체171개 검사를 통과했다. 이전8차의 완료 가드·영어/읽기 수준 보완을 보존했다.
+-
+-| 검증 경로 | 9차 처리 | 한계 |
+-|---|---|---|
+-| 양쪽 저장 summary | 반환값과 저장 JSON을 분석 폴더 생성 전에 대조 | 원자료의 과거 사실성을 인증하지 않음 |
+-| 홀드아웃 보정 계약 | 일반 보정 자료에서 서울 제외 후 원행 집합·관측값 일치 확인 | 예측값은 모델별 차이를 허용 |
+-| 회귀 검사 | 기존 168개에 3개 검사 추가, 총 171개 통과 | 제어 입력 검사이며 실제 학습 아님 |
+-| 연구 상태 | 8가설·15개 평가·분할·수식·문턱 유지 | 실제 학습 중지·성능 미측정 |
+-
+-[직전 비교](docs/차수비교.md) · [전체 차이](docs/전체차이.diff)
++# 새 연구 10차 변경 기록
++
++추가: tests/test_feature_boundaries_v10.py7검사, docs/10차_특징경계검증.md 및 한영5수준 설명. 수정: spatial_features.py의 내부 위치 인덱스와 문자열 키, feature_store.py의 문자열 식별자/전체 생성 열 충돌 검사. 삭제: 공개 파일 삭제 없음. 기존 수식·가설·분할·과학 문턱 변경 없음.
++
++| 검증 경로 | 10차 수정 | 검증 범위 |
++|---|---|---|
++| 위치 계산 | 중복 인덱스를 내부 행 위치와 분리 | 원 인덱스·순서·단지별 값 보존 |
++| 식별키 | 숫자/문자 혼합을 임의 변환하지 않고 거부 | 문자열 01과1은 구분, 미상 키는 결측 유지 |
++| 특징 열 | 값/출처/결측 표시 열 모두 충돌 검사 | 기존 계약 열 덮어쓰기 거부 |
++| 회귀·산술 | 178개 검사 및 독립 직선거리 산술 대조 | 실제 위치 정답·역사적 시설 운영 인증 아님 |
++
++[직전 비교](docs/차수비교.md) · [전체 차이](docs/전체차이.diff)
+--- 9차/사용안내.md
++++ 10차/사용안내.md
+@@ -1,18 +1,11 @@
+-# 9차 검증과 실행 안내
+-
+-실제 학습 중지를 유지한다. Python 3.12·고정 requirements·Rust 금액 파서 환경에서 아래 명령은 제어 입력 검사만 실행한다.
+-
+-```powershell
+-python -B -X utf8 -m unittest discover -s tests -v
+-```
+-
+-결과: 171개 통과. 실제 데이터 학습은 실행하지 않았다. 기존 --manifest 입력 선택은 유지된다. --execute 없는 명령은 계획만 출력하며 중지를 해제하지 않는다.
+-
+-| 검증 경로 | 9차 처리 | 한계 |
+-|---|---|---|
+-| 양쪽 저장 summary | 반환값과 저장 JSON을 분석 폴더 생성 전에 대조 | 원자료의 과거 사실성을 인증하지 않음 |
+-| 홀드아웃 보정 계약 | 일반 보정 자료에서 서울 제외 후 원행 집합·관측값 일치 확인 | 예측값은 모델별 차이를 허용 |
+-| 회귀 검사 | 기존 168개에 3개 검사 추가, 총 171개 통과 | 제어 입력 검사이며 실제 학습 아님 |
+-| 연구 상태 | 8가설·15개 평가·분할·수식·문턱 유지 | 실제 학습 중지·성능 미측정 |
+-
+-[오류와 저장 파일](docs/9차_결과대조.md) · [8차 입력 안내](docs/8차_전수검증.md)
++# 10차 검증·사용 안내
++
++Python3.12·고정 requirements·Rust 파서를 준비해 아래 제어 검사를 실행한다. 실제 학습이나 취득은 실행하지 않는다.
++
++```powershell
++python -B -X utf8 -m unittest discover -s tests -v
++```
++
++178개 통과를 관측했다. 계약·관측·시설의 식별자는 원문을 보존한 문자열이어야 한다. 자동 astype(str)로 오류를 숨기지 말고 원천 명세를 대조한다. 미상 계약 결합키는 그대로 결측으로 유지한다. 출력 특징/출처/결측 표시 열과 기존 열이 겹치면 다른 이름으로 자동 덮어쓰지 않고 실패한다.
++
++[상세 입력 계약과 산술](docs/10차_특징경계검증.md) · [수식·출처](docs/논문_가설과_수식.md)

@@ -1,7 +1,7 @@
 # Balance Compass
 
 
-The latest round binds saved summaries and holdout calibration observations before combined analysis. [Read Round 9 in English](docs/round9.md).
+The latest round validates feature identifiers, generated-column collisions and spatial row boundaries. [Read Round 10 in English](docs/round10.md).
 
 [한국어](../README.md) · **English**
 
@@ -41,10 +41,11 @@ Balance Compass studies **apartment lease deposits, monthly rent, and prediction
 | 7 | Strict CSV/feature validation, fixed-condition evidence and a model-free preflight CLI; training stopped | [Round 7 · English](docs/round7.md) | [6 → 7 · Korean](../7차/docs/차수비교.md) |
 | 8 | Full 48-month lineage audit, selected-manifest execution and analysis completion guards, cluster diagnostics and partial historical evidence | [Round 8 · English](docs/round8.md) | [7 → 8 · Korean](../8차/docs/차수비교.md) |
 | 9 | Bind both saved summaries before combined analysis; match the exact non-Seoul calibration population and observations while allowing different predictions and row order | [Round 9 · English](docs/round9.md) | [8 → 9 · Korean](../9차/docs/차수비교.md) |
+| 10 | Preserve spatial values under duplicate row labels; reject mixed identifier types and generated-column collisions | [Round 10 · English](docs/round10.md) | [9 → 10 · Korean](../10차/docs/차수비교.md) |
 
-Rounds 1–3 remain in Korean and are explicitly labeled. Rounds 4–9 and the five current reading guides have English explanations.
+Rounds 1–3 remain in Korean and are explicitly labeled. Rounds 4–10 and the five current reading guides have English explanations.
 
-[Current source](../9차/) · [Current execution and remaining conditions](docs/round9.md#user-content-reading-level-3) · [Formulas and interpretation · Korean](../4차/docs/확장분석_수식과해석.md)
+[Current source](../10차/) · [Current execution and remaining conditions](docs/round10.md#user-content-reading-level-3) · [Formulas and interpretation · Korean](../4차/docs/확장분석_수식과해석.md)
 
 Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. Revision 6 is available in Korean and English. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../6차/docs/차수설명.md).
 
@@ -58,6 +59,11 @@ Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics an
 Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../9차/docs/차수설명.md).
 
 
-| Latest revision | English | Korean | Status |
+| Previous revision | English | Korean | Status |
 |---|---|---|---|
 | Round 9 | [Five reading levels](docs/round9.md) | [Detailed source revision](../9차/docs/차수설명.md) | 171 controlled tests; real training stopped |
+
+
+| Latest revision | English | Korean | Status |
+|---|---|---|---|
+| Round 10 | [Five reading levels](docs/round10.md) | [Detailed revision](../10차/docs/차수설명.md) | 178 controlled tests; real training stopped |

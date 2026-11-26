@@ -1,7 +1,7 @@
 # LEVEL 4 - Advanced
 
 
-**Latest: Round 9.** [Read the current round at this level](../round9.md#user-content-reading-level-4). The Round 4 foundation below is retained for context.
+**Latest: Round 10.** [Read the current round at this level](../round10.md#user-content-reading-level-4). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨4.md)
 
@@ -73,7 +73,7 @@ Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics an
 Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../../../9차/docs/차수설명.md#user-content-reading-level-4).
 
 
-## Latest Round 9
+## Round 9 record
 
 combine_results validates both saved JSON summaries against returned summaries before creating the combined-analysis folder. Canonical JSON serialization distinguishes true from 1. The exact validated summary bytes are preserved. write_research_results indexes calibration rows by source_row_id, so comparison is independent of ordering.
 
@@ -85,3 +85,16 @@ combine_results validates both saved JSON summaries against returned summaries b
 | Learned outputs | No forced equality | Different prediction_won values remain valid |
 
 [Round 9 at this level](../round9.md#user-content-reading-level-4) · [Round 9 source](../../../9차/) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-4)
+
+
+## Latest Round 10
+
+station_features resets the internal row index and restores the original index at return, including the all-missing-coordinate branch. validate_observations and join_features require string identifiers. Before writing output, join_features checks all three generated column names for every feature.
+
+| Module | Boundary handling | Preservation |
+|---|---|---|
+| station_features | Positional assignment | Restore original labels and order |
+| feature_store | String identifier validation | No forced coercion or key merging |
+| join_features | Feature, __record and __missing column set | Reject collisions before assignment |
+
+[Round 10 at this level](../round10.md#user-content-reading-level-4) · [Round 10 source](../../../10차/) · [한국어 같은 수준](../../../10차/docs/차수설명.md#user-content-reading-level-4)

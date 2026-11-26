@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "status": "reviewed_conditions_not_training_approval",
+  "created_date": "2026-11-27",
+  "training_started": false,
+  "protocol": {
+    "hypotheses": 8,
+    "evaluations": 15,
+    "train": "2022-01-01/2023-12-31",
+    "validation": "2024-01-01/2024-06-30",
+    "calibration": "2024-07-01/2024-12-31",
+    "test": "2025-01-01/2025-12-31",
+    "inclusion": "unchanged_engine_prepare"
+  },
+  "input_manifest_sha256": "564db3912fd7fd8a44fc3105eb91cbb75ea3f95c1d865966b402d486d65c4cd0",
+  "source_receipt_sha256": "0873ec8e79c3dd0573b3d8f7fd561201c30b44dc6f7d5e44494fefa67343e145",
+  "audit_sha256": {
+    "full_input_audit.py": "fe5228c6345a53712f4ee904de6b0997d9a4b9cbe195e6a6641a9258ad377a25",
+    "full_input_audit.json": "5008db0747407212dc59f52cee69b51d7bfe634aa79de9f04631c2580c12b126",
+    "normalized_input_audit.py": "47a24388d2cdfadbd2b5b2ea6aaf15245c1b30ff3dd32dac6d12f5a401268b44",
+    "normalized_input_audit.json": "b36224d34d5c2208fc42f0ed890f7ed197b8376b9a59959820dd8acab9aed105",
+    "source_inventory.py": "5351fd35b3944ce26057397e8c4803365dda375d7b81044825376d922e573c8d",
+    "source_inventory.json": "fcf4cb67dcb030be22f8e475b016db4fd3e9eb444b4104a8fefc413ce352ad8a",
+    "history_evidence.py": "52d6efcd610a127dcee9890677d2c9edc7a6ae5c233b7c1ed47ced6a3ff422a5",
+    "historical_decisions.json": "7dc0f0929093b612017bb8875f1a774107738b1646b93c569f19daf1edc3664f"
+  },
+  "code_sha256": {
+    "__init__.py": "006383028a4f9dccb86b45dda19253d78ec205b1b0bcd3214c5ece2a593bc605",
+    "__main__.py": "f2365dbefed48b78354d2610cc1debc9c0e0d097a831e175286c3889fba2184e",
+    "acquire.py": "fe94a1b30a20ca3f969bfb30762021d0e5483827913031628212ac84bb627ad6",
+    "complex_linkage.py": "0847d77497023703dc0c77ec90a43cda1da8ed720ad8f07182351bc25dcb4227",
+    "engine.py": "bcb61c8d930801bc132a4a3479862d4c7ea4cee122d05b968a0c5a6f4fb4762c",
+    "expansion.py": "ccef018c329609b79136af5b73fbd60da48e0fc67eeee54c368f9bac88715975",
+    "experiment_runner.py": "3a71fb4aa9aa65b96e1314443b1f3285415501231f0ab7877404e89231d7c026",
+    "facility_quality.py": "8510eb093b89f8dc253d0da848d37b5e1e28621363a3b6a7790bfbab357ba6c3",
+    "feature_preflight.py": "f8158f5a90b733171676f7e32840fe3187087760062bdf867fad0bbfd516f589",
+    "feature_store.py": "1195943793b9d29e7babfb5f4d67aa059533da45e875729442f958f1f38ea8cb",
+    "input_contracts.py": "a8e754c4934655ae71da0862ee8e9eac10a09eebf9c8449df36bb0a8f1655984",
+    "kapt_coordinates.py": "aea34d5bb2fc5752b068c9071bed43cfff39a59eba5945189b710d9ac6b7b52a",
+    "kapt_source.py": "6b37aec85728e08019709d96990145213fa211929c9a7551e6723bba6869c05d",
+    "national_sources.py": "d19a71bf9bf077baeb64f15db1433b5e0834df9ed899cc4a042222fbcf82b28a",
+    "public_sources.py": "fb7010bb85796f43ea10bbf46b06eb9204dbe9e29931ab2f84dca8ea900a47b0",
+    "research_input.py": "32096f88bb5cd66cb99aab54ce96a3dd2822bad27f61a3b3da82165a9ef3223d",
+    "research_metrics.py": "9e590c5e3bf7bcc7e4047ffebcee55fd8ccfba2e8cb4b6943f50005b4fdebf32",
+    "research_protocol.py": "28c59bd081c575a40bbdcd8f393686bea5f0f9c34433675d7d6650f36d0adf7b",
+    "runtime.py": "7d6f3d1511729546740c2e0dbacc8b44d8859ea03e815e91c0b1268816e5ba52",
+    "spatial_features.py": "f537dbddf21c41e0106b69b3f3a9121a24346bc3aaa680fd08d872571bc14bf8"
+  },
+  "preserved_missing_cluster_rows": 31,
+  "independent_linkage_labels": 0,
+  "feature_manifest_approved": false,
+  "blockers": [
+    "user_training_stop",
+    "historical_label_availability_unproven",
+    "facility_population_vintages_unproven",
+    "independent_linkage_truth_missing",
+    "final_feature_snapshot_unapproved",
+    "full_contract_cluster_inference_incomplete"
+  ],
+  "limitations": [
+    "No model fit or research performance generated.",
+    "Current official historical documents provide partial rate evidence, not all source vintages.",
+    "31 missing cluster rows retained; no invented independent clusters."
+  ]
+}

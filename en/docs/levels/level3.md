@@ -1,7 +1,7 @@
 # LEVEL 3 - Practitioner
 
 
-**Latest: Round 9.** [Read the current round at this level](../round9.md#user-content-reading-level-3). The Round 4 foundation below is retained for context.
+**Latest: Round 10.** [Read the current round at this level](../round10.md#user-content-reading-level-3). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨3.md)
 
@@ -73,7 +73,7 @@ Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics an
 Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../../../9차/docs/차수설명.md#user-content-reading-level-3).
 
 
-## Latest Round 9
+## Round 9 record
 
 Use Python 3.12, the fixed dependencies and the Rust money parser. Run python -B -X utf8 -m unittest discover -s tests -v from the revision folder. The full suite contains 171 controlled tests. A passing suite is not measured research performance and does not authorize restarting stopped training.
 
@@ -85,3 +85,16 @@ Use Python 3.12, the fixed dependencies and the Rust money parser. Run python -B
 | Traceability | 입력검증.json and 일반원본_summary.json | Preserve originals separately |
 
 [Round 9 at this level](../round9.md#user-content-reading-level-3) · [Round 9 source](../../../9차/) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-3)
+
+
+## Latest Round 10
+
+With Python 3.12, fixed dependencies and the Rust parser, run python -B -X utf8 -m unittest discover -s tests -v from the revision folder. The full suite passed 178 controlled tests. Invalid identifier types and existing-column collisions raise ValueError; the program does not repair identifiers automatically. Real-data training remains stopped.
+
+| Check | Input or location | Expected behavior |
+|---|---|---|
+| Seven regression methods | test_feature_boundaries_v10.py | Check duplicate indices, key types and output columns |
+| Valid boundaries | 01/1 and unknown join keys | Preserve distinct values and missingness |
+| Independent arithmetic | 40 controlled origins and 25 stations | Compare distances, counts, lines and transfer distance |
+
+[Round 10 at this level](../round10.md#user-content-reading-level-3) · [Round 10 source](../../../10차/) · [한국어 같은 수준](../../../10차/docs/차수설명.md#user-content-reading-level-3)

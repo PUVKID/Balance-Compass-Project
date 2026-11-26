@@ -1,7 +1,7 @@
 # LEVEL 1 - Beginner
 
 
-**Latest: Round 9.** [Read the current round at this level](../round9.md#user-content-reading-level-1). The Round 4 foundation below is retained for context.
+**Latest: Round 10.** [Read the current round at this level](../round10.md#user-content-reading-level-1). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨1.md)
 
@@ -72,7 +72,7 @@ Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics an
 Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../../../9차/docs/차수설명.md#user-content-reading-level-1).
 
 
-## Latest Round 9
+## Round 9 record
 
 A result file and its saved description must tell the same story. Before comparing the two experiments, the program checks both descriptions. A different contract cannot quietly replace a calibration example. Different predictions are expected when a different model is trained.
 
@@ -83,3 +83,16 @@ A result file and its saved description must tell the same story. Before compari
 | A new model predicts a different amount | Observed contract is unchanged | Allow the comparison |
 
 [Round 9 at this level](../round9.md#user-content-reading-level-1) · [Round 9 source](../../../9차/) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-1)
+
+
+## Latest Round 10
+
+Repeated table-row labels do not mean the apartments are the same. The fix prevents one apartment’s station and line counts from overwriting another’s. Existing contract information cannot be replaced by new feature or provenance columns.
+
+| Situation | Meaning | Action |
+|---|---|---|
+| Same row label, different apartment | Separate observations | Compute each apartment separately |
+| A destination column already exists | Existing information | Reject the join |
+| Apartment key is unknown | Insufficient evidence | Keep missing features |
+
+[Round 10 at this level](../round10.md#user-content-reading-level-1) · [Round 10 source](../../../10차/) · [한국어 같은 수준](../../../10차/docs/차수설명.md#user-content-reading-level-1)

@@ -1,7 +1,7 @@
 # LEVEL 5 - Expert
 
 
-**Latest: Round 9.** [Read the current round at this level](../round9.md#user-content-reading-level-5). The Round 4 foundation below is retained for context.
+**Latest: Round 10.** [Read the current round at this level](../round10.md#user-content-reading-level-5). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨5.md)
 
@@ -73,7 +73,7 @@ Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics an
 Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../../../9차/docs/차수설명.md#user-content-reading-level-5).
 
 
-## Latest Round 9
+## Round 9 record
 
 This change strengthens H5 input traceability; it does not change the estimand, eight hypotheses, fifteen evaluations, fixed time splits or statistical thresholds. Identical declared provenance alone is insufficient when persisted observations disagree. Matching files does not prove historical availability, between-cluster independence, exchangeability under time shift or causal regional effects.
 
@@ -85,3 +85,16 @@ This change strengthens H5 input traceability; it does not change the estimand, 
 | Outcome claims | 171 controlled tests pass | Real performance, supported hypotheses or completed paper |
 
 [Round 9 at this level](../round9.md#user-content-reading-level-5) · [Round 9 source](../../../9차/) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-5)
+
+
+## Latest Round 10
+
+BallTree outputs were compared with direct haversine atan2 arithmetic. This establishes consistency for the supplied coordinates, not surveyed location accuracy, historical facility operation, walking distance or nationwide completeness. The eight hypotheses, fifteen evaluations, fixed splits and scientific thresholds remain unchanged.
+
+| Evidence | Verified scope | Not established |
+|---|---|---|
+| Direct distance calculation | Maximum difference below 1.924e-9 m | Surveyed location accuracy |
+| Counts and transfers | 25 controlled physical stations, 30 line records | National facility completeness or walking distance |
+| 178 regression tests | Technical contracts and prior behavior | Real performance, hypothesis support or absolute absence of defects |
+
+[Round 10 at this level](../round10.md#user-content-reading-level-5) · [Round 10 source](../../../10차/) · [한국어 같은 수준](../../../10차/docs/차수설명.md#user-content-reading-level-5)
