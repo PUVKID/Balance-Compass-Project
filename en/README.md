@@ -1,7 +1,7 @@
 # Balance Compass
 
 
-The latest round validates saved predictions, dashboard summaries and facility eligibility. [Read Round 6 in English](docs/round6.md).
+The latest English round (Round 6) validates saved predictions, dashboard summaries and facility eligibility. Round 7 is the latest overall revision and is documented in Korean below. [Read Round 6 in English](docs/round6.md).
 
 [한국어](../README.md) · **English**
 
@@ -38,9 +38,13 @@ Balance Compass studies **apartment lease deposits, monthly rent, and prediction
 | 4 | Full-column preservation, public-source acquisition, time-aware feature joins and exploratory comparisons | [Round 4 · English](docs/round4.md) | [3 → 4 · Korean](../4차/docs/차수비교.md) |
 | 5 | MOIS/BOK/KAPT acquisition, exact complex linkage and current-coordinate validation; training stopped | [Round 5 · English](docs/round5.md) | [4 → 5 · Korean](../5차/docs/차수비교.md) |
 | 6 | Saved-prediction identity/split/mode validation, complete Seoul H5, dashboard consistency and facility eligibility | [Round 6 · English](docs/round6.md) | [5 → 6 · Korean](../6차/docs/차수비교.md) |
+| 7 | Strict CSV/feature validation, fixed-condition evidence and a model-free preflight CLI; training stopped | [Round 7 · Korean](../7차/docs/차수설명.md) | [6 → 7 · Korean](../7차/docs/차수비교.md) |
 
 Rounds 1–3 remain in Korean and are explicitly labeled. Rounds 4–6 and the five current reading guides have English explanations.
 
-[Current source](../6차/) · [Current execution and remaining conditions](docs/round6.md#user-content-reading-level-3) · [Formulas and interpretation · Korean](../4차/docs/확장분석_수식과해석.md)
+[Current source](../7차/) · [Current execution and remaining conditions](docs/round6.md#user-content-reading-level-3) · [Formulas and interpretation · Korean](../4차/docs/확장분석_수식과해석.md)
 
 Revision 6 adds persisted-result, dashboard consistency and facility eligibility validation. Revision 6 is available in Korean and English. Real training remains stopped and paper outcomes are unmeasured. [Revision 6](../6차/docs/차수설명.md).
+
+
+Revision 7 adds strict CSV/feature input validation, frozen-condition evidence and a model-free preflight CLI. It is documented in Korean; English coverage remains Round 6. Real training remains stopped and measured paper outcomes are unavailable. [Revision 7](../7차/docs/차수설명.md).

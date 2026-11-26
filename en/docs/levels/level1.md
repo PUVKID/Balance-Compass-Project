@@ -1,7 +1,7 @@
 # LEVEL 1 - Beginner
 
 
-**Latest: Round 6.** [Read the current round at this level](../round6.md#user-content-reading-level-1). The Round 4 foundation below is retained for context.
+**Latest overall: Round 7 (Korean). Latest English: Round 6.** [Read the English round at this level](../round6.md#user-content-reading-level-1). The Round 4 foundation below is retained for context.
 
 [English overview](../../README.md) · [한국어](../../../docs/읽기안내/레벨1.md)
 
@@ -44,4 +44,7 @@ Revision 6 adds persisted-result, dashboard consistency and facility eligibility
 |---|---|---|
 | Prediction and facility integrity | Validate identities, splits, modes, Seoul comparisons and hash-bound facility reports | 145 technical checks do not establish measured hypothesis results or historical facility truth |
 
-[Round 6 at this level](../round6.md#user-content-reading-level-1) · [Current source](../../../6차/)
+[Round 6 at this level](../round6.md#user-content-reading-level-1) · [Current source](../../../7차/)
+
+
+Revision 7 adds strict CSV/feature input validation, frozen-condition evidence and a model-free preflight CLI. It is documented in Korean; English coverage remains Round 6. Real training remains stopped and measured paper outcomes are unavailable. [Revision 7](../../../7차/docs/차수설명.md#user-content-reading-level-1).
