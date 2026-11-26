@@ -67,7 +67,7 @@ Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics an
 |---|---|---|
 | Input lineage and completion | Full 48-month audit, selected manifest and post-analysis hash checks | Data integrity is not independent location truth, historical-vintage approval or measured performance |
 
-[Round 8 at this level](../round8.md#user-content-reading-level-4) · [Current source](../../../9차/)
+[Round 8 at this level](../round8.md#user-content-reading-level-4) · [Round 8 source](../../../8차/)
 
 
 Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../../../9차/docs/차수설명.md#user-content-reading-level-4).
@@ -84,4 +84,4 @@ combine_results validates both saved JSON summaries against returned summaries b
 | Observation fields | Three string fields and numeric actual amount | date, region, cluster_id, actual_won |
 | Learned outputs | No forced equality | Different prediction_won values remain valid |
 
-[Round 9 at this level](../round9.md#user-content-reading-level-4) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-4)
+[Round 9 at this level](../round9.md#user-content-reading-level-4) · [Round 9 source](../../../9차/) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-4)

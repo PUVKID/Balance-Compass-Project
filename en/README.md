@@ -40,8 +40,9 @@ Balance Compass studies **apartment lease deposits, monthly rent, and prediction
 | 6 | Saved-prediction identity/split/mode validation, complete Seoul H5, dashboard consistency and facility eligibility | [Round 6 · English](docs/round6.md) | [5 → 6 · Korean](../6차/docs/차수비교.md) |
 | 7 | Strict CSV/feature validation, fixed-condition evidence and a model-free preflight CLI; training stopped | [Round 7 · English](docs/round7.md) | [6 → 7 · Korean](../7차/docs/차수비교.md) |
 | 8 | Full 48-month lineage audit, selected-manifest execution and analysis completion guards, cluster diagnostics and partial historical evidence | [Round 8 · English](docs/round8.md) | [7 → 8 · Korean](../8차/docs/차수비교.md) |
+| 9 | Bind both saved summaries before combined analysis; match the exact non-Seoul calibration population and observations while allowing different predictions and row order | [Round 9 · English](docs/round9.md) | [8 → 9 · Korean](../9차/docs/차수비교.md) |
 
-Rounds 1–3 remain in Korean and are explicitly labeled. Rounds 4–8 and the five current reading guides have English explanations.
+Rounds 1–3 remain in Korean and are explicitly labeled. Rounds 4–9 and the five current reading guides have English explanations.
 
 [Current source](../9차/) · [Current execution and remaining conditions](docs/round9.md#user-content-reading-level-3) · [Formulas and interpretation · Korean](../4차/docs/확장분석_수식과해석.md)
 

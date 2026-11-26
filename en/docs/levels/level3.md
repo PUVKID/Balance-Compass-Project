@@ -67,7 +67,7 @@ Revision 8 adds a full 48-month lineage audit, cluster-dependence diagnostics an
 |---|---|---|
 | Input lineage and completion | Full 48-month audit, selected manifest and post-analysis hash checks | Data integrity is not independent location truth, historical-vintage approval or measured performance |
 
-[Round 8 at this level](../round8.md#user-content-reading-level-3) · [Current source](../../../9차/)
+[Round 8 at this level](../round8.md#user-content-reading-level-3) · [Round 8 source](../../../8차/)
 
 
 Revision 9 validates both saved summaries before combined analysis and checks holdout calibration contract identity against the ordinary non-Seoul subset. 171 controlled tests pass; real training remains stopped. Round 9 is available in Korean and English. [Revision 9 · Korean](../../../9차/docs/차수설명.md#user-content-reading-level-3).
@@ -84,4 +84,4 @@ Use Python 3.12, the fixed dependencies and the Rust money parser. Run python -B
 | Calibration check | Calibration prediction CSVs | Reject changed row population or observations |
 | Traceability | 입력검증.json and 일반원본_summary.json | Preserve originals separately |
 
-[Round 9 at this level](../round9.md#user-content-reading-level-3) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-3)
+[Round 9 at this level](../round9.md#user-content-reading-level-3) · [Round 9 source](../../../9차/) · [한국어 같은 수준](../../../9차/docs/차수설명.md#user-content-reading-level-3)
